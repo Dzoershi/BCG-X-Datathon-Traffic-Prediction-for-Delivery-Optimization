@@ -1,13 +1,27 @@
+# Versions are pinned for reproducibility and must support Python 3.10 to 3.13.
+
 # Data exploration and modeling
-numpy
-pandas
-scikit-learn
-matplotlib
-seaborn
-pyarrow
-PyYAML
+numpy==2.2.6
+pandas==2.3.3
+scikit-learn==1.7.2
+matplotlib==3.10.9
+seaborn==0.13.2
+pyarrow==25.0.1
+PyYAML==6.0.3
+
+# Data download and calendar features
+requests==2.34.2
+holidays==0.107
+
+# Forecasting models
+lightgbm==4.7.0
+chronos-forecasting==2.3.2
+# Installed by chronos-forecasting; pinned so every Python version gets the same build.
+# On Linux, install the CPU build first (see README).
+torch==2.14.1
 
 # Interactive work and testing
-jupyterlab
-ipykernel
-pytest
+jupyterlab==4.6.5
+ipykernel==7.3.0
+nbstripout==0.9.1
+pytest==9.2.0
