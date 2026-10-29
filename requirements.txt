@@ -1,0 +1,13 @@
+# Data exploration and modeling
+numpy
+pandas
+scikit-learn
+matplotlib
+seaborn
+pyarrow
+PyYAML
+
+# Interactive work and testing
+jupyterlab
+ipykernel
+pytest
