@@ -94,4 +94,14 @@ Les mesures infinies sont également invalides et remplacées par NaN. Un état 
   - `etat_trafic` et `etat_barre` y sont en texte ;
   - `libelle` y est écrit différemment, mais les nœuds sont identiques.
 
+## Accès SQL local (issue #7)
+
+`traffic_prediction.data.query.connect_traffic()` ouvre une connexion DuckDB en mémoire et enregistre une vue `traffic` sur les fichiers Parquet de `data/processed/traffic/`. Un fichier seul ou un autre dossier peut être fourni avec `path=...`. La recherche est récursive, avec prise en charge des partitions Hive (`year=...`, éventuellement `month=...`). Les colonnes de partition ont des types inférés ; un mois écrit `01` peut être une chaîne.
+
+`query_traffic(sql, parameters, path=...)` renvoie le résultat SQL sous forme de DataFrame Pandas et ferme sa connexion. Pour plusieurs requêtes ou une jointure avec un DataFrame de notebook, utiliser `with connect_traffic() as connection` et `connection.register(...)`. Le README contient les exemples de filtres, agrégations et jointures.
+
+La vue lit les fichiers à la demande, sans copie préalable de tout le jeu de données en Pandas ou dans une table SQL. Les filtres sur les partitions permettent d'éviter les fichiers inutiles ; les projections et filtres compatibles sont exécutés par le lecteur Parquet. Le résultat demandé occupe de la mémoire lorsqu'il est converti en DataFrame. La liste de fichiers est fixée à l'ouverture : reconnecter après ajout ou suppression de partitions.
+
+Les requêtes conservent les valeurs manquantes, les rôles et les conventions d'heure du contrat de données. Utiliser des paramètres SQL pour les valeurs de filtre et des bornes explicites, par exemple `datetime >= ? AND datetime < ?` en heure locale de Paris sans fuseau. Aucun décalage, remplacement de cible par un proxy, ni dédoublonnage supplémentaire n'est effectué par la vue.
+
 ## Choix du modèle
