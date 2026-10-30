@@ -699,11 +699,25 @@ def build_date_filter(
     return f"t_1h >= date'{lower}' AND t_1h < date'{upper}'"
 
 
+def build_observation_filter(
+    start: datetime | None, end: datetime | None, road_id: int | None = None
+) -> str | None:
+    """Combine date bounds with an optional single-arc API filter."""
+    date_filter = build_date_filter(start, end)
+    if road_id is None:
+        return date_filter
+    if isinstance(road_id, bool) or not isinstance(road_id, int) or road_id < 1:
+        raise ValueError("road_id must be a positive integer.")
+    road_filter = f"iu_ac = '{road_id}'"
+    return f"({date_filter}) AND {road_filter}" if date_filter else road_filter
+
+
 def fetch_sample(
     limit: int = 3,
     *,
     start: datetime | None = None,
     end: datetime | None = None,
+    road_id: int | None = None,
 ) -> dict:
     """Preview recent raw observations without writing files."""
     if not 1 <= limit <= 10:
@@ -711,7 +725,7 @@ def fetch_sample(
 
     parameters = {"limit": limit, "order_by": "t_1h DESC"}
 
-    date_filter = build_date_filter(start, end)
+    date_filter = build_observation_filter(start, end, road_id)
     if date_filter is not None:
         parameters["where"] = date_filter
 
@@ -756,7 +770,7 @@ def fetch_sample(
 
 
 def validate_observation(
-    record: object, start: datetime, end: datetime
+    record: object, start: datetime, end: datetime, *, road_id: int | None = None
 ) -> None:
     """Validate record structure and requested bounds without changing values."""
     required = {"iu_ac", "t_1h", "q", "k"}
@@ -775,6 +789,8 @@ def validate_observation(
         raise ValueError(
             "Export contains an observation outside the requested period."
         )
+    if road_id is not None and str(record["iu_ac"]) != str(road_id):
+        raise ValueError("Export contains an observation outside the requested road.")
 
 
 def download_observations(
@@ -783,6 +799,7 @@ def download_observations(
     output_dir: Path,
     *,
     attempts: int = 3,
+    road_id: int | None = None,
 ) -> Path:
     """Save a complete raw JSONL snapshot, retrying temporary failures."""
     if attempts < 1:
@@ -791,6 +808,7 @@ def download_observations(
     date_filter = build_date_filter(start, end)
     if date_filter is None:
         raise ValueError("Downloads require start and end timestamps.")
+    date_filter = build_observation_filter(start, end, road_id)
 
     start = start.astimezone(timezone.utc)
     end = end.astimezone(timezone.utc)
@@ -821,7 +839,7 @@ def download_observations(
 
         try:
             expected = fetch_sample(
-                1, start=start, end=end
+                1, start=start, end=end, road_id=road_id
             )["total_count"]
 
             print(
@@ -858,7 +876,7 @@ def download_observations(
                         has_record = bool(line.strip())
                         if has_record:
                             record = json.loads(line)
-                            validate_observation(record, start, end)
+                            validate_observation(record, start, end, road_id=road_id)
                             count += 1
 
                         output.write(line)
@@ -885,7 +903,7 @@ def download_observations(
                 )
 
             latest_count = fetch_sample(
-                1, start=start, end=end
+                1, start=start, end=end, road_id=road_id
             )["total_count"]
 
             if latest_count != expected:
@@ -957,6 +975,11 @@ def main() -> None:
         help="Exclusive timestamp.",
     )
     parser.add_argument(
+        "--road-id",
+        type=int,
+        help="Download or preview one arc by iu_ac, as recommended in the brief.",
+    )
+    parser.add_argument(
         "--output-dir",
         type=Path,
         default=(
@@ -979,6 +1002,7 @@ def main() -> None:
                 args.limit,
                 start=args.start,
                 end=args.end,
+                road_id=args.road_id,
             )
             print(json.dumps(payload, ensure_ascii=False, indent=2))
         else:
@@ -986,6 +1010,7 @@ def main() -> None:
                 args.start,
                 args.end,
                 args.output_dir,
+                road_id=args.road_id,
             )
 
     except (OSError, ValueError, HTTPException) as error:

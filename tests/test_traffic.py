@@ -369,5 +369,35 @@ class TrafficTests(unittest.TestCase):
         self.http.assert_not_called()
 
 
+    def test_single_road_filter_is_reused_for_export_and_count_checks(self):
+        raw = json_lines(observation(arc="5671"))
+        self.http.side_effect = [sample_response(1), FakeResponse(raw), sample_response(1)]
+        result = t.download_observations(
+            self.start, self.end, self.root, road_id=5671, attempts=1
+        )
+        self.assertEqual(result.read_bytes(), raw)
+        expected = t.build_observation_filter(self.start, self.end, 5671)
+        for request in self.http.call_args_list:
+            parameters = parse_qs(urlparse(request.args[0].full_url).query)
+            self.assertEqual(parameters["where"], [expected])
+
+    def test_filtered_export_rejects_another_road(self):
+        self.http.side_effect = [sample_response(1), FakeResponse(json_lines(observation()))]
+        with self.assertRaisesRegex(ValueError, "requested road"):
+            t.download_observations(
+                self.start, self.end, self.root, road_id=5671, attempts=1
+            )
+        self.assert_no_files()
+
+    def test_invalid_road_filter_fails_before_network(self):
+        for road_id in [True, 0, -1, "5671"]:
+            with self.subTest(road_id=road_id):
+                with self.assertRaises(ValueError):
+                    t.download_observations(
+                        self.start, self.end, self.root, road_id=road_id, attempts=1
+                    )
+        self.http.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()
