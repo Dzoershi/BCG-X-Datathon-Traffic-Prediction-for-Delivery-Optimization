@@ -2,7 +2,7 @@
 
 BCG X Datathon project to forecast hourly traffic flow and occupancy on three Paris road segments and support delivery planning.
 
-Historical archive ingestion is implemented. The remaining data and modeling modules are scaffolds.
+Historical and recent traffic ingestion are implemented. Processing and modeling modules remain scaffolds.
 
 ## Repository structure
 
@@ -10,7 +10,7 @@ Historical archive ingestion is implemented. The remaining data and modeling mod
 data/raw/                  Original downloads, excluded from Git
 data/interim/              Cleaned intermediate data
 data/processed/            Model-ready datasets
-src/traffic_prediction/    Reusable code; historical ingestion in data/historical.py
+src/traffic_prediction/    Reusable code; ingestion in data/historical.py and data/traffic.py
 tests/                     Automated tests
 notebooks/                 Numbered notebook templates
 configs/                   Configuration
@@ -29,7 +29,7 @@ python -m venv .venv
 python -m pip install -e . --no-deps
 ```
 
-Historical ingestion and its tests use Python's standard library. Other project dependencies are listed in `requirements.txt`.
+Both ingestion modules and their tests use Python's standard library. Other project dependencies are listed in `requirements.txt`.
 
 ## Historical traffic ingestion
 
@@ -59,12 +59,37 @@ python src/traffic_prediction/data/historical.py --download --years 2023-2025
 
 Road filtering, cleaning, and Parquet conversion belong to the processing pipeline.
 
+## Recent traffic ingestion
+
+Source: [Paris Open Data recent traffic observations](https://opendata.paris.fr/explore/dataset/comptages-routiers-permanents/).
+
+Preview observations for a timestamp range:
+
+```powershell
+python src/traffic_prediction/data/traffic.py --sample --limit 1 --start "2026-10-29T22:00:00Z" --end "2026-10-29T23:00:00Z"
+```
+
+Download all matching observations:
+
+```powershell
+python src/traffic_prediction/data/traffic.py --download --start "2026-10-29T22:00:00Z" --end "2026-10-29T23:00:00Z"
+```
+
+- Downloads require both boundaries. Start is inclusive; end is exclusive, applied to the observation timestamp `t_1h`.
+- Timestamps require `Z` for UTC or an explicit timezone offset.
+- Each run saves a separate raw `.jsonl` snapshot under `data/raw/recent/`. Use `--output-dir PATH` to change the destination.
+- Exports stream one observation at a time and preserve raw values, including nulls.
+- Row counts are checked against the API before and after extraction. Empty periods produce empty snapshots.
+- Temporary failures are retried up to three attempts, restarting extraction. Temporary `.part` files receive their final name after validation succeeds.
+- `--limit` controls previews only; downloads retrieve all matching observations available from the source.
+
 ## Tests
 
-Run the historical ingestion tests without a live connection or large downloads:
+Run the ingestion tests without a live connection or large downloads:
 
 ```powershell
 python -m unittest discover -s tests -p test_historical.py -v -b
+python -m unittest discover -s tests -p test_traffic.py -v -b
 ```
 
 The complete test suite can also run with `python -m pytest` when pytest is installed.
@@ -73,5 +98,5 @@ The complete test suite can also run with `python -m pytest` when pytest is inst
 
 - One issue, one branch, one pull request reviewed by another teammate. Never push directly to `main`.
 - Keep raw downloads unchanged and generated datasets out of Git.
-- Work in a named copy of a notebook template, such as `01_data_exploration_cécile.ipynb`.
+- Work in a named copy of a notebook template, such as `01_data_exploration_cécil.ipynb`.
 - Put reusable code in `src/traffic_prediction/` and document decisions in `docs/methodology.md`.
