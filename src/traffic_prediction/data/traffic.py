@@ -1,24 +1,42 @@
-"""Hourly traffic counts (flow and occupancy rate) from Open Data Paris.
+"""Retrieve and process hourly traffic observations from Open Data Paris.
 
 Pipeline: read raw rows -> keep configured arcs (``normalize_raw``) ->
 drop duplicates and complete the hourly grid (``build_hourly_table``).
 ``normalize_raw`` accepts both archive files and recent API records.
+Run this module to preview or download recent raw observations. Run
+``traffic_prediction.data.build`` to process archives and selected JSONL
+snapshots into Parquet.
 """
 
+from __future__ import annotations
+
+import argparse
 import hashlib
+import json
 import sys
+import time
 import zipfile
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from http.client import HTTPException
 from pathlib import Path
+from tempfile import NamedTemporaryFile
+from typing import TYPE_CHECKING
+from urllib.error import HTTPError
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 
-import numpy as np
-import pandas as pd
-import yaml
+if TYPE_CHECKING:
+    import pandas as pd
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_CONFIG = REPO_ROOT / "configs" / "baseline.yaml"
 DEFAULT_RAW_DIR = REPO_ROOT / "data" / "raw" / "historical"
+RECORDS_URL = (
+    "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/"
+    "comptages-routiers-permanents/records"
+)
 
 # Config list -> value of the output "role" column.
 ARC_ROLES = {"evaluated_arcs": "evalue", "proxy_arcs": "proxy"}
@@ -58,6 +76,7 @@ ETAT_BARRE_CODES = {"Inconnu": 0, "Ouvert": 1, "Barré": 2, "Invalide": 3}
 
 PARIS_TZ = "Europe/Paris"
 CHUNK_ROWS = 200_000
+MAX_JSONL_LINE_BYTES = 4 * 1024 * 1024
 
 
 @dataclass(frozen=True)
@@ -84,6 +103,7 @@ class ProcessingStats:
     conflicting_duplicates: int = 0
     invalid_rows: int = 0
     arcs_without_measurements: list[str] = field(default_factory=list)
+    recent_files_read: list[Path] = field(default_factory=list)
 
 
 # --- Configuration -----------------------------------------------------------
@@ -91,6 +111,8 @@ class ProcessingStats:
 
 def load_arcs(config_path: Path = DEFAULT_CONFIG) -> list[Arc]:
     """Read evaluated and proxy arcs from the ``traffic`` config section."""
+    import yaml
+
     with open(config_path, encoding="utf-8") as file:
         config = yaml.safe_load(file) or {}
 
@@ -142,6 +164,8 @@ def normalize_raw(raw: pd.DataFrame, arcs: list[Arc]) -> pd.DataFrame:
     The result has one row per input row of a configured arc; it is not yet
     deduplicated or completed to a full hourly grid.
     """
+    import pandas as pd
+
     rows = filter_arcs(raw, arcs)
     debit, debit_invalid = parse_measure(rows["q"])
     taux, taux_invalid = parse_measure(rows["k"], upper=100)
@@ -172,6 +196,8 @@ def filter_arcs(raw: pd.DataFrame, arcs: list[Arc]) -> pd.DataFrame:
 
     Raises if a configured node pair appears with an unexpected iu_ac.
     """
+    import pandas as pd
+
     missing = set(RAW_COLUMNS) - set(raw.columns)
     if missing:
         raise ValueError(f"Missing Open Data columns: {sorted(missing)}")
@@ -208,47 +234,83 @@ def parse_t_1h(values: pd.Series) -> pd.Series:
     Archive values are already naive local time and are kept unchanged.
     Values with a time zone (recent API, UTC) are converted to Paris time.
     """
+    import pandas as pd
+
     if isinstance(values.dtype, pd.DatetimeTZDtype):
-        return values.dt.tz_convert(PARIS_TZ).dt.tz_localize(None)
-    if pd.api.types.is_datetime64_dtype(values):
-        return values
+        parsed = values.dt.tz_convert(PARIS_TZ).dt.tz_localize(None)
+    elif pd.api.types.is_datetime64_dtype(values):
+        parsed = values
+    else:
+        text = values.astype(str).str.strip()
+        has_zone = text.str.contains(r"(?:[+-]\d{2}:?\d{2}|Z)$", regex=True)
+        if not has_zone.any():
+            parsed = pd.to_datetime(text, format="ISO8601")
+        elif not has_zone.all():
+            raise ValueError("t_1h mixes values with and without a time zone.")
+        else:
+            parsed = pd.to_datetime(text, format="ISO8601", utc=True)
+            parsed = parsed.dt.tz_convert(PARIS_TZ).dt.tz_localize(None)
 
-    text = values.astype(str).str.strip()
-    has_zone = text.str.contains(r"(?:[+-]\d{2}:?\d{2}|Z)$", regex=True)
-    if not has_zone.any():
-        return pd.to_datetime(text, format="ISO8601")
-    if not has_zone.all():
-        raise ValueError("t_1h mixes values with and without a time zone.")
-
-    parsed = pd.to_datetime(text, format="ISO8601", utc=True)
-    return parsed.dt.tz_convert(PARIS_TZ).dt.tz_localize(None)
+    if parsed.isna().any():
+        raise ValueError("t_1h contains missing timestamps.")
+    if parsed.ne(parsed.dt.floor("h")).any():
+        raise ValueError("t_1h must contain whole-hour timestamps in Paris time.")
+    return parsed
 
 
 def parse_measure(
     values: pd.Series, upper: float | None = None
 ) -> tuple[pd.Series, pd.Series]:
-    """Convert to float; impossible values become NaN and are flagged.
+    """Convert measurements to float and flag invalid supplied values.
 
-    Impossible means not a number, negative, or above ``upper``.
+    Invalid values are non-numeric, non-finite, negative, or above upper.
+    Genuine missing values remain NaN without being marked invalid.
     """
+    import numpy as np
+    import pandas as pd
+
     present = values.notna() & values.astype(str).str.strip().ne("")
-    number = pd.to_numeric(values.where(present), errors="coerce")
-    invalid = (present & number.isna()) | number.lt(0)
+    number = pd.to_numeric(
+        values.where(present), errors="coerce"
+    ).astype("float64")
+
+    invalid = (present & ~np.isfinite(number)) | number.lt(0)
     if upper is not None:
         invalid |= number.gt(upper)
-    return number.mask(invalid).astype("float64"), invalid
+
+    return number.mask(invalid), invalid
 
 
 def parse_state(values: pd.Series, labels: dict[str, int]) -> pd.Series:
-    """Return integer state codes; text labels (API) are mapped to codes."""
-    codes = pd.to_numeric(values, errors="coerce")
+    """Map valid codes or labels to Int8; reject invalid supplied states."""
+    import pandas as pd
+
+    text = values.astype("string").str.strip()
+    present = text.notna() & text.ne("")
+    codes = pd.to_numeric(text, errors="coerce")
     by_label = {label.casefold(): code for label, code in labels.items()}
-    from_text = values.astype(str).str.strip().str.casefold().map(by_label)
-    return codes.fillna(from_text).astype("Int8")
+    from_text = text.str.casefold().map(by_label)
+    parsed = codes.fillna(from_text)
+
+    allowed = set(labels.values())
+    invalid = present & ~parsed.isin(allowed)
+
+    if invalid.any():
+        examples = text.loc[invalid].drop_duplicates().head(5).tolist()
+        field = values.name or "state"
+        raise ValueError(
+            f"Invalid state values for {field}: {examples}; "
+            f"expected codes {sorted(allowed)} or documented text labels."
+        )
+
+    return parsed.astype("Int8")
 
 
 def measure_quality(frame: pd.DataFrame, invalid: pd.Series) -> pd.Series:
     """Label each row: invalide, ok, partielle (q or k missing) or vide."""
+    import numpy as np
+    import pandas as pd
+
     has_debit = frame["debit_horaire"].notna()
     has_taux = frame["taux_occupation"].notna()
     labels = np.select(
@@ -266,6 +328,8 @@ def period_bounds(
     start: str | pd.Timestamp, end: str | pd.Timestamp
 ) -> tuple[pd.Timestamp, pd.Timestamp]:
     """First and last hour labels of an inclusive date period (00:00 to 23:00)."""
+    import pandas as pd
+
     first = pd.Timestamp(start).normalize()
     last = pd.Timestamp(end).normalize() + pd.Timedelta(hours=23)
     if first > last:
@@ -317,6 +381,8 @@ def complete_grid(
     last: pd.Timestamp,
 ) -> pd.DataFrame:
     """One row per arc and hour; hours missing from the source are "absente"."""
+    import pandas as pd
+
     hours = pd.date_range(first, last, freq="h")
     index = pd.MultiIndex.from_product(
         [[arc.name for arc in arcs], hours], names=["arc", "datetime"]
@@ -361,13 +427,50 @@ def warn_arcs_without_measurements(
 def find_archives(
     raw_dir: Path, start: str | pd.Timestamp, end: str | pd.Timestamp
 ) -> list[Path]:
-    """Archives stored as <raw_dir>/<year>/*.zip for the years of the period."""
+    """Select requested years and a readable prior archive for January 1."""
+    from traffic_prediction.data.historical import check_archive_support
+
     first, last = period_bounds(start, end)
-    return sorted(
+    raw_dir = Path(raw_dir)
+
+    archives = sorted(
         path
         for year in range(first.year, last.year + 1)
-        for path in (Path(raw_dir) / str(year)).glob("*.zip")
+        for path in (raw_dir / str(year)).glob("*.zip")
+        if path.is_file()
     )
+
+    if first.month != 1 or first.day != 1:
+        return archives
+
+    previous_year = first.year - 1
+    boundary_archives = []
+
+    for path in sorted((raw_dir / str(previous_year)).glob("*.zip")):
+        if not path.is_file():
+            continue
+
+        try:
+            with zipfile.ZipFile(path) as archive:
+                check_archive_support(archive)
+        except NotImplementedError as error:
+            print(
+                f"WARNING: cannot read optional boundary archive {path}: {error}",
+                file=sys.stderr,
+                flush=True,
+            )
+        else:
+            boundary_archives.append(path)
+
+    if not boundary_archives:
+        print(
+            f"WARNING: no readable archive for {previous_year} in {raw_dir}; "
+            f"{first:%Y-%m-%d %H:%M} may be missing.",
+            file=sys.stderr,
+            flush=True,
+        )
+
+    return sorted(boundary_archives + archives)
 
 
 def unique_archives(paths: Iterable[Path]) -> tuple[list[Path], list[Path]]:
@@ -396,35 +499,154 @@ def file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _validate_chunk_rows(chunk_rows: int) -> None:
+    if (
+        isinstance(chunk_rows, bool)
+        or not isinstance(chunk_rows, int)
+        or chunk_rows < 1
+    ):
+        raise ValueError("chunk_rows must be a positive integer.")
+
+
 def read_archive(
     path: Path, arcs: list[Arc], chunk_rows: int = CHUNK_ROWS
 ) -> Iterator[tuple[pd.DataFrame, int]]:
     """Yield (normalized rows, raw row count) per chunk, without extracting.
 
-    Weekly text files are read in name order, which is chronological.
+    Ordinary ZIP members use filename order; Deflate64 uses archive order.
     """
-    with zipfile.ZipFile(path) as archive:
-        members = sorted(
-            name for name in archive.namelist() if name.lower().endswith(".txt")
-        )
-        for number, member in enumerate(members, start=1):
-            print(f"  [{number}/{len(members)}] {member}", flush=True)
+    import pandas as pd
+    from traffic_prediction.data.historical import iter_zip_members
+
+    _validate_chunk_rows(chunk_rows)
+    try:
+        for member, file in iter_zip_members(path):
+            if member.is_dir() or not member.filename.lower().endswith(".txt"):
+                continue
+            print(f"  {member.filename}", flush=True)
+            chunks = pd.read_csv(
+                file, sep=";", usecols=RAW_COLUMNS, dtype=str,
+                encoding="utf-8", chunksize=chunk_rows,
+            )
+            for chunk in chunks:
+                yield normalize_raw(chunk, arcs), len(chunk)
+    except NotImplementedError as error:
+        raise ValueError(f"Cannot read {path}: {error}") from error
+
+
+def read_recent(
+    path: Path, arcs: list[Arc], chunk_rows: int = CHUNK_ROWS
+) -> Iterator[tuple[pd.DataFrame, int]]:
+    """Yield (normalized rows, raw count) from a completed API JSONL file."""
+    import pandas as pd
+
+    _validate_chunk_rows(chunk_rows)
+
+    path = Path(path)
+    if path.suffix.lower() != ".jsonl":
+        raise ValueError("Expected a completed .jsonl file, not a partial download.")
+
+    records = []
+    required_columns = set(RAW_COLUMNS)
+
+    with path.open("rb") as source:
+        line_number = 0
+        while line := source.readline(MAX_JSONL_LINE_BYTES + 1):
+            line_number += 1
+            context = f"{path}, line {line_number}"
+
+            if len(line) > MAX_JSONL_LINE_BYTES:
+                raise ValueError(f"{context}: JSONL record exceeds 4 MiB.")
+            if not line.strip():
+                continue
+
             try:
-                with archive.open(member) as file:
-                    chunks = pd.read_csv(
-                        file,
-                        sep=";",
-                        usecols=RAW_COLUMNS,
-                        dtype=str,
-                        encoding="utf-8",
-                        chunksize=chunk_rows,
-                    )
-                    for chunk in chunks:
-                        yield normalize_raw(chunk, arcs), len(chunk)
-            except NotImplementedError as error:
+                record = json.loads(line)
+            except ValueError as error:
+                raise ValueError(f"{context}: invalid JSON.") from error
+
+            if not isinstance(record, dict):
+                raise ValueError(f"{context}: expected a JSON object.")
+
+            missing = required_columns - record.keys()
+            if missing:
+                raise ValueError(f"{context}: missing columns {sorted(missing)}.")
+
+            try:
+                parse_timestamp(record["t_1h"])
+            except (argparse.ArgumentTypeError, AttributeError, TypeError) as error:
                 raise ValueError(
-                    f"Cannot read {path} ({member}): {error}"
+                    f"{context}: t_1h must include an explicit timezone."
                 ) from error
+
+            records.append(tuple(record[column] for column in RAW_COLUMNS))
+
+            if len(records) == chunk_rows:
+                rows = normalize_raw(
+                    pd.DataFrame.from_records(records, columns=RAW_COLUMNS), arcs
+                )
+                count = len(records)
+                records.clear()
+                yield rows, count
+
+        if records:
+            yield normalize_raw(
+                pd.DataFrame.from_records(records, columns=RAW_COLUMNS), arcs
+            ), len(records)
+
+
+def process_sources(
+    paths: Iterable[Path],
+    arcs: list[Arc],
+    start: str | pd.Timestamp,
+    end: str | pd.Timestamp,
+    chunk_rows: int = CHUNK_ROWS,
+    *,
+    recent_paths: Iterable[Path] = (),
+) -> tuple[pd.DataFrame, ProcessingStats]:
+    """Build one hourly table from archives followed by ordered API snapshots.
+
+    The last supplied row wins for each arc/hour, including null values.
+    Raw files remain unchanged; duplicates are counted in ProcessingStats.
+    """
+    import pandas as pd
+
+    _validate_chunk_rows(chunk_rows)
+    first, last = period_bounds(start, end)
+    stats = ProcessingStats()
+    recent_paths = [Path(path) for path in recent_paths]
+    for path in recent_paths:
+        if path.suffix.lower() != ".jsonl":
+            raise ValueError(f"Expected a completed .jsonl file: {path}")
+        if not path.is_file():
+            raise ValueError(f"Recent file does not exist: {path}")
+
+    stats.archives_read, stats.duplicate_archives = unique_archives(paths)
+    sources = [
+        (path, read_archive) for path in stats.archives_read
+    ] + [
+        (path, read_recent) for path in recent_paths
+    ]
+
+    parts = []
+    for path, reader in sources:
+        print(f"Reading {path}", flush=True)
+        for rows, raw_count in reader(path, arcs, chunk_rows):
+            stats.raw_rows += raw_count
+            stats.arc_rows += len(rows)
+            inside = rows["datetime"].between(first, last)
+            stats.outside_period += int((~inside).sum())
+            if inside.any():
+                parts.append(rows.loc[inside].copy())
+        if reader is read_recent:
+            stats.recent_files_read.append(path)
+
+    if parts:
+        rows = pd.concat(parts, ignore_index=True)
+    else:
+        rows = normalize_raw(pd.DataFrame(columns=RAW_COLUMNS), arcs)
+
+    return build_hourly_table(rows, arcs, start, end, stats), stats
 
 
 def process_archives(
@@ -434,22 +656,346 @@ def process_archives(
     end: str | pd.Timestamp,
     chunk_rows: int = CHUNK_ROWS,
 ) -> tuple[pd.DataFrame, ProcessingStats]:
-    """Turn historical ZIP archives into the complete hourly table."""
-    stats = ProcessingStats()
-    stats.archives_read, stats.duplicate_archives = unique_archives(paths)
+    """Build the historical hourly table through the shared source pipeline."""
+    return process_sources(paths, arcs, start, end, chunk_rows)
 
-    parts = []
-    for path in stats.archives_read:
-        print(f"Reading {path}", flush=True)
-        for rows, raw_count in read_archive(path, arcs, chunk_rows):
-            stats.raw_rows += raw_count
-            if not rows.empty:
-                parts.append(rows)
 
-    if parts:
-        rows = pd.concat(parts, ignore_index=True)
-    else:
-        rows = normalize_raw(pd.DataFrame(columns=RAW_COLUMNS), arcs)
-    stats.arc_rows = len(rows)
+# --- Recent API ingestion -----------------------------------------------------
 
-    return build_hourly_table(rows, arcs, start, end, stats), stats
+
+def parse_timestamp(value: str) -> datetime:
+    """Parse an ISO timestamp with an explicit timezone and convert to UTC."""
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if parsed.utcoffset() is None:
+            raise ValueError("Timezone is missing.")
+        return parsed.astimezone(timezone.utc)
+    except (ValueError, OverflowError) as error:
+        raise argparse.ArgumentTypeError(
+            "Use an ISO timestamp with Z or an offset, "
+            "for example 2026-10-29T00:00:00Z."
+        ) from error
+
+
+def build_date_filter(
+    start: datetime | None, end: datetime | None
+) -> str | None:
+    """Filter observation timestamps using inclusive start and exclusive end."""
+    if start is None and end is None:
+        return None
+
+    if start is None or end is None:
+        raise ValueError("Provide both --start and --end.")
+
+    if start.utcoffset() is None or end.utcoffset() is None:
+        raise ValueError("Date boundaries must include a timezone.")
+
+    if start >= end:
+        raise ValueError("--start must be earlier than --end.")
+
+    lower = start.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    upper = end.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+    return f"t_1h >= date'{lower}' AND t_1h < date'{upper}'"
+
+
+def fetch_sample(
+    limit: int = 3,
+    *,
+    start: datetime | None = None,
+    end: datetime | None = None,
+) -> dict:
+    """Preview recent raw observations without writing files."""
+    if not 1 <= limit <= 10:
+        raise ValueError("Sample limit must be between 1 and 10.")
+
+    parameters = {"limit": limit, "order_by": "t_1h DESC"}
+
+    date_filter = build_date_filter(start, end)
+    if date_filter is not None:
+        parameters["where"] = date_filter
+
+    query = urlencode(parameters)
+    request = Request(
+        f"{RECORDS_URL}?{query}",
+        headers={
+            "User-Agent": "traffic-prediction/0.1",
+            "Accept-Encoding": "identity",
+        },
+    )
+
+    with urlopen(request, timeout=30) as response:
+        if response.status != 200:
+            raise ValueError(
+                f"Unexpected HTTP status: {response.status}"
+            )
+        payload = json.load(response)
+
+    if not isinstance(payload, dict):
+        raise ValueError("API response must be an object.")
+
+    total = payload.get("total_count")
+    records = payload.get("results")
+
+    if (
+        type(total) is not int
+        or total < 0
+        or not isinstance(records, list)
+    ):
+        raise ValueError(
+            "API response has invalid total_count or results."
+        )
+
+    if len(records) != min(limit, total):
+        raise ValueError("API returned an incomplete sample.")
+
+    if any(not isinstance(record, dict) for record in records):
+        raise ValueError("API returned an invalid observation.")
+
+    return payload
+
+
+def validate_observation(
+    record: object, start: datetime, end: datetime
+) -> None:
+    """Validate record structure and requested bounds without changing values."""
+    required = {"iu_ac", "t_1h", "q", "k"}
+    if not isinstance(record, dict) or not required.issubset(record):
+        raise ValueError("Export contains an invalid traffic observation.")
+
+    if not isinstance(record["t_1h"], str):
+        raise ValueError("Export contains an invalid timestamp.")
+
+    try:
+        timestamp = parse_timestamp(record["t_1h"])
+    except argparse.ArgumentTypeError as error:
+        raise ValueError("Export contains an invalid timestamp.") from error
+
+    if not start <= timestamp < end:
+        raise ValueError(
+            "Export contains an observation outside the requested period."
+        )
+
+
+def download_observations(
+    start: datetime,
+    end: datetime,
+    output_dir: Path,
+    *,
+    attempts: int = 3,
+) -> Path:
+    """Save a complete raw JSONL snapshot, retrying temporary failures."""
+    if attempts < 1:
+        raise ValueError("attempts must be at least 1.")
+
+    date_filter = build_date_filter(start, end)
+    if date_filter is None:
+        raise ValueError("Downloads require start and end timestamps.")
+
+    start = start.astimezone(timezone.utc)
+    end = end.astimezone(timezone.utc)
+
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    prefix = (
+        f"traffic_{start:%Y%m%dT%H%M%S%fZ}_"
+        f"{end:%Y%m%dT%H%M%S%fZ}_"
+    )
+
+    parameters = {
+        "where": date_filter,
+        "limit": -1,
+        "timezone": "UTC",
+    }
+    export_url = RECORDS_URL.rsplit("/", 1)[0] + "/exports/jsonl"
+    request = Request(
+        f"{export_url}?{urlencode(parameters)}",
+        headers={
+            "User-Agent": "traffic-prediction/0.1",
+            "Accept-Encoding": "identity",
+        },
+    )
+
+    for attempt in range(1, attempts + 1):
+        temporary_path = None
+
+        try:
+            expected = fetch_sample(
+                1, start=start, end=end
+            )["total_count"]
+
+            print(
+                f"Exporting {expected} observations "
+                f"(attempt {attempt}/{attempts})...",
+                flush=True,
+            )
+
+            with urlopen(request, timeout=60) as response:
+                if response.status != 200:
+                    raise ValueError(
+                        f"Unexpected HTTP status: {response.status}"
+                    )
+
+                length = response.headers.get("Content-Length")
+                expected_bytes = int(length) if length is not None else None
+                received_bytes = 0
+                count = 0
+
+                with NamedTemporaryFile(
+                    mode="wb",
+                    dir=output_dir,
+                    prefix=prefix,
+                    suffix=".jsonl.part",
+                    delete=False,
+                ) as output:
+                    temporary_path = Path(output.name)
+                    while line := response.readline(MAX_JSONL_LINE_BYTES + 1):
+                        if len(line) > MAX_JSONL_LINE_BYTES:
+                            raise ValueError(
+                                "A JSONL record exceeds the 4 MiB limit."
+                            )
+
+                        has_record = bool(line.strip())
+                        if has_record:
+                            record = json.loads(line)
+                            validate_observation(record, start, end)
+                            count += 1
+
+                        output.write(line)
+                        received_bytes += len(line)
+
+                        if has_record and count % 10000 == 0:
+                            print(
+                                f"Received {count} observations...",
+                                flush=True,
+                            )
+
+                if (
+                    expected_bytes is not None
+                    and received_bytes != expected_bytes
+                ):
+                    raise ValueError(
+                        "Export byte count does not match Content-Length."
+                    )
+
+            if count != expected:
+                raise ValueError(
+                    f"Incomplete export or changed source: "
+                    f"expected {expected} observations, received {count}."
+                )
+
+            latest_count = fetch_sample(
+                1, start=start, end=end
+            )["total_count"]
+
+            if latest_count != expected:
+                raise ValueError(
+                    "Source count changed during export; retry required."
+                )
+
+            destination = temporary_path.with_suffix("")
+            temporary_path.replace(destination)
+
+            print(
+                f"Saved {count} observations: {destination}",
+                flush=True,
+            )
+            return destination
+
+        except (OSError, ValueError, HTTPException) as error:
+            permanent_http_error = (
+                isinstance(error, HTTPError)
+                and 400 <= error.code < 500
+                and error.code not in (408, 429)
+            )
+
+            if attempt == attempts or permanent_http_error:
+                raise
+
+            print(
+                f"Extraction failed: {error}; retrying...",
+                file=sys.stderr,
+            )
+            time.sleep(2 ** (attempt - 1))
+
+        finally:
+            if temporary_path is not None:
+                temporary_path.unlink(missing_ok=True)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Preview or download recent raw traffic observations."
+    )
+
+    actions = parser.add_mutually_exclusive_group(required=True)
+    actions.add_argument(
+        "--sample",
+        action="store_true",
+        help="Preview observations.",
+    )
+    actions.add_argument(
+        "--download",
+        action="store_true",
+        help="Save a full raw export.",
+    )
+
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=3,
+        help="Preview size only.",
+    )
+    parser.add_argument(
+        "--start",
+        type=parse_timestamp,
+        help="Inclusive timestamp.",
+    )
+    parser.add_argument(
+        "--end",
+        type=parse_timestamp,
+        help="Exclusive timestamp.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=(
+            Path(__file__).resolve().parents[3]
+            / "data"
+            / "raw"
+            / "recent"
+        ),
+    )
+    args = parser.parse_args()
+
+    if args.download and (
+        args.start is None or args.end is None
+    ):
+        parser.error("--download requires both --start and --end.")
+
+    try:
+        if args.sample:
+            payload = fetch_sample(
+                args.limit,
+                start=args.start,
+                end=args.end,
+            )
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+        else:
+            download_observations(
+                args.start,
+                args.end,
+                args.output_dir,
+            )
+
+    except (OSError, ValueError, HTTPException) as error:
+        parser.exit(1, f"Traffic ingestion failed: {error}\n")
+    except KeyboardInterrupt:
+        parser.exit(
+            130,
+            "Traffic ingestion interrupted; rerun to retry.\n",
+        )
+
+
+if __name__ == "__main__":
+    main()

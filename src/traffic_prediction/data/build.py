@@ -40,18 +40,29 @@ def build_traffic(
     raw_dir: Path = traffic.DEFAULT_RAW_DIR,
     output_dir: Path = DEFAULT_TRAFFIC_DIR,
     config_path: Path = traffic.DEFAULT_CONFIG,
+    *,
+    recent_paths: list[Path] | None = None,
 ) -> tuple[pd.DataFrame, ProcessingStats]:
-    """Process historical archives and write the traffic dataset to Parquet."""
+    """Process archives and explicitly ordered JSONL snapshots into Parquet.
+
+    Recent snapshots follow archives; the last row wins, including nulls.
+    Output partitions for years in the requested period are replaced.
+    """
     arcs = traffic.load_arcs(config_path)
     roles = pd.Series([arc.role for arc in arcs]).value_counts().to_dict()
     print(f"Traffic {start} to {end}: {len(arcs)} arcs {roles}", flush=True)
 
     archives = traffic.find_archives(raw_dir, start, end)
-    if not archives:
-        raise ValueError(f"No archives in {raw_dir} for {start} to {end}.")
+    if not archives and not recent_paths:
+        raise ValueError(
+            f"No archives in {raw_dir} for {start} to {end}, "
+            "and no recent JSONL files supplied."
+        )
     warn_missing_years(archives, raw_dir, start, end)
 
-    table, stats = traffic.process_archives(archives, arcs, start, end)
+    table, stats = traffic.process_sources(
+        archives, arcs, start, end, recent_paths=recent_paths or ()
+    )
     validate_traffic(table, arcs, start, end)
     write_partitions(table, output_dir)
     return table, stats
@@ -67,7 +78,7 @@ def warn_missing_years(
         if year not in found:
             print(
                 f"WARNING: no archive for {year} in {raw_dir}; "
-                'its hours will be "absente".',
+                'hours missing from all supplied sources will be "absente".',
                 file=sys.stderr,
                 flush=True,
             )
@@ -76,31 +87,100 @@ def warn_missing_years(
 def validate_traffic(
     table: pd.DataFrame, arcs: list[Arc], start: str, end: str
 ) -> None:
-    """Check columns, one row per arc and hour, and value ranges."""
+    """Check the complete hourly grid, configured arc metadata, and values."""
+    import numpy as np
+
     if list(table.columns) != traffic.OUTPUT_COLUMNS:
         raise ValueError(f"Unexpected columns: {list(table.columns)}")
+    traffic.validate_arcs(arcs)
 
     first, last = traffic.period_bounds(start, end)
-    expected_rows = len(arcs) * len(pd.date_range(first, last, freq="h"))
+    hours = pd.date_range(first, last, freq="h")
+    expected_rows = len(arcs) * len(hours)
     if len(table) != expected_rows:
         raise ValueError(f"Expected {expected_rows} rows, got {len(table)}.")
 
-    measured = table["debit_horaire"].notna() | table["taux_occupation"].notna()
+    timestamps = table["datetime"]
+    if not pd.api.types.is_datetime64_any_dtype(timestamps.dtype):
+        raise ValueError(
+            "Invalid traffic table, datetime must have a datetime dtype."
+        )
+    if timestamps.dt.tz is not None:
+        raise ValueError(
+            "Invalid traffic table, datetime must be timezone-free Paris time."
+        )
+    if not pd.api.types.is_integer_dtype(table["iu_ac"].dtype):
+        raise ValueError(
+            "Invalid traffic table, iu_ac must have an integer dtype."
+        )
+
+    for column in [
+        "debit_horaire", "taux_occupation", "etat_trafic", "etat_barre"
+    ]:
+        dtype = table[column].dtype
+        if not (
+            pd.api.types.is_integer_dtype(dtype)
+            or pd.api.types.is_float_dtype(dtype)
+        ):
+            raise ValueError(
+                f"Invalid traffic table, {column} must have a real numeric dtype."
+            )
+
+    expected_ids = table["arc"].map(
+        {arc.name: arc.iu_ac for arc in arcs}
+    )
+    expected_roles = table["arc"].map(
+        {arc.name: arc.role for arc in arcs}
+    )
+    debit = table["debit_horaire"]
     taux = table["taux_occupation"]
-    problems = {
-        "duplicate (arc, datetime)": table.duplicated(["arc", "datetime"]),
-        "unknown arc": ~table["arc"].isin([arc.name for arc in arcs]),
-        "unknown qualite_mesure": ~table["qualite_mesure"].isin(QUALITY_LABELS),
-        "negative debit_horaire": table["debit_horaire"].lt(0),
-        "taux_occupation outside 0-100": taux.notna() & ~taux.between(0, 100),
-        "etat_trafic outside 0-4": table["etat_trafic"].gt(4).fillna(False),
-        "etat_barre outside 0-3": table["etat_barre"].gt(3).fillna(False),
-        "measured hour marked absente": measured
-        & table["qualite_mesure"].eq("absente"),
-    }
-    for label, mask in problems.items():
-        if mask.any():
-            raise ValueError(f"Invalid traffic table, {label}: {mask.sum()} rows.")
+    measured = debit.notna() | taux.notna()
+
+    def reject_invalid(label: str, mask: pd.Series) -> None:
+        count = int(mask.sum())
+        if count:
+            raise ValueError(
+                f"Invalid traffic table, {label}: {count} rows."
+            )
+
+    # Release each mask before checking the next constraint.
+    reject_invalid("unknown arc", ~table["arc"].isin([arc.name for arc in arcs]))
+    reject_invalid(
+        "duplicate (arc, datetime)", table.duplicated(["arc", "datetime"])
+    )
+    reject_invalid(
+        "datetime outside the requested hourly grid", ~timestamps.isin(hours)
+    )
+    reject_invalid(
+        "iu_ac inconsistent with arc",
+        table["iu_ac"].isna() | table["iu_ac"].ne(expected_ids),
+    )
+    reject_invalid("unknown role", ~table["role"].isin(traffic.ARC_ROLES.values()))
+    reject_invalid(
+        "role inconsistent with arc",
+        table["role"].isna() | table["role"].ne(expected_roles),
+    )
+    reject_invalid(
+        "unknown qualite_mesure", ~table["qualite_mesure"].isin(QUALITY_LABELS)
+    )
+    reject_invalid("non-finite debit_horaire", debit.notna() & ~np.isfinite(debit))
+    reject_invalid("non-finite taux_occupation", taux.notna() & ~np.isfinite(taux))
+    reject_invalid("negative debit_horaire", debit.lt(0))
+    reject_invalid(
+        "taux_occupation outside 0-100", taux.notna() & ~taux.between(0, 100)
+    )
+    reject_invalid(
+        "etat_trafic outside 0-4",
+        table["etat_trafic"].notna() & ~table["etat_trafic"].isin(range(5)),
+    )
+    reject_invalid(
+        "etat_barre outside 0-3",
+        table["etat_barre"].notna() & ~table["etat_barre"].isin(range(4)),
+    )
+    reject_invalid(
+        "measured hour marked absente",
+        measured & table["qualite_mesure"].eq("absente"),
+    )
 
 
 def write_partitions(table: pd.DataFrame, output_dir: Path) -> list[Path]:
@@ -147,6 +227,10 @@ def print_traffic_summary(table: pd.DataFrame, stats: ProcessingStats) -> None:
     print("\n=== Traffic summary ===")
     print(f"Archives read: {[str(path) for path in stats.archives_read]}")
     print(
+        "Recent files read (in order): "
+        f"{[str(path) for path in stats.recent_files_read]}"
+    )
+    print(
         "Identical archives skipped: "
         f"{[str(path) for path in stats.duplicate_archives]}"
     )
@@ -155,7 +239,7 @@ def print_traffic_summary(table: pd.DataFrame, stats: ProcessingStats) -> None:
         "Rows of configured arcs": stats.arc_rows,
         "Rows outside the period": stats.outside_period,
         "Identical duplicate rows dropped": stats.identical_duplicates,
-        "Conflicting duplicate rows dropped (last kept)": (
+        "Conflicting duplicate rows dropped (last row kept, including nulls)": (
             stats.conflicting_duplicates
         ),
         "Rows with an invalid value (set to NaN)": stats.invalid_rows,
@@ -225,7 +309,10 @@ def percent_missing(values: pd.Series) -> float:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Build the hourly traffic dataset from historical archives."
+        description=(
+            "Build hourly traffic Parquet from archives and selected JSONL files. "
+            "Output files for years in the requested period are replaced."
+        )
     )
     parser.add_argument(
         "--start",
@@ -246,6 +333,17 @@ def main() -> None:
         help="Archive folder with <year>/*.zip; default: data/raw/historical.",
     )
     parser.add_argument(
+        "--recent-file",
+        type=Path,
+        action="append",
+        default=[],
+        metavar="PATH",
+        help=(
+            "Completed API JSONL snapshot; repeat in the desired reading order. "
+            "Read after archives; last row wins, including nulls."
+        ),
+    )
+    parser.add_argument(
         "--output-dir",
         type=Path,
         default=DEFAULT_TRAFFIC_DIR,
@@ -261,7 +359,8 @@ def main() -> None:
 
     try:
         table, stats = build_traffic(
-            args.start, args.end, args.raw_dir, args.output_dir, args.config
+            args.start, args.end, args.raw_dir, args.output_dir, args.config,
+            recent_paths=args.recent_file,
         )
     except (OSError, ValueError) as error:
         parser.exit(1, f"Traffic processing failed: {error}\n")

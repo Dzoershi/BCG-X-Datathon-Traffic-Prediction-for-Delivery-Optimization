@@ -10,6 +10,9 @@ pyarrow==25.0.1
 PyYAML==6.0.3
 
 # Data download and calendar features
+stream-unzip==0.0.100
+stream-inflate==0.0.43
+pycryptodome==4.2.0
 requests==2.34.2
 holidays==0.107
 

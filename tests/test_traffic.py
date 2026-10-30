@@ -349,5 +349,25 @@ class TrafficTests(unittest.TestCase):
         self.http.assert_not_called()
 
 
+    def test_cli_help_without_processing_dependencies(self):
+        import builtins
+        import runpy
+
+        original_import = builtins.__import__
+
+        def block_processing_imports(name, *args, **kwargs):
+            if name.split(".")[0] in {"numpy", "pandas", "yaml", "pyarrow"}:
+                raise ModuleNotFoundError(f"Blocked processing dependency: {name}")
+            return original_import(name, *args, **kwargs)
+
+        with patch("builtins.__import__", side_effect=block_processing_imports):
+            with patch("sys.argv", ["traffic.py", "--help"]):
+                with self.assertRaises(SystemExit) as error:
+                    runpy.run_path(t.__file__, run_name="__main__")
+
+        self.assertEqual(error.exception.code, 0)
+        self.http.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()
