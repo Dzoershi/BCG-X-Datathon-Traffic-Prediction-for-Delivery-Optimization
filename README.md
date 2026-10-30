@@ -2,7 +2,7 @@
 
 BCG X Datathon project to forecast hourly traffic flow and occupancy on three Paris road segments and support delivery planning.
 
-Historical and recent traffic ingestion are implemented. Processing and modeling modules remain scaffolds.
+Historical archive ingestion and traffic processing are implemented. The remaining data and modeling modules are scaffolds.
 
 ## Repository structure
 
@@ -10,7 +10,7 @@ Historical and recent traffic ingestion are implemented. Processing and modeling
 data/raw/                  Original downloads, excluded from Git
 data/interim/              Cleaned intermediate data
 data/processed/            Model-ready datasets
-src/traffic_prediction/    Reusable code; ingestion in data/historical.py and data/traffic.py
+src/traffic_prediction/    Reusable code; see data/historical.py, data/traffic.py, data/build.py
 tests/                     Automated tests
 notebooks/                 Numbered notebook templates
 configs/                   Configuration
@@ -57,7 +57,22 @@ python src/traffic_prediction/data/historical.py --download --years 2023-2025
 - Temporary failures are retried up to three attempts. Interrupted downloads restart from the beginning.
 - All matching attachments are preserved separately, including the two listed for 2025.
 
-Road filtering, cleaning, and Parquet conversion belong to the processing pipeline.
+Road filtering, cleaning, and Parquet conversion are done by the traffic processing step below.
+
+## Traffic data processing
+
+Turns the downloaded archives into one hourly table for the arcs listed in `configs/baseline.yaml` (the three evaluated arcs and Champs-Elysées proxies):
+
+```powershell
+python -m traffic_prediction.data.build --start 2024-01-01 --end 2025-12-31
+```
+
+- Output: `data/processed/traffic/year=YYYY/part-0.parquet`, compressed Parquet with one file per year. Read it with `pd.read_parquet("data/processed/traffic")`.
+- Columns: `arc, role, iu_ac, datetime, debit_horaire, taux_occupation, etat_trafic, etat_barre, qualite_mesure`. Columns, time convention, quality labels, and duplicate rules are described in the data contract in `docs/methodology.md`.
+- `--start` and `--end` are inclusive days (00:00 to 23:00); they default to 2024-01-01 and 2025-12-31. Archives are read from `data/raw/historical/<year>/`; use `--raw-dir`, `--output-dir`, or `--config` to change paths.
+- Archives are streamed without extraction (about 2 minutes and under 200 MB of memory for 2024–2025). Identical archives are read once. Years covered by the period are replaced; other years already on disk are kept.
+- The final summary lists rows read, dropped, or added, and missing values per arc, variable, and month.
+- The 2023 archive uses Deflate64 compression, which Python's `zipfile` cannot read; it is not processed yet.
 
 ## Recent traffic ingestion
 
@@ -92,7 +107,7 @@ python -m unittest discover -s tests -p test_historical.py -v -b
 python -m unittest discover -s tests -p test_traffic.py -v -b
 ```
 
-The complete test suite can also run with `python -m pytest` when pytest is installed.
+The complete test suite, including traffic processing tests on small synthetic archives, runs with `python -m pytest`.
 
 ## Collaboration
 

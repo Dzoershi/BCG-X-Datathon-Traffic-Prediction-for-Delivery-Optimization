@@ -1,0 +1,32 @@
+# Road segments (arcs) kept by the traffic processing pipeline.
+# An arc is identified by its node labels, in this order: upstream -> downstream.
+# The reverse direction is a different arc with another iu_ac.
+# iu_ac is the identifier expected in the Open Data Paris files; the pipeline
+# fails if the node pair resolves to another one.
+traffic:
+  # Arcs scored by BCG X; "name" is the arc name required in the submission file.
+  evaluated_arcs:
+    - name: "Champs-Elysées"
+      upstream_node: "Av_Champs_Elysees-Washington"
+      downstream_node: "Av_Champs_Elysees-Berri"
+      iu_ac: 4264
+    - name: "Convention"
+      upstream_node: "Lecourbe-Convention"
+      downstream_node: "Convention-Blomet"
+      iu_ac: 5671
+    - name: "Saint-Pères"
+      upstream_node: "Sts_Peres-Voltaire"
+      downstream_node: "Sts_Peres-Universite"
+      iu_ac: 191
+
+  # Neighboring arcs used as substitutes: the Champs-Elysées sensor (4264)
+  # has no measurements since December 2025.
+  proxy_arcs:
+    - name: "Champs-Elysées proxy La Boétie-Berri"
+      upstream_node: "Av_Champs_Elysees-La_Boetie"
+      downstream_node: "Av_Champs_Elysees-Berri"
+      iu_ac: 4272
+    - name: "Champs-Elysées proxy Washington-Balzac"
+      upstream_node: "Av_Champs_Elysees-Washington"
+      downstream_node: "Av_Champs_Elysees-Balzac"
+      iu_ac: 4265
