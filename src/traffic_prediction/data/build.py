@@ -181,6 +181,24 @@ def validate_traffic(
         "measured hour marked absente",
         measured & table["qualite_mesure"].eq("absente"),
     )
+    quality = table["qualite_mesure"]
+    has_debit, has_taux = debit.notna(), taux.notna()
+    reject_invalid(
+        "ok row with missing measurement", quality.eq("ok") & ~(has_debit & has_taux)
+    )
+    reject_invalid(
+        "partielle row without exactly one measurement",
+        quality.eq("partielle") & has_debit.eq(has_taux),
+    )
+    reject_invalid("vide row with a measurement", quality.eq("vide") & measured)
+    reject_invalid(
+        "invalide row without a masked measurement",
+        quality.eq("invalide") & has_debit & has_taux,
+    )
+    reject_invalid(
+        "absente row with an observed state",
+        quality.eq("absente") & (table["etat_trafic"].notna() | table["etat_barre"].notna()),
+    )
 
 
 def write_partitions(table: pd.DataFrame, output_dir: Path) -> list[Path]:

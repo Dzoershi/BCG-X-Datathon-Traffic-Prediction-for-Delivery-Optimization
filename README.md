@@ -2,7 +2,7 @@
 
 BCG X Datathon: forecast hourly traffic flow and occupancy on three Paris road segments.
 
-**Status:** data download, processing, updates, and SQL queries are implemented. Modeling and final prediction export are still to do.
+**Status:** data download, processing, updates, SQL queries, and dataset/submission validation are implemented. Modeling and final prediction export are still to do.
 
 Run commands from the repository root. Terminal examples use PowerShell.
 
@@ -94,6 +94,20 @@ python -m pytest -q
 ```
 
 Tests use small fixtures and mocked network responses.
+
+## 7. Validate data and the final CSV
+
+```powershell
+python -m traffic_prediction.data.validate --write-manifest
+python -m traffic_prediction.data.validate --check-manifest
+
+# Once your forecasting code has produced the submission:
+python -m traffic_prediction.data.validate --submission "outputs/submissions/output_team.csv"
+```
+
+Checks the hourly grid, schema, duplicates, partition labels, and data constraints. The manifest at `data/processed/traffic/_validation.json` records coverage, missing measurements, configuration, versions, and file checksums. Rewrite it after an intentional dataset update.
+
+Use `--data-dir`, `--config`, or paired `--start` / `--end` dates to choose what to validate. Missing measurements are reported separately from missing rows. The CSV check enforces the brief's 360-row format; it does not generate forecasts. PR tests are configured for Windows/Linux and Python 3.10/3.13. [Validation details](docs/methodology.md#vérification-et-tests).
 
 ## Project deliverables
 

@@ -1,0 +1,57 @@
+name: Data pipeline tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.10", "3.13"]
+    env:
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Install the pinned data and test dependencies
+        shell: python
+        run: |
+          from pathlib import Path
+          import subprocess
+          import sys
+
+          required = {
+              "numpy", "pandas", "pyarrow", "pyyaml", "duckdb", "pytest",
+              "stream-unzip", "stream-inflate", "pycryptodome",
+          }
+          specifications = []
+          found = set()
+          for line in Path("requirements.txt").read_text(encoding="utf-8").splitlines():
+              line = line.split("#", 1)[0].strip()
+              name = line.split("==", 1)[0].lower().replace("_", "-")
+              if name in required:
+                  assert "==" in line, f"Unpinned dependency: {line}"
+                  specifications.append(line)
+                  found.add(name)
+          assert found == required, f"Missing dependency pins: {required - found}"
+          subprocess.run([sys.executable, "-m", "pip", "install", *specifications], check=True)
+          subprocess.run([sys.executable, "-m", "pip", "install", "-e", ".", "--no-deps"], check=True)
+      - name: Run offline tests
+        run: python -m pytest -q

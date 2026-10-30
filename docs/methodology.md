@@ -45,6 +45,7 @@ Le brief LivraisonCo 2026 fourni par les organisateurs est la référence. Les i
 | [`build.py`](../src/traffic_prediction/data/build.py) | Construction complète, schéma Arrow, validation et écriture des partitions. | Séparer le format final interne de la récupération des sources. |
 | [`query.py`](../src/traffic_prediction/data/query.py) | Vue SQL sur les fichiers Parquet et résultats Pandas. | Réutiliser les fichiers locaux dans les analyses. |
 | [`update.py`](../src/traffic_prediction/data/update.py) | Couverture, période de reprise, orchestration des téléchargements, fusion et publication. | Actualiser sans reconstruire toutes les archives ni dupliquer la normalisation. |
+| [`validate.py`](../src/traffic_prediction/data/validate.py) | Contrôles du dataset, manifeste d'intégrité et validation du CSV de prévisions. | Vérifier les artefacts et la complétude sans réimplémenter le nettoyage ou un modèle. |
 | [`configs/baseline.yaml`](../configs/baseline.yaml) | Identités, sens des arcs et rôles évalué/proxy. | Éviter de disperser ces paramètres entre notebooks et commandes. |
 | [`notebooks/`](../notebooks/) | Gabarits numérotés pour exploration, nettoyage, features, baseline, expériences et impact livraison. | Organiser le travail exploratoire ; les traitements réutilisables vont dans le package. |
 
@@ -209,7 +210,7 @@ Les mesures infinies sont également invalides et remplacées par NaN. Un état 
 - Un arc sans aucune mesure sur la période ne bloque pas le traitement : il produit un avertissement, il est compté, et ses heures restent NaN.
 - Rien n'est écarté sans être signalé. Le résumé de fin compte les lignes lues, gardées, hors période, en double et invalides, et donne la part de valeurs manquantes par arc, par variable et par mois.
 
-**Validation.** Avant l'écriture, le traitement vérifie les colonnes et leur ordre, les types, le nombre de lignes (arcs × heures), l'appartenance à la grille demandée, l'absence de doublons, la cohérence `arc`/`iu_ac`/`role`, les plages de valeurs et les labels de qualité. Après l'écriture, il relit le schéma et le nombre de lignes de chaque fichier. Les transformations sont déterministes pour les mêmes entrées, configuration et versions ; l'identité binaire des Parquet entre versions de bibliothèques n'est pas un engagement.
+**Validation.** Avant l'écriture, le traitement vérifie les colonnes et leur ordre, les types, le nombre de lignes (arcs × heures), l'appartenance à la grille demandée, l'absence de doublons, la cohérence `arc`/`iu_ac`/`role`, les plages de valeurs et les labels de qualité. Les labels sont confrontés aux mesures : `ok` exige deux valeurs, `partielle` une seule, `vide` aucune, et `invalide` au moins une mesure masquée ; une ligne `absente` ne porte ni mesure ni état observé. Après l'écriture, il relit le schéma et le nombre de lignes de chaque fichier. Les transformations sont déterministes pour les mêmes entrées, configuration et versions ; l'identité binaire des Parquet entre versions de bibliothèques n'est pas un engagement.
 
 ## Stockage, mémoire et reproductibilité
 
@@ -244,7 +245,7 @@ Pandas peut inférer une colonne `year` à partir des dossiers Hive. Cette colon
 
 Les entrées brutes sont conservées, la configuration et les versions sont explicites, et les règles de transformation et de priorité sont déterministes. Les doublons d'archives sont identifiés par SHA-256, calculé par blocs de 1 MiB. Les règles de nettoyage peuvent ainsi être réexaminées sans avoir détruit les valeurs d'origine.
 
-Il n'existe pas encore de manifeste global associant chaque résultat à tous les hashes d'entrée, à un commit, à une configuration et à un cutoff de prévision. Les snapshots API ne sont pas automatiquement sélectionnés par « plus récent » : leur ordre doit être fourni explicitement. La stabilité du jeu distant ou l'identité binaire des sorties entre environnements ne doit pas être supposée.
+Le validateur peut désormais enregistrer un manifeste du dataset traité : fichiers et SHA-256, configuration des arcs, couverture, qualité et versions. Il identifie les artefacts locaux ; il ne constitue pas encore un manifeste global de toutes les entrées brutes, du commit d'exécution et du cutoff d'un modèle. Les snapshots API ne sont pas automatiquement sélectionnés par « plus récent » : leur ordre doit être fourni explicitement. La stabilité du jeu distant ou l'identité binaire des sorties entre environnements ne doit pas être supposée.
 
 Le filtre de dates porte sur l'heure de mesure, pas sur sa date de publication ou de correction. Réinterroger aujourd'hui une ancienne période ne reconstitue donc pas nécessairement ce qui était connu à l'époque. Cette distinction devra être prise en compte pour les backtests et le gel des données de prévision.
 
@@ -365,6 +366,30 @@ La protection est un verrou entre actualisations et une publication atomique **p
 
 ## Vérification et tests
 
+### Validation locale du dataset
+
+`python -m traffic_prediction.data.validate` valide le dataset de travail existant. `--write-manifest` enregistre le rapport dans `data/processed/traffic/_validation.json` ; `--check-manifest` vérifie les artefacts courants par rapport au rapport enregistré. `--manifest-path` change l'emplacement du JSON. Aucun téléchargement réseau n'est nécessaire à ces commandes.
+
+Le validateur vérifie le schéma exact de chaque Parquet, lit les données une année à la fois via DuckDB et réutilise `build.validate_traffic`. Il contrôle les timestamps absents, les doublons, les nombres de lignes, les arcs et rôles, les valeurs et la cohérence entre les dossiers Hive `year`/`month` et les timestamps des observations.
+
+Par défaut, la grille doit être complète entre le premier et le dernier jour stockés, pour tous les arcs configurés. Une année ou une journée manquante entre deux partitions provoque une erreur. Des bornes `--start` et `--end` peuvent limiter les contrôles ligne par ligne à une période inclusive ; le schéma et les hashes continuent à couvrir tous les fichiers. Cette portée est inscrite dans le rapport.
+
+**Complétude structurelle et disponibilité des mesures sont distinctes.** Une grille complète avec des `NaN` reste valide si les labels de qualité et les contraintes sont cohérents. Le rapport indique, par arc, le nombre de lignes source, les valeurs de `q` et `k` présentes après normalisation, les manques, les labels de qualité et la dernière heure source. Il ne déclare pas automatiquement le dataset suffisant pour entraîner un modèle.
+
+### Métadonnées et reproductibilité : issue #9
+
+Le rapport versionné contient les chemins relatifs, tailles, SHA-256 et nombres de lignes des Parquet ; la couverture stockée et la fenêtre validée ; les identités d'arcs ; les versions de Python et des principales bibliothèques. L'empreinte du dataset porte sur ses fichiers et la configuration canonique des arcs. La date de validation, le chemin absolu et le système d'exploitation n'entrent pas dans cette empreinte ; les commentaires YAML ne changent pas l'identité de la configuration.
+
+La vérification compare des **artefacts exacts**, pas une équivalence sémantique entre deux encodages Parquet différents. Copier les mêmes fichiers sur une autre machine conserve leur identité ; reconstruire des valeurs identiques avec un autre encodeur peut changer les octets. Le test de reproduction du pipeline compare donc aussi les résultats Pandas triés.
+
+Les inventaires sont comparés avant et après la validation pour détecter les modifications en cours de lecture. Un verrou d'actualisation présent bloque le contrôle. Le JSON n'est remplacé qu'après une validation réussie, par une écriture temporaire atomique ; une validation ou publication échouée conserve le précédent manifeste. Après une mise à jour volontaire des observations, relancer `--write-manifest` pour enregistrer leur nouvel état.
+
+### Validation du rendu officiel
+
+`python -m traffic_prediction.data.validate --submission outputs/submissions/output_team.csv` vérifie le nom `output_<nom_du_groupe>.csv`, charge un CSV séparé par des points-virgules et vérifie les quatre colonnes, les trois noms officiels, les 360 couples arc/heure uniques du 7 au 11 novembre 2026, le format exact `%Y-%m-%d %H:%M` et des mesures flottantes finies. Le débit doit être positif ou nul et le taux d'occupation compris entre 0 et 100.
+
+Ce contrôle ne produit aucune prévision et ne mesure pas la RMSE. La règle provisoire de nettoyage des observations `q=0, k>0` n'est pas appliquée aux valeurs prédites. La génération et l'export du CSV par un modèle restent à construire.
+
 ### Stratégie retenue
 
 Les tests utilisent de petits fichiers représentatifs et des réponses réseau simulées. Ils doivent vérifier les contrats et les échecs qui risqueraient de perdre des données, sans exiger un téléchargement de plusieurs gigaoctets ni une API vivante.
@@ -376,9 +401,10 @@ Les tests utilisent de petits fichiers représentatifs et des réponses réseau 
 | [`test_traffic_processing.py`](../tests/test_traffic_processing.py) | Normalisation des deux sources, états et mesures invalides, conventions de temps, doublons, grille, frontières d'années, proxies vides, schéma et round-trip Parquet, CLI et mélange des sources. |
 | [`test_query.py`](../tests/test_query.py) | Vue SQL, partitions année/mois, fichiers et chemins avec espaces ou apostrophes, paramètres, filtres, agrégations, jointures, nulls, sortie réelle du build, plan Parquet et fermeture des connexions. |
 | [`test_update.py`](../tests/test_update.py) | Ajouts, corrections nulles, répétitions sans réécriture, histoire préservée, couverture source, bootstrap, jours de 23/25 heures, échecs réseau/écriture/validation, rollback, interruption clavier et verrou concurrent. |
+| [`test_data.py`](../tests/test_data.py) | Chaîne HTTP simulée → ingestion → build → SQL → actualisation → manifeste, reprise après interruptions, reproduction dans un autre dossier, erreurs de complétude, intégrité et contrat du CSV officiel. |
 | [`test_imports.py`](../tests/test_imports.py) | Import des modules du package, y compris les points d'entrée nouvellement ajoutés. |
 
-La dernière exécution consignée a donné **205 tests et 27 sous-tests réussis** sous Python 3.12. Les contrôles de documentation ont aussi parsé les blocs PowerShell, vérifié les options de commandes et les liens locaux, puis exécuté les exemples SQL sur des Parquet de test.
+La dernière exécution locale consignée a donné **249 tests et 27 sous-tests réussis** sous Python 3.12. Les contrôles de documentation ont aussi parsé les blocs PowerShell, vérifié les options de commandes et les liens locaux, puis exécuté les exemples SQL sur des Parquet de test.
 
 Un snapshot récent réel de **2 974 observations** a auparavant été converti en **120 lignes horaires** pour les cinq arcs configurés sur une journée, avec contrôle du schéma Parquet. Ce contrôle ponctuel ne remplace pas un test exhaustif de toutes les années ou de l'API en production.
 
@@ -391,7 +417,13 @@ Un snapshot récent réel de **2 974 observations** a auparavant été converti 
 - L'absence de fuite temporelle dans un futur modèle ou la qualité des prévisions : ces composants restent à écrire.
 - La reproduction des chiffres d'exploration de l'équipe sur toutes les archives.
 
-Il n'y a pas de workflow CI configuré dans le dépôt à cette date. `test_data.py` et `test_features.py` sont encore des emplacements réservés ; leurs noms ne signifient pas qu'une suite de validation de modèle existe déjà.
+### Tests automatiques sur GitHub
+
+Le workflow [Data pipeline tests](../.github/workflows/tests.yml) est configuré sur les PR, les pushes vers `main` et les déclenchements manuels. La matrice couvre Windows et Linux avec Python 3.10 et 3.13 ; la vérification locale ci-dessus utilise Python 3.12. Les actions de checkout et d'installation de Python sont épinglées par commit, et le jeton de workflow n'a que le droit de lecture du dépôt.
+
+La CI extrait les versions du sous-ensemble données/tests directement depuis `requirements.txt`, installe le package éditable et lance `python -m pytest -q`. Les bibliothèques lourdes de modèles ne sont pas installées tant que les tests ne les utilisent pas. Il faudra adapter ce périmètre à l'implémentation des modèles. Les tests du pipeline n'appellent pas l'API réelle.
+
+La configuration du workflow ne constitue pas une exécution distante réussie : son résultat devra être vérifié lors de la publication de la PR. `test_features.py` reste un emplacement réservé ; aucune suite de validation de modèle ou de fuite temporelle n'est encore implémentée.
 
 ## Modélisation, évaluation et feuille de route
 
@@ -405,7 +437,7 @@ Il n'y a pas de workflow CI configuré dans le dépôt à cette date. `test_data
 | Familles de modèles | Répertoire `models/` ; scikit-learn, LightGBM, Chronos et PyTorch préparés dans les dépendances. | Ces bibliothèques sont des possibilités, pas une architecture gagnante ou une décision de modèle final. |
 | Entraînement | `train.py`. | Implémenter la préparation sur les données d'entraînement, l'ajustement et la sauvegarde. |
 | Évaluation | `evaluate.py` et notebook 05. | Fixer les découpages chronologiques et mesurer la RMSE des deux cibles sur les mêmes fenêtres. |
-| Prévision et export | `predict.py`. | Produire les 120 heures × 3 arcs, vérifier les quatre colonnes et exporter le CSV demandé. |
+| Prévision et export | `predict.py` ; contrôle du format disponible dans `data/validate.py`. | Produire les 120 heures × 3 arcs et exporter le CSV demandé ; le validateur ne génère pas les valeurs. |
 | Impact livraison | Notebook 06. | Construire la proposition métier, ses hypothèses et la feuille de route des sept planches. |
 
 Ces fichiers et notebooks sont actuellement des gabarits ou des modules documentés sans implémentation de modèle. Aucun entraînement, sélection de modèle ou génération complète du CSV final n'est réalisé par les commandes de données.
@@ -443,7 +475,7 @@ Le brief fournit les coûts horaires et les durées de vacation. La présentatio
 | Proxies 4272 et 4265 | Candidats configurés, avec fortes lacunes rapportées. | Mesurer leur utilité séparément pour `q` et `k` ; vérifier les autres candidats avant adoption. |
 | `etat_barre` et `etat_trafic` | Champs conservés dans le contrat ; réserves de l'exploration. | Décider des features selon qualité et disponibilité à l'instant de prévision. |
 | Modèles, enrichissements, scores | Gabarits et bibliothèques préparés. | Choisir une baseline, les backtests, les variables et les expériences sur des critères mesurés. |
-| Reproductibilité finale | Bruts, versions et règles conservés ; pas de manifeste global. | Figer le cutoff et les entrées utilisées pour chaque score et pour le rendu. |
+| Reproductibilité finale | Bruts conservés et manifeste des fichiers traités disponible ; pas de provenance complète d'un modèle. | Figer le cutoff et toutes les entrées utilisées pour chaque score et pour le rendu. |
 | Validation réelle 2023 | Support testé sur fixtures Deflate64. | Vérifier le vrai téléchargement et traitement de l'archive quand cette année est nécessaire. |
 
 ## Mise à jour de ce document
