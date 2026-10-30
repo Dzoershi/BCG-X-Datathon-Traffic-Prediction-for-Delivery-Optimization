@@ -1,91 +1,77 @@
 # Traffic Prediction for Delivery Optimization
 
-A BCG X Datathon project for predicting traffic and assessing its impact on delivery operations.
+BCG X Datathon project to forecast hourly traffic flow and occupancy on three Paris road segments and support delivery planning.
+
+Historical archive ingestion is implemented. The remaining data and modeling modules are scaffolds.
 
 ## Repository structure
 
 ```text
-.
-|-- data/
-|   |-- raw/                 # Downloaded by scripts; never add or edit by hand
-|   |-- interim/             # Cleaned intermediate data
-|   `-- processed/           # Model-ready features
-|-- notebooks/               # Numbered notebook templates; work in your own copy
-|-- src/traffic_prediction/  # Reusable Python code
-|   |-- data/                # One module per data source
-|   |   |-- traffic.py         # Open Data Paris traffic counts
-|   |   |-- calendar_events.py # Public and school holidays
-|   |   |-- weather.py         # Weather
-|   |   |-- disruptions.py     # Roadworks and events
-|   |   `-- build.py           # Assembly of all sources
-|   |-- models/              # One module per model family
-|   |-- features.py          # Time, location, and historical features
-|   |-- train.py             # Model training
-|   |-- predict.py           # Inference
-|   `-- evaluate.py          # Metrics and error analysis
-|-- configs/baseline.yaml    # Paths and experiment settings
-|-- models/                  # Saved models (ignored by Git)
-|-- outputs/
-|   |-- figures/
-|   |-- metrics/
-|   `-- submissions/
-|-- tests/                   # Tests for reusable code
-`-- docs/
-    |-- methodology.md       # Data contract, decisions, findings, model choice
-    `-- experiments.csv      # One row per experiment, shared by the team
+data/raw/                  Original downloads, excluded from Git
+data/interim/              Cleaned intermediate data
+data/processed/            Model-ready datasets
+src/traffic_prediction/    Reusable code; historical ingestion in data/historical.py
+tests/                     Automated tests
+notebooks/                 Numbered notebook templates
+configs/                   Configuration
+docs/                      Methodology and experiment log
+models/                    Saved models, excluded from Git
+outputs/                   Figures, metrics, and submissions, excluded from Git
 ```
 
 ## Setup
 
-Use Python 3.10 or newer. From the repository root:
+Use Python 3.10 or newer. From the repository root, create and activate a virtual environment if needed (PowerShell):
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-python -m pip install -e .
-nbstripout --install
-jupyter lab
+python -m pip install -e . --no-deps
 ```
 
-Select the virtual environment's Python kernel when opening notebooks.
+Historical ingestion and its tests use Python's standard library. Other project dependencies are listed in `requirements.txt`.
 
-Run `nbstripout --install` once on each computer, and again if you recreate `.venv`. It removes notebook outputs and execution counts when you commit, so diffs stay readable and notebooks do not conflict. Check it with `nbstripout --status`.
+## Historical traffic ingestion
 
-`chronos-forecasting` installs PyTorch. On Windows and macOS, the default build runs on CPU only and weighs about 125 MB. On Linux, pip also downloads several GB of CUDA libraries, so install the CPU build first, using the version pinned in `requirements.txt`:
+Source: [Paris Open Data historical traffic archives](https://opendata.paris.fr/explore/dataset/comptages-routiers-permanents-historique/).
 
-```bash
-python -m pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
+Run commands from the repository root.
+
+List available archives:
+
+```powershell
+python src/traffic_prediction/data/historical.py --list
 ```
 
-## Workflow
+Download one year or an inclusive range:
 
-1. Download the datasets with the code in `src/traffic_prediction/data/`. Never place or edit files in `data/raw/` by hand: we will rerun the whole pipeline from scratch on 6 November. Dataset files are excluded from Git.
-2. Work in your own copy of a numbered notebook, suffixed with your first name (for example, `01_data_exploration_hassan.ipynb`). Leave the numbered templates unchanged.
-3. Move code that works into `src/traffic_prediction/` and import it in notebooks.
-4. Define the prediction target, chronological validation periods, and metric before training.
-5. Save model artifacts in `models/`, metrics in `outputs/metrics/`, and prediction files in `outputs/submissions/`.
-6. Record findings and delivery impact in `docs/methodology.md`, and add one row per experiment to `docs/experiments.csv`.
+```powershell
+python src/traffic_prediction/data/historical.py --download --years 2024
+python src/traffic_prediction/data/historical.py --download --years 2023-2025
+```
 
-The notebooks and Python modules are starting templates, and there is no model pipeline yet. Update `configs/baseline.yaml` once we know the dataset schema and the challenge requirements. Add the training, evaluation, and submission commands here once they exist.
+- Downloads require `--years`. An unavailable year causes the command to fail before downloading.
+- Archives are stored unchanged at `data/raw/historical/<year>/<attachment_id>.zip`. Use `--output-dir PATH` to override the destination.
+- Downloads stream in chunks and use temporary `.part` files until ZIP integrity checks pass. Validation reads decompressed contents without extracting them and can take time.
+- Valid existing archives are checked and reused. Remote revisions are not automatically detected.
+- Temporary failures are retried up to three attempts. Interrupted downloads restart from the beginning.
+- All matching attachments are preserved separately, including the two listed for 2025.
+
+Road filtering, cleaning, and Parquet conversion belong to the processing pipeline.
+
+## Tests
+
+Run the historical ingestion tests without a live connection or large downloads:
+
+```powershell
+python -m unittest discover -s tests -p test_historical.py -v -b
+```
+
+The complete test suite can also run with `python -m pytest` when pytest is installed.
 
 ## Collaboration
 
-- One issue = one branch = one reviewed pull request.
-- Never push directly to `main`. Every change goes through a pull request that another team member reviews.
-
-## Data and validation conventions
-
-- Keep raw datasets unchanged; write derived data to `interim/` or `processed/`.
-- For forecasting, split chronologically and fit preprocessing on training data only.
-- Build historical features using only information available at prediction time.
-- Compare experiments against a simple baseline on the same validation split.
-- Keep large datasets, saved models, and generated outputs out of Git.
-
-## Checks
-
-Run `python -m pytest` from the repository root once there are tests. For now, the test files only contain guidance.
-
-## Project brief
-
-Place the project brief at `docs/project_brief.pdf` if you have it. This scaffold does not include it.
+- One issue, one branch, one pull request reviewed by another teammate. Never push directly to `main`.
+- Keep raw downloads unchanged and generated datasets out of Git.
+- Work in a named copy of a notebook template, such as `01_data_exploration_cécile.ipynb`.
+- Put reusable code in `src/traffic_prediction/` and document decisions in `docs/methodology.md`.
