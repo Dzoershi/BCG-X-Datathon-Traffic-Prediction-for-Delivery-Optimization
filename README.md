@@ -2,7 +2,7 @@
 
 BCG X Datathon project to forecast hourly traffic flow and occupancy on three Paris road segments and support delivery planning.
 
-Historical archive ingestion and traffic processing are implemented. The remaining data and modeling modules are scaffolds.
+Historical archive ingestion, recent traffic ingestion, and traffic processing from both sources are implemented. The remaining data and modeling modules are scaffolds.
 
 ## Repository structure
 
@@ -29,7 +29,19 @@ python -m venv .venv
 python -m pip install -e . --no-deps
 ```
 
-Both ingestion modules and their tests use Python's standard library. Other project dependencies are listed in `requirements.txt`.
+Recent downloads and ordinary historical ZIP downloads use Python's standard library. The shared `traffic.py` module loads processing dependencies only when processing functions are called.
+
+For Deflate64 archives, including 2023, install the optional streaming decoder and its pinned dependencies. These are also required by the historical ingestion tests, which include genuine Deflate64 fixtures:
+
+```powershell
+python -m pip install stream-unzip==0.0.100 stream-inflate==0.0.43 pycryptodome==4.2.0
+```
+
+For traffic processing, install the data dependencies pinned in `requirements.txt`:
+
+```powershell
+python -m pip install numpy==2.2.6 pandas==2.3.3 pyarrow==25.0.1 PyYAML==6.0.3
+```
 
 ## Historical traffic ingestion
 
@@ -56,12 +68,13 @@ python src/traffic_prediction/data/historical.py --download --years 2023-2025
 - Valid existing archives are checked and reused. Remote revisions are not automatically detected.
 - Temporary failures are retried up to three attempts. Interrupted downloads restart from the beginning.
 - All matching attachments are preserved separately, including the two listed for 2025.
+- The published 2023 archive uses Deflate64. With the optional decoder installed, validation and processing stream its contents without extraction and check member sizes and CRCs. Missing decoder errors include the installation command.
 
 Road filtering, cleaning, and Parquet conversion are done by the traffic processing step below.
 
 ## Traffic data processing
 
-Turns the downloaded archives into one hourly table for the arcs listed in `configs/baseline.yaml` (the three evaluated arcs and Champs-Elysées proxies):
+Turns downloaded archives and explicitly selected recent snapshots into one hourly table for the arcs listed in `configs/baseline.yaml` (the three evaluated arcs and Champs-Elysées proxies):
 
 ```powershell
 python -m traffic_prediction.data.build --start 2024-01-01 --end 2025-12-31
@@ -70,13 +83,27 @@ python -m traffic_prediction.data.build --start 2024-01-01 --end 2025-12-31
 - Output: `data/processed/traffic/year=YYYY/part-0.parquet`, compressed Parquet with one file per year. Read it with `pd.read_parquet("data/processed/traffic")`.
 - Columns: `arc, role, iu_ac, datetime, debit_horaire, taux_occupation, etat_trafic, etat_barre, qualite_mesure`. Columns, time convention, quality labels, and duplicate rules are described in the data contract in `docs/methodology.md`.
 - `--start` and `--end` are inclusive days (00:00 to 23:00); they default to 2024-01-01 and 2025-12-31. Archives are read from `data/raw/historical/<year>/`; use `--raw-dir`, `--output-dir`, or `--config` to change paths.
-- Archives are streamed without extraction (about 2 minutes and under 200 MB of memory for 2024–2025). Identical archives are read once. Years covered by the period are replaced; other years already on disk are kept.
+- When the period starts on January 1, available readable archives from the preceding year are also included to recover midnight. Missing or unsupported optional boundary archives produce a warning.
+- Archives are streamed without extraction; JSONL snapshots are read in batches. Only configured arcs inside the requested period are accumulated for the hourly table. The selected rows and final hourly grid still occupy RAM; processing is not fully out of core. Identical archives are read once.
+- Each run replaces the entire output file for each year in its period, even for a one-day build. Use a separate `--output-dir` for experiments. Updating existing partitions without replacement belongs to the incremental-update issue.
 - The final summary lists rows read, dropped, or added, and missing values per arc, variable, and month.
-- The 2023 archive uses Deflate64 compression, which Python's `zipfile` cannot read; it is not processed yet.
+- Deflate64 archives, including 2023, require the optional decoder above. Their members are read in physical archive order; ordinary ZIP members retain filename order.
+
+Include a completed recent download by passing its path (replace the example path with your file):
+
+```powershell
+python -m traffic_prediction.data.build --start 2026-10-29 --end 2026-10-29 --recent-file "data/raw/recent/YOUR_SNAPSHOT.jsonl" --output-dir "data/processed/recent_check"
+```
+
+- Repeat `--recent-file PATH` to include multiple snapshots. Files are read in argument order, after historical archives. Recent files are not discovered automatically.
+- For overlapping arc/hour pairs, the last row wins in full, including nulls. This does not fill missing measurements from an older row or from a proxy. Identical and conflicting duplicates are counted in the summary.
+- Recent-only builds work when no historical archive is available for the requested period. API timestamps are converted to Paris local time before filtering by the inclusive build dates.
 
 ## Recent traffic ingestion
 
 Source: [Paris Open Data recent traffic observations](https://opendata.paris.fr/explore/dataset/comptages-routiers-permanents/).
+
+`traffic.py` contains both the recent downloader and processing helpers. Its command line previews or downloads raw observations; `python -m traffic_prediction.data.build` processes historical archives and snapshots selected with `--recent-file` into Parquet.
 
 Preview observations for a timestamp range:
 
@@ -107,7 +134,7 @@ python -m unittest discover -s tests -p test_historical.py -v -b
 python -m unittest discover -s tests -p test_traffic.py -v -b
 ```
 
-The complete test suite, including traffic processing tests on small synthetic archives, runs with `python -m pytest`.
+The complete test suite, including mixed-source builds, CLI checks, and a mocked recent-download-to-Parquet integration test, runs with `python -m pytest`. It requires the processing dependencies above and `pytest==9.2.0`.
 
 ## Collaboration
 

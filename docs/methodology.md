@@ -30,7 +30,7 @@ Les valeurs manquantes sont NaN pour les mesures et `<NA>` pour les états. Aucu
 - Au retour à l'heure d'hiver, l'heure 02:00, qui se produit deux fois, n'apparaît qu'une fois dans la source. L'une des deux heures réelles est perdue.
 - Les heures de l'API récente sont en UTC avec fuseau. `normalize_raw` les convertit en heure de Paris sans fuseau. Sur la période où les deux sources se recouvrent (septembre à décembre 2025, Convention et Saint-Pères), les valeurs concordent à 100 % à la même étiquette d'heure, sans aucun décalage.
 - Les heures ne sont pas décalées pour suivre le format de rendu : on ne sait pas encore si BCG X désigne le début ou la fin de l'heure. La question reste ouverte.
-- Conséquence : la ligne `2024-01-01 00:00` se trouve dans l'archive 2023 et apparaît donc `absente`. La ligne `2026-01-01 00:00` de l'archive 2025 est hors période ; elle est comptée dans le résumé.
+- Quand la période commence le 1er janvier, les archives lisibles de l'année précédente sont également recherchées pour récupérer la ligne de minuit. Une archive précédente manquante ou de compression non prise en charge produit un avertissement. L'archive 2023 est maintenant lisible avec le décodeur Deflate64 optionnel ; sans cette archive ou une autre source fournie contenant la mesure, `2024-01-01 00:00` reste `absente`. Les lignes hors période sont comptées dans le résumé.
 
 **Qualité de la mesure (`qualite_mesure`).**
 
@@ -44,15 +44,19 @@ Les valeurs manquantes sont NaN pour les mesures et `<NA>` pour les états. Aucu
 
 `etat_barre` n'entre pas dans le calcul de la qualité.
 
+Les mesures infinies sont également invalides et remplacées par NaN. Un état fourni avec un code ou un libellé inconnu arrête le traitement ; un état manquant reste manquant.
+
 **Doublons.**
 
 - Une archive identique à une autre (même SHA-256) n'est lue qu'une fois. C'est le cas de 2025, que le portail liste deux fois.
-- Si plusieurs lignes portent le même couple (`arc`, `datetime`) avec des valeurs identiques, une seule est gardée. Si leurs valeurs diffèrent, on garde la dernière dans l'ordre de lecture. Les fichiers sont lus par ordre de nom, qui est l'ordre chronologique. Les deux cas sont comptés dans le résumé. Aucun cas n'a été observé en 2024–2025.
+- Si plusieurs lignes portent le même couple (`arc`, `datetime`) avec des valeurs identiques, une seule est gardée. Si leurs valeurs diffèrent, on garde la dernière ligne entière dans l'ordre de lecture, y compris ses valeurs manquantes. Les deux cas sont comptés dans le résumé.
+- Les archives sont lues par ordre de nom. Leurs membres sont lus par ordre de nom pour les ZIP ordinaires, et dans l'ordre physique de l'archive pour Deflate64 afin de décompresser en flux. Les snapshots JSONL sont lus ensuite, dans l'ordre explicite des arguments `--recent-file`. Leur nom aléatoire ne permet pas de déduire leur date d'extraction : aucun tri automatique ni mélange des valeurs de plusieurs lignes n'est effectué.
 
 **Filtre et garde-fous.**
 
 - Un arc est défini par son couple (nœud amont, nœud aval), dans cet ordre. Le sens inverse est un autre arc, avec un autre `iu_ac`.
 - Si un couple de nœuds configuré apparaît avec un autre `iu_ac` que celui attendu, le traitement s'arrête.
+- Un horodatage manquant ou qui ne correspond pas à une heure entière de Paris arrête le traitement avant la création de la grille, pour éviter de perdre silencieusement une observation.
 - Un arc sans aucune mesure sur la période ne bloque pas le traitement : il produit un avertissement, il est compté, et ses heures restent NaN.
 - Rien n'est écarté sans être signalé. Le résumé de fin compte les lignes lues, gardées, hors période, en double et invalides, et donne la part de valeurs manquantes par arc, par variable et par mois.
 
@@ -61,9 +65,9 @@ Les valeurs manquantes sont NaN pour les mesures et `<NA>` pour les états. Aucu
 ## Décisions
 
 - **Heure** : on garde `t_1h` tel quel (heure de Paris sans fuseau, fin de l'heure). On n'ajoute pas de colonne UTC : les heures du changement d'heure ne sont pas convertibles sans ambiguïté, et la source compte 24 heures par jour.
-- **Sortie** : `data/processed/traffic/`, partitionnée par année. `build.py` contient une fonction par source (`build_traffic` pour l'instant). La lecture et la mise au format sont dans `traffic.py`, qui sera réutilisé pour les données récentes (issue #5).
+- **Sortie** : `data/processed/traffic/`, partitionnée par année. `build.py` contient une fonction par source (`build_traffic` pour l'instant). `traffic.py` réunit l'extraction API récente (issue #5) et les fonctions de lecture et de mise au format (issue #6). Sa commande en ligne extrait les données brutes ; celle de `build.py` traite les archives historiques et les snapshots JSONL explicitement fournis avec `--recent-file`. Une construction remplace le fichier complet de chaque année concernée, même si la période demandée ne couvre qu'un jour. Utiliser un autre dossier de sortie pour les essais ; la mise à jour incrémentale reste un travail distinct.
 - **Arcs proxy** pour les Champs-Élysées : 4272 (La Boétie → Berri) et 4265 (Washington → Balzac), parce que l'arc évalué n'a plus de mesures depuis novembre 2025.
-- **2023** est laissé de côté pour l'issue #6 : l'archive est compressée en Deflate64, que le module `zipfile` de Python ne sait pas lire.
+- **2023 / Deflate64** : l'ingestion et le traitement utilisent `stream-unzip` à la demande pour cette compression. Lecture par blocs sans extraction ; tailles et CRC sont contrôlés, y compris pour les membres ignorés par le traitement. `zipfile` reste utilisé seul pour les archives ordinaires. Les dépendances optionnelles et leur installation sont indiquées dans le README.
 
 ## Constats d'exploration
 
@@ -82,7 +86,7 @@ Les valeurs manquantes sont NaN pour les mesures et `<NA>` pour les états. Aucu
 - **Proxy La Boétie-Berri (4272)** : on n'y trouve quasiment que le taux d'occupation. `q` manque à 96,6 % et n'est présent qu'en janvier 2024. Question ouverte : faut-il le garder comme proxy de taux seulement, ou chercher un autre proxy ? Candidats vus dans l'API en 2026, en part d'heures avec `k`, sans avoir vérifié `q` : 4274 (Berri → La Boétie, sens inverse, environ 75 %) et 4267 (Balzac → Washington, sens inverse, environ 47 %).
 - **Proxy Washington-Balzac (4265)** : il est très dégradé à partir d'avril 2025. `q` manque à 85–100 % chaque mois, et `k` manque à 100 % de juillet à novembre 2025.
 - **`q = 0` alors que `k > 0`** : 98 heures sur La Boétie-Berri et 101 sur Washington-Balzac, aucune sur les arcs évalués. Ces lignes sont marquées `invalide`.
-- **L'archive 2023 est compressée en Deflate64**, illisible par `zipfile`. Elle est laissée de côté pour l'instant.
+- **L'archive 2023 est compressée en Deflate64**, illisible par `zipfile` seul. Cette limite est désormais prise en charge par le lecteur en flux optionnel.
 - **API récente (pour l'issue #5)** :
   - elle commence le 01/09/2025 et recouvre donc l'archive jusqu'à fin 2025 ;
   - elle a elle aussi des heures absentes ;
