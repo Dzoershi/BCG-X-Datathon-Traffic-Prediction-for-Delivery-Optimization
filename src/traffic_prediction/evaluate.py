@@ -100,7 +100,8 @@ def backtest(
     """Score a model using only history through each Thursday 23:00.
 
     All supplied arcs are scored.
-    Truth and predictions are aligned on a complete arc/hour grid.
+    Missing/invalid truth is ignored per variable and counted on a complete
+    arc/hour grid. A missing/nonfinite forecast for valid truth is an error.
     Atypical means Saturday, Sunday or a metropolitan France public holiday.
     Aggregates are unweighted means of available arc/window RMSEs, not pooled
     errors; coverage and numbers of contributing groups accompany every mean.
@@ -139,7 +140,8 @@ def backtest(
                 y = actual[variable].to_numpy(dtype=float, na_value=np.nan)
                 p = predicted[variable].to_numpy(dtype=float, na_value=np.nan)
                 b = baseline[variable].to_numpy(dtype=float, na_value=np.nan)
-                valid = np.ones(len(y), dtype=bool)
+                valid = actual["qualite_mesure"].eq("ok").fillna(False).to_numpy(dtype=bool) & np.isfinite(y)
+                valid &= (y >= 0) if variable == "debit_horaire" else ((y >= 0) & (y <= 100))
                 if not np.isfinite(p[valid]).all():
                     raise ValueError(f"Missing/nonfinite prediction for valid truth: {arc}, {day.date()}, {variable}")
                 for subset, mask in (("all", np.ones(120, dtype=bool)), ("atypical", atypical)):
