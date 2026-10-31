@@ -24,7 +24,8 @@ Le statut « implémenté » décrit l'arbre de travail ; le statut de publicati
 12. [Météo](#météo-issue-21)
 13. [Baselines](#baselines-issue-17)
 14. [Chantiers et événements](#chantiers-et-événements-issue-34)
-15. [Décisions ouvertes](#décisions-ouvertes)
+15. [Chronos-2](#chronos-2-issue-19)
+16. [Décisions ouvertes](#décisions-ouvertes)
 
 ## Périmètre du brief
 
@@ -410,9 +411,10 @@ Les tests utilisent de petits fichiers représentatifs et des réponses réseau 
 | [`test_data.py`](../tests/test_data.py) | Chaîne HTTP simulée → ingestion → build → SQL → actualisation → manifeste, reprise après interruptions, reproduction dans un autre dossier, erreurs de complétude, intégrité et contrat du CSV officiel. |
 | [`test_weather.py`](../tests/test_weather.py) | Météo sans réseau : requêtes UTC et copie brute, étiquettes de Paris et changements d'heure, jointure avec la grille trafic, raccord historique/prévision, rafraîchissement, nouvelles tentatives, validation et CLI. |
 | [`test_disruptions.py`](../tests/test_disruptions.py) | Chantiers et événements sans réseau : distance à l'arc, seuils de 50 et 200 m, conversion des dates, règle de `chantier_actif`, étiquettes horaires, lignes « non appliqué », liste manuelle mal formée refusée et fichier versionné validé, requêtes, nouvelles tentatives, construction et CLI. |
+| [`test_chronos.py`](../tests/test_chronos.py) | Chronos-2 sans torch ni chronos : un faux pipeline enregistre ce que le modèle recevrait. Format, 120 heures par arc, horizon de 144 heures, espion anti-fuite, heures non `ok` en NaN, bornes, repli au seuil de 168 heures, covariables sur tout l'horizon, médiane, moyenne ou quantile par type de jour, rendu officiel valide, réglages par défaut. La comparaison avec la vraie signature de `predict_df` n'est exécutée que si chronos est installé. |
 | [`test_imports.py`](../tests/test_imports.py) | Import des modules du package, y compris les points d'entrée nouvellement ajoutés. |
 
-La dernière exécution locale consignée a donné **249 tests et 27 sous-tests réussis** sous Python 3.12. Les contrôles de documentation ont aussi parsé les blocs PowerShell, vérifié les options de commandes et les liens locaux, puis exécuté les exemples SQL sur des Parquet de test.
+La dernière exécution locale consignée (1er novembre 2026, issue #19) a donné **479 tests et 27 sous-tests réussis** sous Python 3.13 ; sans torch ni chronos, comme en CI, 478 réussis et 1 sauté. Les contrôles de documentation ont aussi parsé les blocs PowerShell, vérifié les options de commandes et les liens locaux, puis exécuté les exemples SQL sur des Parquet de test.
 
 Un snapshot récent réel de **2 974 observations** a auparavant été converti en **120 lignes horaires** pour les cinq arcs configurés sur une journée, avec contrôle du schéma Parquet. Ce contrôle ponctuel ne remplace pas un test exhaustif de toutes les années ou de l'API en production.
 
@@ -442,7 +444,7 @@ La configuration du workflow ne constitue pas une exécution distante réussie :
 | Données externes | Modules `weather.py`, `calendar_events.py`, `disruptions.py` et dépendance `holidays`. | Météo implémentée : voir [Météo](#météo-issue-21). Chantiers et événements implémentés comme table de contrôle, pas comme variable d'entraînement : voir [Chantiers et événements](#chantiers-et-événements-issue-34). |
 | Feature engineering | `features.py` et notebook 03. | Définir les variables temporelles, retards et agrégats ; contrôler l'absence d'information future. |
 | Baseline | `models/baselines.py` et notebook 04. | Quatre baselines mesurées et consignées ; voir [Baselines](#baselines-issue-17). |
-| Familles de modèles | Répertoire `models/` ; scikit-learn, LightGBM, Chronos et PyTorch préparés dans les dépendances. | Ces bibliothèques sont des possibilités, pas une architecture gagnante ou une décision de modèle final. |
+| Familles de modèles | Répertoire `models/` ; scikit-learn, LightGBM, Chronos et PyTorch préparés dans les dépendances. | Chronos-2 mesuré : voir [Chronos-2](#chronos-2-issue-19). Le modèle final reste à choisir (#32). |
 | Entraînement | `train.py`. | Implémenter la préparation sur les données d'entraînement, l'ajustement et la sauvegarde. |
 | Évaluation | `evaluate.py`, contrat `models/base.py` et huit fenêtres configurées. | Backtest implémenté ; mesurer les modèles sur les données locales disponibles. |
 | Prévision et export | `predict.py` ; contrôle du format disponible dans `data/validate.py`. | Produire les 120 heures × 3 arcs et exporter le CSV demandé ; le validateur ne génère pas les valeurs. |
@@ -607,6 +609,7 @@ Les bornes ne servent qu'à détecter une erreur d'unité ou de lecture ; les re
 - Open-Meteo signale que les versions des modèles changent dans le temps.
 - La stabilité des valeurs passées d'Historical Forecast entre deux téléchargements n'a pas été vérifiée ; le rafraîchissement ne retélécharge pas l'historique stocké.
 - La prévision téléchargée le 31 octobre classe aussi en `forecast` le 31 octobre, déjà présent dans le trafic ; après le rafraîchissement du 6 novembre, toutes les heures de trafic connues ont une météo `historical_forecast`.
+- **Testée comme covariable de Chronos-2 : aucun gain**, même avec cette météo presque observée, y compris sur les heures de pluie (voir [Chronos-2](#chronos-2-issue-19)).
 
 ## Baselines (issue #17)
 
@@ -786,6 +789,140 @@ Les erreurs de `HolidayAwarePreviousWeekBaseline` ont été recalculées heure p
 5. Confirmer la grève du 05/11 avec les plans de transport SNCF publiés le 04/11.
 6. Comparer le samedi 31/10 et le dimanche 01/11 sur Saint-Pères et Convention à un samedi et un dimanche normaux. S'ils sont perturbés, la semaine recopiée par `HolidayAwarePreviousWeek` est biaisée pour le 07/11, le 08/11 et le 11/11.
 
+## Chronos-2 (issue #19)
+
+[`models/chronos.py`](../src/traffic_prediction/models/chronos.py) applique Chronos-2, le modèle de prévision pré-entraîné d'Amazon, sans entraînement sur nos données (*zero-shot*). La classe `Chronos2Forecaster` respecte le contrat `ForecastModel` ; `Chronos2Forecaster(calendar)` donne l'essai retenu (essai 4). Les dix essais sont consignés dans [`experiments.csv`](experiments.csv), avec leur temps de calcul.
+
+### Fonctionnement
+
+| Élément | Choix | Raison |
+|---|---|---|
+| Modèle | `amazon/chronos-2`, 120 M de paramètres, licence Apache-2.0, révision épinglée `29ec3766` (5 juin 2026), appelé par `predict_df` de `chronos-forecasting` 2.3.2. | Mêmes poids pour toute l'équipe et pour le rendu. |
+| Contexte | Les 8 192 dernières heures (maximum du modèle, environ 11 mois), sur une grille horaire régulière. Les heures dont la qualité n'est pas `ok` sont des NaN, que le modèle masque. | Chronos-2 exige des pas réguliers ; une valeur douteuse ne doit pas entrer dans le contexte. |
+| Horizon | 144 heures depuis le jeudi 23:00 (le vendredi, puis les 120 heures notées), en une seule passe ; seules les 120 heures demandées sont gardées. | Le modèle prédit jusqu'à 1 024 pas d'un coup, sans boucler sur ses propres prévisions. |
+| Covariables connues à l'avance | Six colonnes du calendrier, en flottants : `is_holiday`, `is_school_holiday`, `is_day_before_holiday`, `is_bridge`, `is_sunday_or_holiday` et `day_type` (0 = lundi … 6 = dimanche, férié = 6). | Chronos-2 ne connaît pas les dates : il déduit le rythme de la semaine du contexte, mais ne peut pas deviner un férié. Des booléens seraient encodés comme des catégories. |
+| Mode | Multivarié : une série par arc, débit et occupation ensemble. | Meilleur pour l'occupation, presque deux fois plus rapide. |
+| Prévision ponctuelle | Médiane (quantile 0,5). | Meilleure que la moyenne des quantiles (voir les essais). |
+| Quantile par type de jour (option) | `point_by_day_type`, désactivée par défaut. Par exemple `{"ouvre": 0.5, "weekend": 0.2, "ferie": 0.2}` prend le quantile 0,2 les week-ends et les fériés ; les heures du repli ne changent pas. | Chronos-2 surestime le trafic des jours non ouvrés ; score croisé 96,2 / 1,78 (voir les [pistes pour la #32](#pistes-chiffrées-pour-la-32)). |
+| Repli | Un arc avec moins de 168 heures `ok` (une semaine) dans les 28 derniers jours reçoit la prévision de `HolidayAwarePreviousWeekBaseline` ; `sources_` indique l'origine de chaque heure. | Avec un contexte vide, Chronos-2 prévoit environ 0 sans signaler d'erreur. Pour le rendu, les Champs-Élysées (sans mesure depuis le 19/11/2025) reçoivent ainsi le profil par type de jour, comme avec les baselines. |
+| Bornes | Débit ≥ 0, occupation entre 0 et 100. | Comme les baselines et le validateur du rendu. |
+
+**Reproductibilité.** Chronos-2 prédit directement ses quantiles, sans tirage aléatoire, et le *dropout* est inactif : deux exécutions donnent des sorties identiques, et les essais relancés avec le code final ont redonné exactement leurs scores. La graine 42 est fixée par précaution ; des écarts de l'ordre de 1e-5 restent possibles d'une machine à l'autre.
+
+**Fuite.** Le modèle ne reçoit que l'historique coupé au jeudi 23:00, ce que vérifie l'espion de [`test_chronos.py`](../tests/test_chronos.py). Les poids pré-entraînés ne dépendent pas de nos données. La fiche du modèle cite les corpus Chronos, GIFT-Eval et des séries synthétiques, sans comptages de Paris ; on ne peut toutefois pas exclure qu'une série publique proche y figure.
+
+### Essais
+
+Backtest des huit fenêtres, données du 1er janvier 2024 au 31 octobre 2026 (manifeste `f3c95ed5`), même vérité que les baselines. RMSE poolée sur Convention + Saint-Pères, le critère de décision ; débit en véh/h, occupation en points ; jours atypiques : samedis, dimanches et fériés. Temps de calcul pour les huit fenêtres sur un portable (i7-13700H, 14 cœurs, torch CPU), hors chargement des poids (18 à 40 s, une fois) : deux mesures, pendant les essais puis lors de la relance pour le journal ; ils varient de 20 à 70 % selon la charge de la machine.
+
+| Essai | Contenu | Débit | Occupation | Débit, atypiques | Occupation, atypiques | Temps (2 mesures) |
+|---|---|---:|---:|---:|---:|---:|
+| Baseline | `HolidayAwarePreviousWeekBaseline` | **97,5** | 2,04 | **100,1** | **1,27** | 1 s |
+| 1 | Historique seul, univarié | 107,2 | 1,99 | 126,6 | 1,89 | 11–13 s |
+| 2a | + 5 indicateurs du calendrier | 106,2 | 1,98 | 125,7 | 1,86 | 67–72 s |
+| 2b | 2a sans `is_sunday_or_holiday` | 107,4 | 1,99 | 127,3 | 1,88 | 62–74 s |
+| 2 | 2a + `day_type` (6 covariables) | 104,3 | 1,94 | 122,8 | 1,79 | 74–123 s |
+| 3 | 2 + météo (`temperature_c`, `wind_speed_kmh`, `rain_3h`) | 106,2 | 1,97 | 126,1 | 1,86 | 132–161 s |
+| 3b | 2 + `rain_3h` seul | 105,3 | 1,96 | 124,3 | 1,84 | 118–133 s |
+| **4 (retenu)** | **2, multivarié** | 104,4 | **1,91** | 122,8 | 1,73 | **43–70 s** |
+| 4b | 4 + `cross_learning` (partage entre arcs) | 104,8 | 1,93 | 123,3 | 1,76 | 44–67 s |
+| 4, moyenne | 4, moyenne des 19 quantiles de 0,05 à 0,95 | 104,6 | 2,04 | 123,0 | 1,93 | 43–63 s |
+| 4, quantile par type de jour | 4, option `point_by_day_type` (0,5 en semaine, 0,2 les week-ends et fériés) | 94,2* | 1,71* | 106,9* | 1,32* | 43 s |
+
+\* 0,2 a été choisi sur ce même backtest : ce score est optimiste. Choisi sur sept fenêtres et mesuré sur la huitième, à tour de rôle, il vaut **96,2 / 1,78** (voir les [pistes pour la #32](#pistes-chiffrées-pour-la-32)).
+
+Par type de jour, essai 4 contre baseline (RMSE poolée Convention + Saint-Pères, débit / occupation) :
+
+| Type de jour | Heures notées | Baseline | Essai 4 |
+|---|---:|---:|---:|
+| Jours ouvrés | 442 | 94,1 / 2,71 | **75,4 / 2,11** |
+| Week-ends | 432 | **84,7 / 1,28** | 99,3 / 1,52 |
+| Fériés | 120 | **142,3 / 1,22** | 183,8 / 2,33 |
+
+### Lecture
+
+- **Chronos-2 seul ne bat pas la baseline pour le débit (104,4 contre 97,5), mais la bat pour l'occupation (1,91 contre 2,04).**
+- **Il gagne nettement les jours ouvrés (−20 % sur le débit, −22 % sur l'occupation) et perd les week-ends et surtout les fériés.** Il surestime le trafic des jours non ouvrés (erreur moyenne de +41 véh/h le week-end, +54 les fériés) : il garde une partie du profil des jours ouvrés. Aux heures de pointe du 11/11/2025 (08, 09, 18 et 19 h), il prévoit 469 véh/h sur Convention et 570 sur Saint-Pères, pour 332 et 410 réels ; la baseline, qui recopie le dimanche, prévoit 332 et 373.
+- **Le calendrier aide peu.** Chronos-2 apprend l'effet d'une covariable dans son propre contexte : onze mois ne contiennent qu'une dizaine de fériés, dont plusieurs pendant une panne de capteur. `day_type` aide le plus (fériés : 185 véh/h contre 195 sans), car le code « dimanche » revient chaque semaine ; `is_sunday_or_holiday` aide un peu (195 contre 200).
+- **La météo a été testée, sans gain.** Elle dégrade légèrement tous les scores, y compris sur les 69 heures où il a plu au moins 1 mm en trois heures (126,8 à 127,8 véh/h, contre 126,3 sans météo). Le constat est d'autant plus net que la météo du backtest est presque observée : avec la vraie prévision du rendu, à 2 à 6 jours d'échéance, le gain ne pourrait être que plus faible. Elle n'est pas gardée.
+- **Le multivarié** améliore l'occupation (1,91 contre 1,94) et rend le calcul presque deux fois plus rapide ; le débit est inchangé.
+- **Le partage entre arcs (`cross_learning`)** n'apporte rien sur Convention et Saint-Pères.
+- **La médiane bat la moyenne des quantiles** pour l'occupation (1,91 contre 2,04) : la distribution prévue a une queue haute (bouchons possibles) qui se réalise rarement. Les jours ouvrés, la médiane est presque sans biais (+0,02 point) ; la moyenne ajoute environ +0,4 point.
+- **Champs-Élysées** : Chronos-2 y fait mieux que la baseline dans le backtest (moyenne des fenêtres : débit 189 contre 212, occupation 5,7 contre 8,0), mais ce gain ne compte pas pour le rendu, où l'arc passe par le repli.
+- **Repli dans le backtest** : Chronos-2 ne prédit que 6 fenêtres de Convention et 3 de Saint-Pères ; ailleurs, l'arc n'avait pas une semaine de mesures récentes et son score est celui de la baseline. Pour le rendu, Convention et Saint-Pères ont des mesures jusqu'au 31/10/2026 : ils passeront par Chronos-2.
+
+### Pistes chiffrées pour la #32
+
+Chiffres calculés à partir des prévisions de l'essai 4 et de la baseline ; le choix revient à la #32. Seul le quantile par type de jour existe dans le module, comme option désactivée par défaut (`point_by_day_type`) ; la combinaison avec la baseline n'est pas implémentée. RMSE poolée Convention + Saint-Pères, débit / occupation.
+
+| Stratégie | Ouvrés | Week-ends | Fériés | Total | Estimation, 5 jours du rendu |
+|---|---:|---:|---:|---:|---:|
+| Baseline seule | 94,1 / 2,71 | 84,7 / 1,28 | 142,3 / 1,22 | 97,5 / 2,04 | 102,4 / 1,93 |
+| Chronos-2 seul (médiane) | 75,4 / 2,11 | 99,3 / 1,52 | 183,8 / 2,33 | 104,4 / 1,91 | 113,6 / 1,88 |
+| Chronos-2, quantile bas les week-ends et fériés (validation croisée) | 75,4 / 2,11 | 89,8 / 1,47 | 163,5 / 1,39 | 96,2 / 1,78 | 103,8 / 1,66 |
+| **Chronos-2 en semaine, baseline les week-ends et fériés** | 75,4 / 2,11 | 84,7 / 1,28 | 142,3 / 1,22 | **89,9 / 1,69** | **95,5 / 1,57** |
+
+- **Estimation pour le rendu** : 48 heures de week-end (7 et 8/11), 48 heures ouvrées (9 et 10/11) et 24 heures fériées (11/11), en repondérant les erreurs par type de jour des heures réellement prédites par Chronos-2. Ce n'est pas une mesure.
+- **Quantile bas** : 0,2, 0,3, 0,4 et 0,5 testés, choisis séparément pour les week-ends et les fériés et pour chaque variable, sur sept fenêtres puis mesurés sur la huitième, à tour de rôle ; le tableau donne ce score croisé. Le choix est stable : 0,2 pour les fériés dans les huit tours ; pour les week-ends, 0,2 dans sept tours sur huit (0,3 pour le débit et 0,4 pour l'occupation quand la fenêtre d'octobre 2026 est mise de côté). 0,2 est au bord de la grille : il corrige surtout le biais des jours non ouvrés. Les fériés ne figurent que dans quatre fenêtres.
+- **Option du module** : `Chronos2Forecaster(point_by_day_type={"ouvre": 0.5, "weekend": 0.2, "ferie": 0.2})` reproduit cette piste avec 0,2 fixé ; son backtest redonne exactement les erreurs par type de jour calculées ici et vaut 94,2 / 1,71, un score optimiste puisque 0,2 a été choisi sur ce même backtest. **Le score à retenir est celui de la validation croisée : 96,2 / 1,78.**
+- **Réserve sur la combinaison** : elle n'a pas de paramètre, mais sa règle a été suggérée par ce même backtest ; son score est donc un peu optimiste.
+- **Le week-end du rendu recopiera un week-end de vacances de la Toussaint** (31/10 et 01/11, avec une manifestation). Dans les deux fenêtres comparables, Chronos-2 fait mieux que la baseline en 2025 (Convention 44 contre 70 véh/h, Saint-Pères 45 contre 58) et un peu moins bien en 2024 (Saint-Pères 125 contre 117). Les samedis de vacances d'octobre 2026 sont bas sur Saint-Pères (274 et 387 véh/h, contre 504 à 531 pour les samedis normaux). À contrôler après la mise à jour du 6 novembre (point 6 de la [check-list](#check-list-du-vendredi-6-novembre)) avant de confier les week-ends à la baseline.
+
+### Jours perturbés, pour l'essai retenu
+
+| Jour | Arc | Heures | Débit réel | Baseline | Essai 4 | RMSE débit, baseline / essai 4 |
+|---|---|---|---:|---:|---:|---:|
+| 11/11/2024 | Champs-Élysées | fermées (7) | 203 | 603 | 906 | 480 / 757 |
+| | | ouvertes (17) | 687 | 756 | 651 | 95 / 176 |
+| 11/11/2025 | Champs-Élysées | fermées (7) | 127 | 840 | 872 | 758 / 774 |
+| | | ouvertes (17) | 696 | 795 | 614 | 180 / 174 |
+| 11/11/2025 | Convention | 24 | 303 | 333 | 321 | 58 / 79 |
+| 11/11/2025 | Saint-Pères | 24 | 373 | 364 | 439 | 102 / 115 |
+| 21/04/2025 (Pâques) | Champs-Élysées | 24 | 643 | 425 | 769 | 328 / 306 |
+
+Débits moyens en véh/h ; heures fermées : `evenement_actif` de la [table des perturbations](#chantiers-et-événements-issue-34).
+
+- **Aucun modèle ne connaît la fermeture du 11/11** : l'erreur atteint environ 750 véh/h sur les sept heures fermées. Ces heures se ressemblent d'une année à l'autre : de 08 h à 14 h, 217, 74, 53, 13, 26, 207 et 828 véh/h en 2024 ; 81, 42, 16, 19, 12, 119 et 601 en 2025.
+- **À Pâques 2025**, la baseline recopie le dimanche du Marathon (avenue barrée) et sous-estime ; Chronos-2 fait mieux, surtout pour l'occupation (4,5 contre 9,0 points).
+- **Correction simple, chiffrée mais non implémentée** : sur les heures où `evenement_actif` est vrai, copier les mêmes heures de l'événement de l'année précédente, connues à la coupure. Champs-Élysées, fenêtre du 06/11/2025 : RMSE du débit du 11/11 de 436 à 162 (baseline) et de 443 à 157 (essai 4) ; RMSE du débit de la fenêtre de 230 à 138 et de 214 à 102 ; occupation de la fenêtre de 6,48 à 5,08 et de 6,45 à 4,92. Pour le rendu, les Champs-Élysées passent par le repli : la correction s'appliquerait à la baseline, avec les heures du 11/11/2025, une fois les horaires 2026 confirmés.
+- Un indicateur d'événement en covariable de Chronos-2 ne servirait pas au rendu : seuls les Champs-Élysées en ont, et ils ne passent pas par Chronos-2.
+
+### Installation, poids hors ligne et utilisation
+
+torch et `chronos-forecasting` ne sont installés ni par la CI ni par la commande du README : les tests simulent le modèle. Pour exécuter Chronos-2 :
+
+```powershell
+# torch en version CPU (l'index CPU évite de télécharger la version CUDA, de plusieurs Go), puis chronos
+python -m pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
+python -m pip install chronos-forecasting==2.3.2
+# Poids (478 Mo), une seule fois, à la révision épinglée dans models/chronos.py
+.\.venv\Scripts\hf.exe download amazon/chronos-2 --revision 29ec3766d36d6f73f0696f85560a422f50e8498c
+# Ensuite, sans réseau : chargement depuis le cache Hugging Face
+$env:HF_HUB_OFFLINE = "1"
+```
+
+Les poids sont rangés dans `%USERPROFILE%\.cache\huggingface\hub` (ou sous `HF_HOME`). Sous Windows, l'avertissement sur les liens symboliques est sans conséquence : les fichiers sont copiés. Le téléchargement a pris 41 s.
+
+```python
+from traffic_prediction.data.query import query_traffic
+from traffic_prediction.evaluate import backtest
+from traffic_prediction.models.chronos import Chronos2Forecaster
+
+data = query_traffic("SELECT * FROM traffic")
+result = backtest(Chronos2Forecaster(), data, experiments_path=None)  # Essai 4.
+# Essai 1 : Chronos2Forecaster(multivariate=False, calendar_covariates=())
+# Essai 3 : Chronos2Forecaster(multivariate=False, weather_covariates=("temperature_c", "wind_speed_kmh", "rain_3h"))
+```
+
+### Limites
+
+- Chronos-2 seul ne bat pas la baseline pour le débit ; son intérêt passe par une combinaison (#32).
+- Huit fenêtres et 120 heures fériées sur Convention et Saint-Pères : les écarts de 1 à 2 % entre essais sont dans le bruit. L'écart entre jours ouvrés et non ouvrés, lui, est net et se retrouve d'une fenêtre à l'autre.
+- Les essais ont été comparés sur le backtest qui a servi à les choisir ; il n'y a pas de jeu de test séparé.
+- Champs-Élysées : rien de Chronos-2 n'est utilisé pour le rendu.
+- Les comparaisons par type de jour, la validation croisée des quantiles et la correction de la fermeture ont été calculées par un script d'analyse non versionné ; les prévisions de chaque essai se recalculent en quelques minutes avec la classe et le backtest.
+- Temps mesurés sur un portable récent (14 cœurs) : une machine plus modeste sera plus lente, mais le rendu ne demande qu'une fenêtre (5 à 10 s, plus le chargement des poids).
+
 ## Décisions ouvertes
 
 | Point | Comportement ou constat actuel | Prochain arbitrage |
@@ -796,11 +933,11 @@ Les erreurs de `HolidayAwarePreviousWeekBaseline` ont été recalculées heure p
 | Période de travail historique | Huit fenêtres de backtest 2024–2026 configurées. | Vérifier la couverture locale ; maintenir la cible officielle de novembre 2026. |
 | Proxies 4272 et 4265 | Candidats configurés, avec fortes lacunes rapportées. | Mesurer leur utilité séparément pour `q` et `k` ; vérifier les autres candidats avant adoption. |
 | `etat_barre` et `etat_trafic` | Champs conservés dans le contrat ; réserves de l'exploration. | Décider des features selon qualité et disponibilité à l'instant de prévision. |
-| Modèles, enrichissements, scores | Backtest, référence semaine précédente et quatre baselines implémentés et mesurés ; autres modèles à construire. | Comparer les modèles et variables sur les fenêtres communes, à battre : `HolidayAwarePreviousWeekBaseline`. |
+| Modèles, enrichissements, scores | Backtest, référence semaine précédente, quatre baselines et Chronos-2 implémentés et mesurés. Chronos-2 gagne les jours ouvrés, la baseline les week-ends et fériés. | #32 : choisir la combinaison ; chiffres dans [Pistes pour la #32](#pistes-chiffrées-pour-la-32). |
 | Météo dans le backtest | Historique Historical Forecast : prévisions à très courte échéance, presque observées. Le gain mesuré grâce à la météo est un plafond. | Backtest strict avec l'API Previous Runs (`*_previous_dayN`) si le temps le permet. |
 | Reproductibilité finale | Bruts conservés et manifeste des fichiers traités disponible ; pas de provenance complète d'un modèle. | Figer le cutoff et toutes les entrées utilisées pour chaque score et pour le rendu. |
 | Validation réelle 2023 | Support testé sur fixtures Deflate64. | Vérifier le vrai téléchargement et traitement de l'archive quand cette année est nécessaire. |
-| Jours perturbés dans le rendu | Les grosses erreurs de l'examen blanc viennent de jours perturbés, à l'heure prédite ou dans la semaine recopiée. Pour le rendu : Champs-Élysées fermés le 11/11 de 7 h à 14 h (horaires provisoires) ; week-end de référence du 31/10 au 01/11 avec manifestation. | #19 et #18 : décider comment traiter ces heures (prévision dédiée, autre semaine de référence) ; confirmer avec la [check-list du 6 novembre](#check-list-du-vendredi-6-novembre). |
+| Jours perturbés dans le rendu | Les grosses erreurs de l'examen blanc viennent de jours perturbés, à l'heure prédite ou dans la semaine recopiée. Pour le rendu : Champs-Élysées fermés le 11/11 de 7 h à 14 h (horaires provisoires) ; week-end de référence du 31/10 au 01/11 avec manifestation. | #32 et #18 : décider comment traiter ces heures ; une correction simple est chiffrée en #19 ([jours perturbés](#jours-perturbés-pour-lessai-retenu)) ; confirmer avec la [check-list du 6 novembre](#check-list-du-vendredi-6-novembre). |
 
 ## Mise à jour de ce document
 

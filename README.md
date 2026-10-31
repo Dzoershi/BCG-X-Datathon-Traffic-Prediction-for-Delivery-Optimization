@@ -142,6 +142,7 @@ print(result.summary)
 ```
 
 Replace `PreviousWeekModel()` with any model implementing `predict(history, target_times)`.
+Chronos-2 (#19) is `Chronos2Forecaster()` in `models/chronos.py`; it needs `torch`, `chronos-forecasting` and the pretrained weights (478 MB, download once): [installation, offline use and results](docs/methodology.md#chronos-2-issue-19).
 The eight configured Thursday cutoffs produce Saturday–Wednesday forecasts after a Friday gap.
 Results contain per-window/arc scores (`scores`), means by arc (`per_arc`), and overall means
 (`summary`), including atypical days, coverage counts, and ratios to the previous-week baseline.
