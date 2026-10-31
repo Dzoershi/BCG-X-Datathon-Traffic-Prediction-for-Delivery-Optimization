@@ -16,6 +16,7 @@ MODULE_NAMES = [
     "traffic_prediction.data.update",
     "traffic_prediction.data.validate",
     "traffic_prediction.models",
+    "traffic_prediction.models.base",
     "traffic_prediction.features",
     "traffic_prediction.train",
     "traffic_prediction.predict",
