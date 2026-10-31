@@ -21,8 +21,9 @@ Le statut « implémenté » décrit l'arbre de travail ; le statut de publicati
 9. [Vérification et tests](#vérification-et-tests)
 10. [Modélisation et feuille de route](#modélisation-évaluation-et-feuille-de-route)
 11. [Backtest](#backtest-issue-15)
-12. [Baselines](#baselines-issue-17)
-13. [Décisions ouvertes](#décisions-ouvertes)
+12. [Météo](#météo-issue-21)
+13. [Baselines](#baselines-issue-17)
+14. [Décisions ouvertes](#décisions-ouvertes)
 
 ## Périmètre du brief
 
@@ -48,6 +49,7 @@ Le brief LivraisonCo 2026 fourni par les organisateurs est la référence. Les i
 | [`query.py`](../src/traffic_prediction/data/query.py) | Vue SQL sur les fichiers Parquet et résultats Pandas. | Réutiliser les fichiers locaux dans les analyses. |
 | [`update.py`](../src/traffic_prediction/data/update.py) | Couverture, période de reprise, orchestration des téléchargements, fusion et publication. | Actualiser sans reconstruire toutes les archives ni dupliquer la normalisation. |
 | [`validate.py`](../src/traffic_prediction/data/validate.py) | Contrôles du dataset, manifeste d'intégrité et validation du CSV de prévisions. | Vérifier les artefacts et la complétude sans réimplémenter le nettoyage ou un modèle. |
+| [`weather.py`](../src/traffic_prediction/data/weather.py) | Météo Open-Meteo : historique et prévision, conversion en étiquettes de Paris, raccord et validation. | Fournir une covariable connue à l'avance, sur la même grille horaire que le trafic. |
 | [`configs/baseline.yaml`](../configs/baseline.yaml) | Identités, sens des arcs et rôles évalué/proxy. | Éviter de disperser ces paramètres entre notebooks et commandes. |
 | [`notebooks/`](../notebooks/) | Gabarits numérotés pour exploration, nettoyage, features, baseline, expériences et impact livraison. | Organiser le travail exploratoire ; les traitements réutilisables vont dans le package. |
 
@@ -404,6 +406,7 @@ Les tests utilisent de petits fichiers représentatifs et des réponses réseau 
 | [`test_query.py`](../tests/test_query.py) | Vue SQL, partitions année/mois, fichiers et chemins avec espaces ou apostrophes, paramètres, filtres, agrégations, jointures, nulls, sortie réelle du build, plan Parquet et fermeture des connexions. |
 | [`test_update.py`](../tests/test_update.py) | Ajouts, corrections nulles, répétitions sans réécriture, histoire préservée, couverture source, bootstrap, jours de 23/25 heures, échecs réseau/écriture/validation, rollback, interruption clavier et verrou concurrent. |
 | [`test_data.py`](../tests/test_data.py) | Chaîne HTTP simulée → ingestion → build → SQL → actualisation → manifeste, reprise après interruptions, reproduction dans un autre dossier, erreurs de complétude, intégrité et contrat du CSV officiel. |
+| [`test_weather.py`](../tests/test_weather.py) | Météo sans réseau : requêtes UTC et copie brute, étiquettes de Paris et changements d'heure, jointure avec la grille trafic, raccord historique/prévision, rafraîchissement, nouvelles tentatives, validation et CLI. |
 | [`test_imports.py`](../tests/test_imports.py) | Import des modules du package, y compris les points d'entrée nouvellement ajoutés. |
 
 La dernière exécution locale consignée a donné **249 tests et 27 sous-tests réussis** sous Python 3.12. Les contrôles de documentation ont aussi parsé les blocs PowerShell, vérifié les options de commandes et les liens locaux, puis exécuté les exemples SQL sur des Parquet de test.
@@ -433,7 +436,7 @@ La configuration du workflow ne constitue pas une exécution distante réussie :
 
 | Sujet | Préparé dans le dépôt | Décision ou travail restant |
 |---|---|---|
-| Données externes | Modules `weather.py`, `calendar_events.py`, `disruptions.py` et dépendance `holidays`. | Choisir les sources, contrôler leur disponibilité à la date de prévision et implémenter la collecte. Aucun enrichissement n'est encore exécuté. |
+| Données externes | Modules `weather.py`, `calendar_events.py`, `disruptions.py` et dépendance `holidays`. | Météo implémentée : voir [Météo](#météo-issue-21). Pour `disruptions.py`, choisir les sources, contrôler leur disponibilité à la date de prévision et implémenter la collecte. |
 | Feature engineering | `features.py` et notebook 03. | Définir les variables temporelles, retards et agrégats ; contrôler l'absence d'information future. |
 | Baseline | `models/baselines.py` et notebook 04. | Quatre baselines mesurées et consignées ; voir [Baselines](#baselines-issue-17). |
 | Familles de modèles | Répertoire `models/` ; scikit-learn, LightGBM, Chronos et PyTorch préparés dans les dépendances. | Ces bibliothèques sont des possibilités, pas une architecture gagnante ou une décision de modèle final. |
@@ -512,6 +515,95 @@ La clé unique `datetime` est un timestamp ns **Paris sans fuseau**, étiquette 
 Les bornes scolaires avec fuseau sont converties en dates locales de Paris. À cette résolution journalière, la date de départ est incluse et celle de reprise exclue ; le départ après la classe n'est pas modélisé à l'heure près. Les lignes propres aux enseignants sont exclues, les ponts scolaires publiés sont inclus. Une année scolaire absente du snapshot provoque une erreur plutôt qu'un indicateur silencieusement faux. Conserver ce snapshot pour reproduire une expérience ; il représente le calendrier publié lors de sa récupération, sans reconstruction des versions historiquement connues.
 
 Les tests hors ligne utilisent un extrait officiel limité aux années scolaires 2023–2027 et vérifient la grille complète, la jointure directe au trafic, les changements d'heure, les 11 novembre 2024/2025/2026, les samedi 7 et dimanche 8 novembre 2026, les ponts et les bornes de Toussaint 2026 : **du 17 octobre inclus au 2 novembre exclu**.
+
+## Météo (issue #21)
+
+[`data/weather.py`](../src/traffic_prediction/data/weather.py) fournit la météo horaire de Paris depuis [Open-Meteo](https://open-meteo.com/) : l'historique sert à l'entraînement, la prévision couvre les jours à prédire. Une variable météo n'est utilisable que si elle est aussi connue pour la période prédite : c'est une covariable future connue pour Chronos-2 et une variable explicative pour LightGBM. Aucun assemblage avec le trafic n'est fait ici (issue #22).
+
+```powershell
+# Construction complète : historique depuis le premier jour du trafic local, prévision jusqu'au 11/11.
+python -m traffic_prediction.data.build --weather
+# Avant le rendu (vendredi 6 novembre) : garder l'historique, compléter les jours passés, remplacer la prévision.
+python -m traffic_prediction.data.build --weather --refresh-forecast
+```
+
+`--start`, `--end`, `--output-dir`, `--traffic-dir` et `--weather-source` fonctionnent comme pour le calendrier ; `--refresh-forecast` exige `--weather` et refuse `--start`.
+
+### Sources et variables
+
+| Rôle | API Open-Meteo | Utilisation |
+|---|---|---|
+| Jours passés (par défaut) | Historical Forecast, `historical-forecast-api.open-meteo.com/v1/forecast` | Premières heures de chaque run des modèles de prévision, mises bout à bout. |
+| Jours à partir d'aujourd'hui | Forecast, `api.open-meteo.com/v1/forecast` | Prévision courante, 16 jours au plus. Pour la France : AROME (1,5 km, 4 jours), puis ARPEGE, ICON et IFS. |
+| Comparaison | Archive ERA5, `archive-api.open-meteo.com/v1/archive` | Réanalyse, avec `--weather-source archive`. Elle n'est pas mélangée à l'historique par défaut. |
+
+Un seul point est demandé : **48,856 N, 2,310 E**, le centre des trois arcs évalués. Chaque API se cale sur sa maille (environ 1,5 km pour les prévisions, environ 11 km pour l'archive) ; un point unique suffit pour une grandeur aussi lisse à l'échelle de 3 km, sauf pour les averses locales.
+
+| Colonne | Variable Open-Meteo | Nature | Unité |
+|---|---|---|---|
+| `precipitation_mm` | `precipitation` (pluie, averses et neige) | Cumul de l'heure précédente | mm |
+| `temperature_c` | `temperature_2m` | Instantanée, à 2 m | °C |
+| `wind_speed_kmh` | `wind_speed_10m` | Vent moyen instantané à 10 m, pas les rafales | km/h |
+| `source` | | `historical_forecast` (ou `archive`) pour le passé, `forecast` à partir du jour de coupure | |
+
+**Licence.** Données sous licence CC BY 4.0 : la présentation doit mentionner « Weather data by Open-Meteo.com ». L'API gratuite est réservée à un usage non commercial ; le cadre éducatif du datathon est à confirmer, l'organisateur étant une entreprise. Une requête de plus de deux semaines compte au prorata : l'historique complet représente environ 75 appels, pour une limite de 10 000 par jour.
+
+### Convention de temps
+
+- **Requêtes en UTC.** Avec `timezone=Europe/Paris`, Open-Meteo applique un seul décalage à toute la réponse et ignore les changements d'heure. Ce comportement est documenté et a été vérifié (`utc_offset_seconds = 3600` pour toute la réponse) : sept mois par an, toutes les étiquettes seraient décalées d'une heure, sans erreur. Le code exige `utc_offset_seconds = 0`.
+- **Conversion.** Chaque heure UTC est convertie en heure de Paris, puis le fuseau est retiré, comme `parse_t_1h` pour le trafic de l'API. L'étiquette obtenue marque la **fin** de l'heure, exactement comme le trafic : la pluie à 08:00 est le cumul de 07:00 à 08:00, soit l'heure de trafic elle-même. La température et le vent sont ceux de l'instant 08:00, la fin de l'heure, sans moyenne : une demi-heure d'écart avec le milieu de l'heure reste négligeable pour une grandeur lente.
+- **Début de période.** La requête commence la veille, en UTC : l'étiquette `2024-01-01 00:00` couvre 23:00–24:00 le 31 décembre, soit 22:00–23:00 UTC.
+- **Passage à l'heure d'été.** L'étiquette 02:00 n'est produite par aucune heure UTC. Comme côté trafic, la ligne est conservée pour garder 24 lignes par jour, mais remplie pour éviter une valeur manquante gênante pour Chronos-2. L'horloge saute de 01:59 à 03:00 : l'instant « 02:00 » est donc celui de 03:00. La température et le vent sont copiés de 03:00, et la pluie vaut 0 mm, puisqu'aucune minute ne s'écoule.
+- **Retour à l'heure d'hiver.** L'étiquette 02:00 reçoit deux heures UTC. La **dernière** est gardée, comme le trafic garde la dernière ligne lue : la pluie de la première heure est perdue, une heure par an.
+
+Toute autre heure ou valeur manquante dans une réponse arrête la construction plutôt que de produire une ligne vide.
+
+### Observé ou prévu : choix pour l'entraînement et le backtest
+
+L'issue demandait l'API historique (ERA5). **Le choix retenu est l'historique Historical Forecast**, pour deux raisons :
+
+1. **Même niveau que la prévision du rendu.** Sur un mois complet et aux mêmes coordonnées, Historical Forecast est plus chaud que l'archive d'environ 1,1 °C (juillet 2024 : 20,8 contre 19,7 °C ; octobre 2025 : 13,6 contre 12,5 °C). Le vent est plus faible de 1,2 à 2,7 km/h, et la pluie diffère (juillet 2024 : 78,2 contre 61,8 mm). Les mailles et les modèles ne sont pas les mêmes. Un modèle entraîné sur l'archive recevrait le 6 novembre une prévision systématiquement décalée. À l'inverse, sur les jours communs, l'API de prévision et Historical Forecast renvoient des valeurs identiques (écart de 0,00 sur les trois variables, du 28 au 30 octobre 2026) : le raccord ne crée aucune rupture de niveau.
+2. **Moins d'information future que l'observé.** Le 6 novembre, le modèle n'aura qu'une prévision ; s'entraîner et se tester sur la météo réelle rend le backtest trop optimiste.
+
+**Le gain mesuré grâce à la météo reste un plafond.** Historical Forecast n'enchaîne que les premières heures de chaque run, donc des prévisions à quelques heures d'échéance, presque observées. Dans le backtest, la météo du samedi au mercredi est ainsi connue presque parfaitement. Pour le rendu, le 11 novembre sera prévu à environ six jours, hors de portée d'AROME. Le gain mesuré grâce à la météo est donc une borne haute, pas une estimation du gain réel.
+
+**Backtest strict, non implémenté.** L'API Previous Runs (`previous-runs-api.open-meteo.com`, variables `temperature_2m_previous_day1` à `_previous_day7`) donne la valeur prévue N jours avant. Pour Paris, elle est disponible à partir du 23 janvier 2024 à 12:00 UTC (vérifié), ce qui couvre les huit fenêtres. Elle reproduirait l'information connue au cutoff, mais demande d'assembler l'échéance propre à chaque heure prédite et à chaque fenêtre ; ce travail relève de la modélisation (#19) ou de l'assemblage (#22).
+
+### Construction, raccord et rafraîchissement
+
+- **Coupure.** Le jour de Paris de l'exécution sépare les deux sources : historique jusqu'à hier 23:00, prévision à partir d'aujourd'hui 00:00, jusqu'au 11 novembre 23:00 (`calendar_events.PREDICTION_END`). Exécuté le vendredi 6 novembre, l'historique s'arrête au jeudi 23:00, la coupure du modèle, et la prévision couvre du 6 novembre 00:00 au 11 novembre 23:00.
+- **Raccord.** Chaque partie est déjà une grille complète. `join_consecutive` exige que chaque partie commence l'heure qui suit la fin de la précédente : un trou ou un chevauchement arrête la construction.
+- **Rafraîchissement.** `--refresh-forecast` relit `weather.parquet` et garde les lignes d'historique antérieures à aujourd'hui, sans les retélécharger. Il télécharge ensuite les jours passés manquants, puis la nouvelle prévision. L'historique stocké doit venir de la même source que celle demandée. Les anciennes lignes `forecast` sont remplacées.
+- **Fichier.** `data/processed/weather/weather.parquet`, une ligne par heure : `datetime` (timestamp ns sans fuseau), trois colonnes float64 et `source`. L'écriture passe par un fichier temporaire, contrôlé avant remplacement ; en cas d'échec, l'ancien fichier est conservé.
+- **Copies brutes.** Chaque réponse est gardée telle quelle dans `data/raw/weather/<source>_<début>_<fin>_<AAAAMMJJTHHMMSSZ>.json`, avec l'heure UTC du téléchargement : on retrouve ainsi la prévision utilisée pour le rendu. Deux téléchargements identiques dans la même seconde écriraient le même fichier.
+- **Réseau.** Les requêtes passent par `urllib`, comme les autres téléchargeurs. `requests` n'est pas installé par la CI. La politique d'échec est celle de la [collecte](#principes-communs) : timeout de 60 secondes, trois tentatives espacées d'une puis deux secondes, aucune nouvelle tentative sur une erreur 4xx hors 408 et 429. Un refus d'Open-Meteo affiche sa raison, par exemple une date hors limites.
+
+### Validation et contrôles
+
+`validate_weather` refuse, avant toute écriture :
+- des colonnes inattendues ou un `datetime` avec fuseau ;
+- une grille incomplète ou dépassant la période, des doublons, des lignes non triées ;
+- des valeurs manquantes, infinies ou hors de bornes larges (pluie de 0 à 100 mm, température de −30 à 50 °C, vent de 0 à 200 km/h) ;
+- plusieurs sources d'historique, ou une ligne `forecast` avant l'historique.
+
+Les bornes ne servent qu'à détecter une erreur d'unité ou de lecture ; les records de Paris sont −23,9 et 42,6 °C.
+
+**Exécution du 31 octobre 2026.** Le fichier contient 25 104 lignes : `historical_forecast` du 1er janvier 2024 00:00 au 30 octobre 2026 23:00 (24 816 heures), puis `forecast` jusqu'au 11 novembre 23:00 (288 heures). Jointure sur `datetime` avec le trafic :
+
+- les 124 200 lignes de trafic (5 arcs) trouvent chacune une ligne météo, sans valeur manquante ;
+- sur la période commune, les 24 840 heures se correspondent, sans heure manquante d'un côté ni de l'autre ;
+- les 120 heures du 7 au 11 novembre sont présentes, en `forecast` ;
+- les six jours de changement d'heure de 2024 à 2026 ont 24 lignes de chaque côté.
+
+**Vraisemblance.** Les moyennes mensuelles suivent les normales de Paris, et les épisodes connus apparaissent : février 2024 très doux, juin 2025 caniculaire, tempête Kirk le 9 octobre 2024 (67,1 mm). Le maximum est de 40,4 °C le 24 juin 2026, 39,8 °C dans l'archive ERA5. Le cumul de 2024 atteint 1 038 mm, et l'archive en donne encore plus (1 151 mm). Comparé à l'archive heure par heure, Historical Forecast est très proche pour la température (corrélation 0,991), proche pour le vent (0,846), mais **pas pour la pluie (0,391)** : les deux sources ne s'accordent ni sur l'heure exacte ni sur l'intensité des averses. Par exemple, le 10 mai 2026 donne 59,8 mm d'un côté et 17,9 mm de l'autre. Un indicateur de pluie ou un cumul sur plusieurs heures sera plus robuste que les millimètres d'une heure précise.
+
+**Tests.** [`test_weather.py`](../tests/test_weather.py) compte 46 tests sans réseau : un faux serveur remplace `urlopen` dans tout le fichier, et ses valeurs encodent l'heure UTC pour vérifier chaque étiquette à la main. Un contrôle par mutation a été fait : garder la première heure 02:00 d'octobre, ne pas remplir le trou de mars, ne pas demander la veille ou ne pas convertir en heure de Paris fait échouer respectivement 1, 3, 6 et 7 tests.
+
+**Limites.**
+- Le backtest reste optimiste pour la météo, voir plus haut.
+- Open-Meteo signale que les versions des modèles changent dans le temps.
+- La stabilité des valeurs passées d'Historical Forecast entre deux téléchargements n'a pas été vérifiée ; le rafraîchissement ne retélécharge pas l'historique stocké.
+- La prévision téléchargée le 31 octobre classe aussi en `forecast` le 31 octobre, déjà présent dans le trafic ; après le rafraîchissement du 6 novembre, toutes les heures de trafic connues ont une météo `historical_forecast`.
 
 ## Baselines (issue #17)
 
@@ -625,6 +717,7 @@ Exécution du 31 octobre 2026 : données du 1er janvier 2024 au 31 octobre 2026 
 | Proxies 4272 et 4265 | Candidats configurés, avec fortes lacunes rapportées. | Mesurer leur utilité séparément pour `q` et `k` ; vérifier les autres candidats avant adoption. |
 | `etat_barre` et `etat_trafic` | Champs conservés dans le contrat ; réserves de l'exploration. | Décider des features selon qualité et disponibilité à l'instant de prévision. |
 | Modèles, enrichissements, scores | Backtest, référence semaine précédente et quatre baselines implémentés et mesurés ; autres modèles à construire. | Comparer les modèles et variables sur les fenêtres communes, à battre : `HolidayAwarePreviousWeekBaseline`. |
+| Météo dans le backtest | Historique Historical Forecast : prévisions à très courte échéance, presque observées. Le gain mesuré grâce à la météo est un plafond. | Backtest strict avec l'API Previous Runs (`*_previous_dayN`) si le temps le permet. |
 | Reproductibilité finale | Bruts conservés et manifeste des fichiers traités disponible ; pas de provenance complète d'un modèle. | Figer le cutoff et toutes les entrées utilisées pour chaque score et pour le rendu. |
 | Validation réelle 2023 | Support testé sur fixtures Deflate64. | Vérifier le vrai téléchargement et traitement de l'archive quand cette année est nécessaire. |
 
