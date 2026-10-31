@@ -1,6 +1,6 @@
 """Assemble all data sources into one hourly dataset per street.
 
-One ``build_<source>`` function per source; traffic is the first one.
+One ``build_<source>`` function per source, with separate output datasets.
 """
 
 import argparse
@@ -11,12 +11,13 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from traffic_prediction.data import traffic
+from traffic_prediction.data import calendar_events, traffic
 from traffic_prediction.data.traffic import Arc, ProcessingStats
 
 DEFAULT_START = "2024-01-01"
 DEFAULT_END = "2025-12-31"
 DEFAULT_TRAFFIC_DIR = traffic.REPO_ROOT / "data" / "processed" / "traffic"
+DEFAULT_CALENDAR_DIR = traffic.REPO_ROOT / "data" / "processed" / "calendar"
 
 TRAFFIC_SCHEMA = pa.schema(
     [
@@ -32,6 +33,39 @@ TRAFFIC_SCHEMA = pa.schema(
     ]
 )
 QUALITY_LABELS = ["ok", "partielle", "vide", "invalide", "absente"]
+
+
+def build_calendar(
+    start: str | None = None,
+    end: str = calendar_events.PREDICTION_END,
+    output_dir: Path = DEFAULT_CALENDAR_DIR,
+    *,
+    traffic_dir: Path = DEFAULT_TRAFFIC_DIR,
+    school_holidays_path: Path = calendar_events.DEFAULT_SCHOOL_PATH,
+) -> pd.DataFrame:
+    """Write calendar.parquet from an offline official school-calendar snapshot.
+
+    Infer the first date from local processed traffic unless explicitly supplied.
+    Only the minimum traffic timestamp is materialized, never the full history.
+    """
+    if start is None:
+        from traffic_prediction.data.query import query_traffic
+
+        first = query_traffic("SELECT min(datetime) AS first FROM traffic", path=traffic_dir).iloc[0, 0]
+        if pd.isna(first):
+            raise ValueError("Traffic history is empty; supply a calendar start date")
+        start = str(pd.Timestamp(first).date())
+    table = calendar_events.calendar_table(start, end, school_holidays_path=school_holidays_path)
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    path = output_dir / "calendar.parquet"
+    temporary = output_dir / ".calendar.parquet.tmp"
+    table.to_parquet(temporary, engine="pyarrow", compression="zstd", index=False)
+    if pq.read_metadata(temporary).num_rows != len(table):
+        raise ValueError("Calendar Parquet row count mismatch")
+    temporary.replace(path)
+    print(f"Saved {path} ({len(table):,} rows)", flush=True)
+    return table
 
 
 def build_traffic(
@@ -328,21 +362,28 @@ def percent_missing(values: pd.Series) -> float:
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "Build hourly traffic Parquet from archives and selected JSONL files. "
-            "Output files for years in the requested period are replaced."
+            "Build hourly traffic Parquet, or calendar covariates with --calendar. "
+            "Traffic output files for years in the requested period are replaced."
         )
     )
+    parser.add_argument("--calendar", action="store_true", help="Build calendar covariates instead of traffic.")
+    parser.add_argument("--traffic-dir", type=Path, default=DEFAULT_TRAFFIC_DIR,
+                        help="Processed history used to infer the calendar start.")
+    parser.add_argument("--school-holidays-file", type=Path, default=calendar_events.DEFAULT_SCHOOL_PATH,
+                        help="Local official Paris school-calendar JSON snapshot.")
+    parser.add_argument("--refresh-school-holidays", action="store_true",
+                        help="With --calendar, download/refresh the small official calendar snapshot.")
     parser.add_argument(
         "--start",
-        default=DEFAULT_START,
+        default=None,
         metavar="YYYY-MM-DD",
-        help=f"First day, from 00:00 (default: {DEFAULT_START}).",
+        help=f"First day, from 00:00 (traffic: {DEFAULT_START}; calendar: infer from history).",
     )
     parser.add_argument(
         "--end",
-        default=DEFAULT_END,
+        default=None,
         metavar="YYYY-MM-DD",
-        help=f"Last day, until 23:00 (default: {DEFAULT_END}).",
+        help=f"Last day, until 23:00 (traffic: {DEFAULT_END}; calendar: {calendar_events.PREDICTION_END}).",
     )
     parser.add_argument(
         "--raw-dir",
@@ -364,8 +405,8 @@ def main() -> None:
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=DEFAULT_TRAFFIC_DIR,
-        help="Parquet destination; default: data/processed/traffic.",
+        default=None,
+        help="Parquet destination; default: data/processed/traffic or data/processed/calendar.",
     )
     parser.add_argument(
         "--config",
@@ -374,16 +415,28 @@ def main() -> None:
         help="Arc configuration; default: configs/baseline.yaml.",
     )
     args = parser.parse_args()
+    source = "Calendar" if args.calendar else "Traffic"
+    if args.refresh_school_holidays and not args.calendar:
+        parser.error("--refresh-school-holidays requires --calendar")
 
     try:
+        if args.calendar:
+            if args.refresh_school_holidays:
+                calendar_events.download_school_holidays(args.school_holidays_file)
+            build_calendar(args.start, args.end or calendar_events.PREDICTION_END,
+                           args.output_dir or DEFAULT_CALENDAR_DIR,
+                           traffic_dir=args.traffic_dir,
+                           school_holidays_path=args.school_holidays_file)
+            return
         table, stats = build_traffic(
-            args.start, args.end, args.raw_dir, args.output_dir, args.config,
+            args.start or DEFAULT_START, args.end or DEFAULT_END, args.raw_dir,
+            args.output_dir or DEFAULT_TRAFFIC_DIR, args.config,
             recent_paths=args.recent_file,
         )
     except (OSError, ValueError) as error:
-        parser.exit(1, f"Traffic processing failed: {error}\n")
+        parser.exit(1, f"{source} processing failed: {error}\n")
     except KeyboardInterrupt:
-        parser.exit(130, "Traffic processing interrupted; rerun to retry.\n")
+        parser.exit(130, f"{source} processing interrupted; rerun to retry.\n")
 
     print_traffic_summary(table, stats)
 
