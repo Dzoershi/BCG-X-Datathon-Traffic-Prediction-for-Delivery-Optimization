@@ -1,6 +1,7 @@
 """Offline submission tests using synthetic processed traffic only."""
 
 from pathlib import Path
+import os
 import sys
 
 import numpy as np
@@ -71,7 +72,10 @@ def test_nonfinite_predictions_rejected(history, bad):
 
 
 @pytest.mark.parametrize("model_name", predict.MODELS)
-def test_pipeline_roundtrip_reproducible_and_no_network(local_data, monkeypatch, model_name):
+@pytest.mark.parametrize("line_ending", ["\n", "\r\n"], ids=["LF", "CRLF"])
+def test_pipeline_roundtrip_reproducible_and_no_network(local_data, monkeypatch, model_name, line_ending):
+    # Exercise both organizer-export defaults, including Windows on Unix hosts.
+    monkeypatch.setattr(os, "linesep", line_ending)
     def forbidden(*args, **kwargs):
         pytest.fail("Offline submission attempted network access")
     monkeypatch.setattr(predict.update, "update_traffic", forbidden)
@@ -79,7 +83,9 @@ def test_pipeline_roundtrip_reproducible_and_no_network(local_data, monkeypatch,
     path = predict.run_submission("test_team", skip_update=True, model_name=model_name, **local_data)
     original = path.read_bytes()
     assert path.name == "output_test_team.csv"
-    assert original.startswith(b";arc;datetime;debit_horaire;taux_occupation\n")
+    assert original.startswith(
+        b";arc;datetime;debit_horaire;taux_occupation" + line_ending.encode("ascii")
+    )
     table = pd.read_csv(path, sep=";", index_col=0)
     validate_submission(table)
     predict.run_submission("test_team", skip_update=True, model_name=model_name, **local_data)
