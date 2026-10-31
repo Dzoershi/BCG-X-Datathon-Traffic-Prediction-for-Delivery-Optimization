@@ -23,6 +23,8 @@ Thumbs.db
 # Data and generated artifacts; retain folder placeholders
 /data/raw/*
 !/data/raw/.gitkeep
+# Hand-checked events list (issue #34): small, sourced and edited by the team.
+!/data/raw/events_manual.csv
 /data/interim/*
 !/data/interim/.gitkeep
 /data/processed/*
