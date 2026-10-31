@@ -21,7 +21,8 @@ Le statut « implémenté » décrit l'arbre de travail ; le statut de publicati
 9. [Vérification et tests](#vérification-et-tests)
 10. [Modélisation et feuille de route](#modélisation-évaluation-et-feuille-de-route)
 11. [Backtest](#backtest-issue-15)
-12. [Décisions ouvertes](#décisions-ouvertes)
+12. [Baselines](#baselines-issue-17)
+13. [Décisions ouvertes](#décisions-ouvertes)
 
 ## Périmètre du brief
 
@@ -434,7 +435,7 @@ La configuration du workflow ne constitue pas une exécution distante réussie :
 |---|---|---|
 | Données externes | Modules `weather.py`, `calendar_events.py`, `disruptions.py` et dépendance `holidays`. | Choisir les sources, contrôler leur disponibilité à la date de prévision et implémenter la collecte. Aucun enrichissement n'est encore exécuté. |
 | Feature engineering | `features.py` et notebook 03. | Définir les variables temporelles, retards et agrégats ; contrôler l'absence d'information future. |
-| Baseline | Notebook 04. | Choisir et mesurer une première prévision de référence. Aucun score de baseline n'est consigné. |
+| Baseline | `models/baselines.py` et notebook 04. | Quatre baselines mesurées et consignées ; voir [Baselines](#baselines-issue-17). |
 | Familles de modèles | Répertoire `models/` ; scikit-learn, LightGBM, Chronos et PyTorch préparés dans les dépendances. | Ces bibliothèques sont des possibilités, pas une architecture gagnante ou une décision de modèle final. |
 | Entraînement | `train.py`. | Implémenter la préparation sur les données d'entraînement, l'ajustement et la sauvegarde. |
 | Évaluation | `evaluate.py`, contrat `models/base.py` et huit fenêtres configurées. | Backtest implémenté ; mesurer les modèles sur les données locales disponibles. |
@@ -512,6 +513,107 @@ Les bornes scolaires avec fuseau sont converties en dates locales de Paris. À c
 
 Les tests hors ligne utilisent un extrait officiel limité aux années scolaires 2023–2027 et vérifient la grille complète, la jointure directe au trafic, les changements d'heure, les 11 novembre 2024/2025/2026, les samedi 7 et dimanche 8 novembre 2026, les ponts et les bornes de Toussaint 2026 : **du 17 octobre inclus au 2 novembre exclu**.
 
+## Baselines (issue #17)
+
+### Les quatre modèles
+
+[`models/baselines.py`](../src/traffic_prediction/models/baselines.py) contient quatre prévisions de référence qui respectent le contrat `ForecastModel`. Elles se recalculent à chaque appel à partir du seul historique reçu, n'utilisent que les arcs évalués et les heures `qualite_mesure == "ok"` (comme la vérité du backtest) et ignorent les proxies.
+
+| Classe | Règle principale |
+|---|---|
+| `PreviousWeekBaseline` | Même arc, même heure locale 7 jours avant ; si la valeur manque, 14 jours avant. |
+| `FourWeekMeanBaseline` | Moyenne des valeurs disponibles 7, 14, 21 et 28 jours avant (une à quatre valeurs). |
+| `DayTypeProfileBaseline` | Moyenne par (arc, type de jour, heure) sur tout l'historique reçu. |
+| `HolidayAwarePreviousWeekBaseline` | Comme `PreviousWeekBaseline` les jours normaux ; un jour férié, même heure du dernier dimanche connu de l'historique (le dimanche 1er novembre 2026 pour le rendu), sinon le dimanche précédent. |
+
+**Types de jour.** Sept types : lundi, mardi, mercredi, jeudi, vendredi, samedi, et dimanche **avec les jours fériés**. Ils viennent des colonnes `day_of_week` et `is_holiday` du calendrier de l'issue #16 (`data/processed/calendar/calendar.parquet`). Les profils couvrent tout l'historique antérieur à la coupure, depuis le 1er janvier 2024, sans pondération des semaines récentes.
+
+**Repli.** Quand la règle principale ne donne rien, chaque modèle essaie dans l'ordre : le profil de l'arc par type de jour, son profil horaire tous jours confondus, puis le profil par type de jour de tous les arcs évalués réunis. Sans aucun historique valide, le modèle échoue explicitement au lieu de renvoyer zéro. Après chaque appel, `sources_` indique la règle utilisée pour chaque couple (arc, heure). Sur les huit fenêtres de backtest et les coupures des 29 octobre et 5 novembre 2026, pour les quatre modèles, les deux derniers niveaux n'ont jamais servi : ils restent un filet de sécurité. Les prévisions sont bornées : débit ≥ 0, occupation entre 0 et 100.
+
+**Champs-Elysées.** Sans mesure après le 19 novembre 2025 à 11:00, la semaine précédente, le dernier dimanche et la moyenne sur quatre semaines sont vides en 2026 : les quatre modèles y prévoient le profil par type de jour de l'arc, appris de janvier 2024 à novembre 2025. Ce profil ignore toute évolution récente de l'avenue ; les proxies ne sont pas utilisés à ce stade.
+
+### Pourquoi « semaine précédente » reste valable sur toute la fenêtre
+
+Les données s'arrêtent le **jeudi 23:00** et l'on prédit du **samedi 00:00 au mercredi 23:00**, soit de 25 à 144 heures après la dernière heure connue (1 à 6 jours). La valeur « semaine précédente » est prise 168 heures (7 jours) avant chaque heure prédite : elle tombe donc toujours **au plus tard le mercredi 23:00 précédant la coupure**, soit 24 heures avant celle-ci. Elle est connue pour toute la fenêtre, sans jamais utiliser le vendredi. La règle ne cesserait de fonctionner qu'au-delà de 7 jours d'horizon. Le même raisonnement couvre la valeur à 14 jours et la moyenne sur 7 à 28 jours. Les huit fenêtres du backtest ont exactement cette géométrie.
+
+Rendu final, coupure le jeudi 5 novembre 2026 à 23:00 :
+
+| Jour prédit | Valeur « semaine précédente » | Horizon depuis la coupure | Remarque |
+|---|---|---|---|
+| Samedi 7/11 | Samedi 31/10 | 25 à 48 h | Le 31/10 est encore en vacances de la Toussaint. |
+| Dimanche 8/11 | Dimanche 1/11 | 49 à 72 h | Toussaint, mais déjà un dimanche : peu d'écart attendu. |
+| Lundi 9/11 | Lundi 2/11 | 73 à 96 h | Jour de la rentrée scolaire. |
+| Mardi 10/11 | Mardi 3/11 | 97 à 120 h | Le 10/11 est une veille de jour férié. |
+| **Mercredi 11/11 (férié)** | **Mercredi 4/11** | 121 à 144 h | **Jour ouvré copié sur un jour férié.** La source la plus récente est le 4/11 à 23:00. |
+
+**Biais possible le samedi 7 novembre.** Le samedi 31 octobre 2026 est encore dans les vacances scolaires de la Toussaint (du 17 octobre inclus au 2 novembre exclu), alors que le samedi 7 novembre ne l'est plus : la « semaine précédente » de ce samedi peut être un peu biaisée. Le dimanche 1er novembre est aussi en vacances et férié, mais reste un dimanche ; les jours prédits du lundi au mercredi copient des jours hors vacances.
+
+**Limite le 11 novembre.** La semaine précédente reproduit un mercredi ordinaire, avec ses pointes du matin et du soir, alors qu'un jour férié ressemble à un dimanche. Le 11 novembre 2025 (mardi, coupure le jeudi 6 novembre) le montre sur les données, en moyenne sur les étiquettes 08, 09, 18 et 19 h :
+
+| Heures de pointe du 11/11/2025 | Férié réel | `PreviousWeek` (mardi 4/11) | `HolidayAware` (dimanche 2/11) | `DayTypeProfile` | Dimanche 9/11, inconnu à la coupure |
+|---|---:|---:|---:|---:|---:|
+| Convention, débit (véh/h) | 332 | 566 | 332 | 371 | 319 |
+| Saint-Pères, débit (véh/h) | 410 | 582 | 373 | 354 | 409 |
+| Convention, occupation (%) | 2,5 | 8,0 | 2,5 | 3,0 | 1,5 |
+| Saint-Pères, occupation (%) | 5,9 | 6,2 | 5,2 | 4,8 | 6,1 |
+
+Sur ces heures de pointe, la semaine précédente surestime le débit du jour férié d'environ 70 % (Convention) et 40 % (Saint-Pères). Les deux variantes qui traitent le férié comme un dimanche s'en rapprochent nettement. L'égalité exacte de Convention pour `HolidayAware` est une coïncidence de moyenne : heure par heure, le dimanche 2/11 et le férié diffèrent (135 contre 173 véh/h à 08 h, 486 contre 443 à 19 h). Le score sur les jours atypiques du backtest permet de comparer les approches sur toutes les fenêtres.
+
+Les baselines utilisent tout l'historique qu'on leur transmet : c'est à l'appelant (backtest ou script de rendu) de le couper au jeudi 23:00.
+
+### Résultats du backtest
+
+Exécution du 31 octobre 2026 : données du 1er janvier 2024 au 31 octobre 2026 (manifeste `f3c95ed5…`), huit coupures par défaut. Les quatre runs sont consignés dans [`experiments.csv`](experiments.csv). Tous les modèles prédisent toutes les heures : ils sont notés sur exactement les mêmes heures.
+
+**Couverture.** Une heure est notée si la vérité est `ok` ; les autres sont ignorées. Les mêmes heures valent pour le débit et l'occupation.
+
+| Coupure | Champs-Elysées | Convention | Saint-Pères |
+|---|---:|---:|---:|
+| 2024-11-07 | 89 | 0 | 89 |
+| 2024-12-19 | 120 | 81 | 0 |
+| 2024-12-26 | 113 | 120 | 0 |
+| 2025-04-17 | 119 | 1 | 0 |
+| 2025-07-10 | 38 | 120 | 0 |
+| 2025-10-16 | 95 | 120 | 31 |
+| 2025-11-06 | 116 | 120 | 119 |
+| 2026-10-22 | 0 | 97 | 96 |
+| **Heures notées / ignorées** | 690 / 270 | 659 / 301 | 335 / 625 |
+| **Fenêtres notées (toutes / atypiques)** | 7 / 7 | 7 / 6 | 4 / 3 |
+
+**RMSE par arc**, moyenne des fenêtres notées (débit en véh/h, occupation en points de %) :
+
+| Arc | Modèle | Débit, toutes | Débit, atypiques | Occupation, toutes | Occupation, atypiques |
+|---|---|---:|---:|---:|---:|
+| Champs-Elysées | `PreviousWeek` | 231,6 | 244,0 | 7,98 | 8,67 |
+| | `FourWeekMean` | 207,1 | 222,6 | 6,70 | 7,43 |
+| | `DayTypeProfile` | **157,0** | **149,5** | **6,23** | **6,56** |
+| | `HolidayAwarePreviousWeek` | 212,3 | 221,2 | 8,04 | 8,78 |
+| Convention | `PreviousWeek` | 89,4 | 113,8 | 3,36 | 1,70 |
+| | `FourWeekMean` | 87,5 | 113,9 | 3,44 | 1,80 |
+| | `DayTypeProfile` | 87,7 | 103,4 | 3,43 | 1,47 |
+| | `HolidayAwarePreviousWeek` | **75,9** | **89,1** | **3,08** | **1,02** |
+| Saint-Pères | `PreviousWeek` | 106,4 | 112,5 | 2,41 | 1,64 |
+| | `FourWeekMean` | 118,7 | 147,2 | 2,65 | 2,34 |
+| | `DayTypeProfile` | **93,5** | 112,9 | **2,22** | 2,00 |
+| | `HolidayAwarePreviousWeek` | 101,8 | **104,7** | 2,37 | **1,59** |
+
+**Synthèse.** La moyenne des RMSE par fenêtre est l'agrégat de l'issue #15 ; la RMSE poolée, recalculée à partir de `rmse` et `n_scored` sur toutes les heures notées, est plus proche de la note officielle (une RMSE sur les 360 lignes du rendu) et ne donne pas le même poids à la fenêtre de Convention qui ne compte qu'une heure.
+
+| Modèle | 3 arcs, débit (moyenne / poolée) | 3 arcs, occupation (moyenne / poolée) | Convention + Saint-Pères, débit (moyenne / poolée) | Convention + Saint-Pères, occupation (moyenne / poolée) |
+|---|---:|---:|---:|---:|
+| `PreviousWeek` | 148,5 / 175,3 | 4,95 / 5,67 | 95,5 / 112,8 | 3,02 / 2,27 |
+| `FourWeekMean` | 140,9 / 165,5 | 4,53 / 4,53 | 98,9 / 118,8 | 3,15 / 2,42 |
+| `DayTypeProfile` | **115,9 / 135,0** | **4,25 / 4,24** | 89,8 / 104,3 | 2,99 / 2,24 |
+| `HolidayAwarePreviousWeek` | 134,7 / 157,7 | 4,85 / 5,81 | **85,3 / 97,5** | **2,82 / 2,04** |
+
+**Lecture.**
+
+- Sur les trois arcs, `DayTypeProfile` est la meilleure, mais l'écart vient surtout des Champs-Elysées, dont la semaine précédente est très bruitée (fermetures, événements) et qui pèsent sur sept fenêtres.
+- Dans le rendu réel, les Champs-Elysées n'ont plus de mesure : **les quatre modèles y prévoient le même profil par type de jour**. Le choix du modèle ne change donc que Convention et Saint-Pères, où `HolidayAwarePreviousWeek` est la meilleure sur les huit mesures, y compris les jours atypiques. C'est la baseline retenue comme filet de sécurité pour le rendu.
+- Les scores des Champs-Elysées sont optimistes pour le rendu réel : dans le backtest, le profil y est appris jusqu'à la coupure, alors qu'en novembre 2026 il aura presque un an de retard.
+- Point de départ pour la présentation, sur Convention et Saint-Pères (RMSE poolée, toutes heures) : **97,5 véh/h pour le débit et 2,04 points pour l'occupation**.
+- `normalized_score` reste indéfini sur la plupart des fenêtres, car la référence semaine précédente de l'issue #15 ne couvre pas toutes les heures notées ; on compare donc les RMSE directement.
+
 ## Décisions ouvertes
 
 | Point | Comportement ou constat actuel | Prochain arbitrage |
@@ -522,7 +624,7 @@ Les tests hors ligne utilisent un extrait officiel limité aux années scolaires
 | Période de travail historique | Huit fenêtres de backtest 2024–2026 configurées. | Vérifier la couverture locale ; maintenir la cible officielle de novembre 2026. |
 | Proxies 4272 et 4265 | Candidats configurés, avec fortes lacunes rapportées. | Mesurer leur utilité séparément pour `q` et `k` ; vérifier les autres candidats avant adoption. |
 | `etat_barre` et `etat_trafic` | Champs conservés dans le contrat ; réserves de l'exploration. | Décider des features selon qualité et disponibilité à l'instant de prévision. |
-| Modèles, enrichissements, scores | Backtest et référence semaine précédente implémentés ; autres modèles à construire. | Comparer les modèles et variables sur les fenêtres communes. |
+| Modèles, enrichissements, scores | Backtest, référence semaine précédente et quatre baselines implémentés et mesurés ; autres modèles à construire. | Comparer les modèles et variables sur les fenêtres communes, à battre : `HolidayAwarePreviousWeekBaseline`. |
 | Reproductibilité finale | Bruts conservés et manifeste des fichiers traités disponible ; pas de provenance complète d'un modèle. | Figer le cutoff et toutes les entrées utilisées pour chaque score et pour le rendu. |
 | Validation réelle 2023 | Support testé sur fixtures Deflate64. | Vérifier le vrai téléchargement et traitement de l'archive quand cette année est nécessaire. |
 
