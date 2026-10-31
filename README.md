@@ -54,6 +54,15 @@ python -m traffic_prediction.data.build --weather --refresh-forecast
 
 Weather data by [Open-Meteo.com](https://open-meteo.com/) (CC BY 4.0); credit it in the presentation.
 
+### Road works and events on the evaluated arcs
+
+```powershell
+# Rerun on November 6: the sources only list current and planned works.
+python -m traffic_prediction.data.build --disruptions
+```
+
+**Output:** `data/processed/disruptions/disruptions.parquet`, one row per arc and hour from January 1, 2024 to November 11, 2026 23:00, with `chantier_actif`, `evenement_actif` and a `description`; and `chantiers.parquet`, the works within 200 m of each arc. It combines Open Data Paris road works with the hand-checked list [data/raw/events_manual.csv](data/raw/events_manual.csv), one source per row. The command ends with a check of November 7–11. Use the table to check the test period and explain past errors, not as a training feature. [Sources, rules, and the November 6 checklist](docs/methodology.md#chantiers-et-événements-issue-34).
+
 ## 3. Process data into Parquet
 
 ```powershell
