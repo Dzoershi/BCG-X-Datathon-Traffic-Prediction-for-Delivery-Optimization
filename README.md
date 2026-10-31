@@ -2,7 +2,7 @@
 
 BCG X Datathon: forecast hourly traffic flow and occupancy on three Paris road segments.
 
-**Status:** data download, processing, updates, SQL queries, and dataset/submission validation are implemented. Modeling and final prediction export are still to do.
+**Status:** data download, processing, updates, SQL queries, dataset/submission validation, and chronological backtesting are implemented. Forecasting models and final prediction export are still to do.
 
 Run commands from the repository root. Terminal examples use PowerShell.
 
@@ -13,7 +13,7 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -e . --no-deps
 python -m pip install numpy==2.2.6 pandas==2.3.3 pyarrow==25.0.1 `
-  PyYAML==6.0.3 duckdb==1.4.5 pytest==9.2.0 ipykernel==7.3.0
+  PyYAML==6.0.3 duckdb==1.4.5 holidays==0.107 pytest==9.2.0 ipykernel==7.3.0
 python -m pip install stream-unzip==0.0.100 stream-inflate==0.0.43 pycryptodome==4.2.0
 ```
 
@@ -108,6 +108,24 @@ python -m traffic_prediction.data.validate --submission "outputs/submissions/out
 Checks the hourly grid, schema, duplicates, partition labels, and data constraints. The manifest at `data/processed/traffic/_validation.json` records coverage, missing measurements, configuration, versions, and file checksums. Rewrite it after an intentional dataset update.
 
 Use `--data-dir`, `--config`, or paired `--start` / `--end` dates to choose what to validate. Missing measurements are reported separately from missing rows. The CSV check enforces the brief's 360-row format; it does not generate forecasts. PR tests are configured for Windows/Linux and Python 3.10/3.13. [Validation details](docs/methodology.md#vérification-et-tests).
+
+## 8. Backtest a forecasting model
+
+```python
+from traffic_prediction.data.query import query_traffic
+from traffic_prediction.evaluate import backtest, PreviousWeekModel
+data = query_traffic("SELECT * FROM traffic")
+result = backtest(PreviousWeekModel(), data, author="your-name", description="Weekly reference")
+print(result.summary)
+```
+
+Replace `PreviousWeekModel()` with any model implementing `predict(history, target_times)`.
+The eight configured Thursday cutoffs produce Saturday–Wednesday forecasts after a Friday gap.
+Results contain per-window/arc scores (`scores`), means by arc (`per_arc`), and overall means
+(`summary`), including atypical days, coverage counts, and ratios to the previous-week baseline.
+Each successful call appends a run to `docs/experiments.csv`; use `experiments_path=None` to
+skip logging. Data is read only from existing local Parquet files; no download is triggered.
+[Model contract, metric definitions, and limitations](docs/methodology.md#backtest-issue-15).
 
 ## Project deliverables
 
