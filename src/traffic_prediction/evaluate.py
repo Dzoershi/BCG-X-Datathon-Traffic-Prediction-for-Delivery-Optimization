@@ -3,7 +3,11 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+import csv
 from dataclasses import dataclass
+from datetime import datetime, timezone
+import getpass
+import json
 from pathlib import Path
 
 import holidays
@@ -17,6 +21,8 @@ from traffic_prediction.models.base import ForecastModel
 TARGETS = ("debit_horaire", "taux_occupation")
 KEYS = ["arc", "datetime"]
 DEFAULT_CONFIG = REPO_ROOT / "configs" / "baseline.yaml"
+DEFAULT_EXPERIMENTS = REPO_ROOT / "docs" / "experiments.csv"
+LOG_COLUMNS = ["date", "author", "model", "description", "scores"]
 
 
 @dataclass
@@ -96,6 +102,10 @@ def backtest(
     model: ForecastModel,
     data: pd.DataFrame,
     cutoffs: Iterable[object] | None = None,
+    *,
+    author: str | None = None,
+    description: str = "",
+    experiments_path: str | Path | None = DEFAULT_EXPERIMENTS,
 ) -> BacktestResult:
     """Score a model using only history through each Thursday 23:00.
 
@@ -106,6 +116,8 @@ def backtest(
     Aggregates are unweighted means of available arc/window RMSEs, not pooled
     errors; coverage and numbers of contributing groups accompany every mean.
     Ratios require full baseline coverage and a positive baseline RMSE.
+    Successful calls append one JSON score record to the experiment CSV;
+    pass experiments_path=None to disable logging (e.g. in tests).
     """
     _check_frame(data, [*KEYS, *TARGETS, "role", "qualite_mesure"], "data")
     if data.groupby("arc")["role"].nunique(dropna=False).gt(1).any():
@@ -161,4 +173,25 @@ def backtest(
     scores = pd.DataFrame.from_records(records)
     result = BacktestResult(scores, _aggregate(scores, ["arc", "variable", "subset"]),
                             _aggregate(scores, ["variable", "subset"]))
+    if experiments_path is not None:
+        _append_experiment(result, Path(experiments_path), author or getpass.getuser(),
+                           type(model).__name__, description)
     return result
+
+
+def _append_experiment(result: BacktestResult, path: Path, author: str, model: str, description: str) -> None:
+    # Pandas serializes undefined scores as JSON null, never non-standard NaN.
+    payload = {name: json.loads(getattr(result, name).to_json(orient="records", date_format="iso"))
+               for name in ("scores", "per_arc", "summary")}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a+", encoding="utf-8", newline="") as stream:
+        stream.seek(0)
+        header = next(csv.reader(stream), None)
+        if header is not None and header != LOG_COLUMNS:
+            raise ValueError(f"Experiment CSV must have columns {LOG_COLUMNS}")
+        stream.seek(0, 2)
+        writer = csv.writer(stream)
+        if header is None:
+            writer.writerow(LOG_COLUMNS)
+        writer.writerow([datetime.now(timezone.utc).isoformat(), author, model, description,
+                         json.dumps(payload, ensure_ascii=False, allow_nan=False)])
