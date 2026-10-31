@@ -41,6 +41,19 @@ python -m traffic_prediction.data.traffic --download --road-id 5671 `
 
 Sources: [historical archives](https://opendata.paris.fr/explore/dataset/comptages-routiers-permanents-historique/) · [recent observations](https://opendata.paris.fr/explore/dataset/comptages-routiers-permanents/).
 
+### Weather: history and forecast
+
+```powershell
+python -m traffic_prediction.data.build --weather
+
+# Before the final forecast (November 6): keep history, add missing past days, replace the forecast.
+python -m traffic_prediction.data.build --weather --refresh-forecast
+```
+
+**Output:** `data/processed/weather/weather.parquet`, one row per hour from the first local traffic day to November 11, 2026 23:00. It joins traffic directly on `datetime`. Columns are `precipitation_mm`, `temperature_c`, `wind_speed_kmh`, and `source`: Open-Meteo Historical Forecast until yesterday, the live forecast from today. Raw responses are kept in `data/raw/weather/`, named with their UTC download time. [Weather sources, time convention, and limits](docs/methodology.md#météo-issue-21).
+
+Weather data by [Open-Meteo.com](https://open-meteo.com/) (CC BY 4.0); credit it in the presentation.
+
 ## 3. Process data into Parquet
 
 ```powershell
