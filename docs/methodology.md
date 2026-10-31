@@ -1,6 +1,6 @@
 # Méthodologie
 
-Ce document consigne les choix présents dans le code au **30 octobre 2026**, leurs raisons, leurs limites et les questions encore ouvertes. Le [README](../README.md) reste le guide de commandes rapide.
+Ce document consigne les choix présents dans le code au **31 octobre 2026**, leurs raisons, leurs limites et les questions encore ouvertes. Le [README](../README.md) reste le guide de commandes rapide.
 
 - **Implémenté** : comportement observable dans les modules et couvert par les tests indiqués.
 - **Provisoire** : règle ou hypothèse en place qui doit encore être justifiée par les données ou le métier.
@@ -20,7 +20,8 @@ Le statut « implémenté » décrit l'arbre de travail ; le statut de publicati
 8. [Actualisation et reprise](#actualisation-des-observations-issue-8)
 9. [Vérification et tests](#vérification-et-tests)
 10. [Modélisation et feuille de route](#modélisation-évaluation-et-feuille-de-route)
-11. [Décisions ouvertes](#décisions-ouvertes)
+11. [Backtest](#backtest-issue-15)
+12. [Décisions ouvertes](#décisions-ouvertes)
 
 ## Périmètre du brief
 
@@ -414,7 +415,7 @@ Un snapshot récent réel de **2 974 observations** a auparavant été converti 
 - Une couverture complète des données réellement disponibles pour les Champs-Elysées.
 - La compatibilité exécutée sur tous les systèmes et toutes les versions de Python visées.
 - Une reprise transactionnelle de plusieurs années après coupure électrique ; seule la validité par fichier et la reprise décrite pour l'updater sont visées.
-- L'absence de fuite temporelle dans un futur modèle ou la qualité des prévisions : ces composants restent à écrire.
+- La qualité des prévisions ou la disponibilité des features propres aux futurs modèles : le test du backtest borne seulement les observations qui leur sont transmises.
 - La reproduction des chiffres d'exploration de l'équipe sur toutes les archives.
 
 ### Tests automatiques sur GitHub
@@ -423,7 +424,7 @@ Le workflow [Data pipeline tests](../.github/workflows/tests.yml) est configuré
 
 La CI extrait les versions du sous-ensemble données/tests directement depuis `requirements.txt`, installe le package éditable et lance `python -m pytest -q`. Les bibliothèques lourdes de modèles ne sont pas installées tant que les tests ne les utilisent pas. Il faudra adapter ce périmètre à l'implémentation des modèles. Les tests du pipeline n'appellent pas l'API réelle.
 
-La configuration du workflow ne constitue pas une exécution distante réussie : son résultat devra être vérifié lors de la publication de la PR. `test_features.py` reste un emplacement réservé ; aucune suite de validation de modèle ou de fuite temporelle n'est encore implémentée.
+La configuration du workflow ne constitue pas une exécution distante réussie : son résultat devra être vérifié lors de la publication de la PR. `test_features.py` reste un emplacement réservé ; la suite de backtest et son test anti-fuite sont décrits ci-dessous.
 
 ## Modélisation, évaluation et feuille de route
 
@@ -436,17 +437,17 @@ La configuration du workflow ne constitue pas une exécution distante réussie :
 | Baseline | Notebook 04. | Choisir et mesurer une première prévision de référence. Aucun score de baseline n'est consigné. |
 | Familles de modèles | Répertoire `models/` ; scikit-learn, LightGBM, Chronos et PyTorch préparés dans les dépendances. | Ces bibliothèques sont des possibilités, pas une architecture gagnante ou une décision de modèle final. |
 | Entraînement | `train.py`. | Implémenter la préparation sur les données d'entraînement, l'ajustement et la sauvegarde. |
-| Évaluation | `evaluate.py` et notebook 05. | Fixer les découpages chronologiques et mesurer la RMSE des deux cibles sur les mêmes fenêtres. |
+| Évaluation | `evaluate.py`, contrat `models/base.py` et huit fenêtres configurées. | Backtest implémenté ; mesurer les modèles sur les données locales disponibles. |
 | Prévision et export | `predict.py` ; contrôle du format disponible dans `data/validate.py`. | Produire les 120 heures × 3 arcs et exporter le CSV demandé ; le validateur ne génère pas les valeurs. |
 | Impact livraison | Notebook 06. | Construire la proposition métier, ses hypothèses et la feuille de route des sept planches. |
 
-Ces fichiers et notebooks sont actuellement des gabarits ou des modules documentés sans implémentation de modèle. Aucun entraînement, sélection de modèle ou génération complète du CSV final n'est réalisé par les commandes de données.
+Les modules d’entraînement, de features et d’export restent des gabarits ; le backtest et sa référence semaine précédente sont implémentés. Aucun entraînement, sélection de modèle ou génération complète du CSV final n'est réalisé par les commandes de données.
 
 ### Principes de validation déjà posés
 
-Les gabarits et docstrings demandent une validation chronologique, des variables disponibles au moment de la prévision et un prétraitement appris uniquement sur l'entraînement. Ce sont des principes de conception, **pas une procédure de backtest déjà implémentée**.
+Les gabarits et docstrings demandent une validation chronologique, des variables disponibles au moment de la prévision et un prétraitement appris uniquement sur l'entraînement. Le backtest ci-dessous applique la coupure temporelle aux entrées du modèle ; les features propres à chaque modèle doivent aussi respecter ces principes.
 
-Le brief impose la RMSE. Il faut encore décider des fenêtres de validation, de la présentation des scores par arc et par cible et d'une éventuelle synthèse. `q` et `k` n'ont pas la même unité ; l'existence d'une colonne `score_combine` dans le journal n'établit aucune pondération officielle.
+Le brief impose la RMSE. Le backtest publie séparément les deux cibles, leurs scores normalisés et la couverture ; aucune pondération officielle entre `q` et `k` n’est supposée.
 
 La simulation d'octobre 2025 avec test début novembre 2025 a été évoquée par l'équipe pour avancer malgré les manques récents. C'est une proposition de backtest ; elle ne remplace pas la période officielle de novembre 2026 sans validation des organisateurs.
 
@@ -454,15 +455,41 @@ Les états contemporains du trafic, les observations futures ou une météo obse
 
 ### Suivi des expériences
 
-[`docs/experiments.csv`](experiments.csv) contient l'en-tête `date,auteur,modele,variables,score_debit,score_occupation,score_combine,score_semaine_feriee,commentaire`, mais aucune expérience enregistrée.
+[`docs/experiments.csv`](experiments.csv) utilise désormais `date,author,model,description,scores` (le journal précédent ne contenait aucune expérience). Chaque appel réussi ajoute une ligne : date UTC, auteur (utilisateur local par défaut), classe du modèle, description et JSON strict des tables de scores avec cutoffs et compteurs. Les scores indéfinis deviennent `null`. Le JSON conserve les fenêtres sans vérité ; une moyenne seule ne suffit pas à comparer les modèles.
 
-Le journal est préparé pour comparer les travaux de l'équipe. Il faudra lui associer des périodes de validation et une version des données reproductibles avant de considérer les scores comparables. Aucun choix de fenêtre ou de métrique combinée ne doit être inféré de son schéma actuel.
+Le chemin est ancré à la racine du dépôt, même depuis un notebook. Passer `experiments_path=None` désactive le journal ; un autre chemin isole un essai. Un en-tête incompatible provoque une erreur sans ajout. Les écritures du journal sont destinées aux exécutions séquentielles locales. Consigner les paramètres du modèle et la version/manifeste des données dans `description` : le framework n’archive pas les poids ni les données d’entraînement.
 
 ### Feuille de route métier
 
 Le rôle du trafic prédit est d'aider à choisir des créneaux de livraison plus favorables. Passer de cette information à une décision de coût nécessite encore des éléments : demande de colis, durées de livraison, capacité des livreurs, contraintes de service et relation entre trafic et temps de parcours.
 
 Le brief fournit les coûts horaires et les durées de vacation. La présentation doit proposer les modèles complémentaires, les données et les étapes nécessaires pour exploiter ces contraintes. Aucun algorithme de tournées, règle de conversion de `q/k` en vitesse, nombre optimal de livreurs ou gain financier chiffré n'a été arrêté ou implémenté.
+
+## Backtest (issue #15)
+
+### Interface et utilisation
+
+`models/base.py` définit le protocole structurel `ForecastModel` : aucune classe parente n’est imposée. La méthode `predict(history: DataFrame, target_times: DatetimeIndex) -> DataFrame` reçoit les colonnes du trafic traité, y compris les proxies, et renvoie `arc`, `datetime`, `debit_horaire`, `taux_occupation`. Les couples arc/heure doivent être uniques ; les dates sont des heures entières **locales Paris sans fuseau**, conformément au Parquet. Une chaîne de caractères doit être convertie en datetime par le modèle avant retour.
+
+Charger les fichiers existants avec `query_traffic("SELECT * FROM traffic")`, puis appeler `backtest(model, data)` ; `cutoffs` permet de fournir d’autres jeudis. Les huit cutoffs par défaut sont dans `configs/baseline.yaml`. Aucun téléchargement n’est déclenché. Pour un gros historique, limiter la requête SQL à l’historique nécessaire au modèle et aux fenêtres voulues, sans supprimer les lignes de vérité ni les arcs sans mesure. La copie du seul historique antérieur à chaque cutoff isole les mutations du modèle du DataFrame d’origine.
+
+Un cutoff désigne le **jeudi entier**, jusqu’à 23:00 inclus. Le vendredi est une journée de latence ; les 120 étiquettes vont du samedi 00:00 au mercredi 23:00. La fenêtre reste composée de 120 heures locales même lors d’un changement d’heure, selon la grille interne dédupliquée. Les fenêtres de Noël, du Nouvel An, de Pâques, du 14 juillet et des deux 11 novembre couvrent des jours fériés lundi/mardi/mercredi. Deux semaines d’automne ordinaires complètent la liste, dont le 24–28 octobre 2026 après intégration de l’updater #8.
+
+Le framework ne transmet aucune ligne après le jeudi. Le modèle doit réinitialiser/réentraîner son état à chaque appel et ne pas charger d’observations futures par un autre accès : l’interface ne peut pas empêcher un modèle d’utiliser un fichier externe ou un état préentraîné avec des données futures. Le test espion vérifie les bornes sur plusieurs fenêtres, la présence des proxies et l’absence de mutation des données d’origine.
+
+### Scores et couverture
+
+`BacktestResult.scores` contient une ligne par cutoff, arc évalué, variable et sous-ensemble (`all` ou `atypical`). `per_arc` moyenne les fenêtres par arc/variable/sous-ensemble ; `summary` moyenne les couples arc/fenêtre par variable/sous-ensemble. Seuls les arcs `role == "evalue"` sont évalués, y compris ceux présents dans l’entrée mais sans aucune vérité dans une fenêtre. Un arc totalement absent de l’entrée ne peut pas être découvert : conserver la grille produite par le pipeline.
+
+La vérité est réindexée sur tous les couples arc × 120 heures. Une heure est ignorée si la ligne manque, si `qualite_mesure != "ok"` ou si la valeur de la cible est absente, non finie ou hors limites physiques (débit ≥ 0, occupation entre 0 et 100). `n_expected`, `n_scored` et `n_ignored` sont rapportés pour chaque cible et sous-ensemble. Une prévision absente ou non finie **sur une vérité valide fait échouer le run**, afin de ne pas améliorer artificiellement le score. Des prévisions manquantes sur une vérité ignorée sont autorisées.
+
+`rmse = sqrt(mean((prediction - vérité)**2))` est calculée séparément pour les deux variables. Les jours atypiques sont samedi, dimanche ou jour férié de France métropolitaine (`holidays.France`, sans jours régionaux). Une fenêtre sans vérité produit une RMSE `NaN`, avec 120 heures ignorées par cible. Les moyennes sont des **moyennes arithmétiques des RMSE disponibles**, sans pondération par nombre d’heures ; elles ne sont pas une RMSE des erreurs mises en commun. `n_groups`, `n_groups_scored` et `n_groups_normalized` rendent explicite le nombre de contributions. Comparer deux modèles demande les mêmes cutoffs et données.
+
+`PreviousWeekModel` fournit la référence minimale nécessaire à la normalisation : même arc, même heure locale sept jours avant, uniquement si la qualité source est `ok`. Aucun proxy, entraînement ou remplissage n’est appliqué. `baseline_n_scored` compte les vérités valides dont la référence est finie ; `baseline_rmse` est calculée sur ces seules heures. `normalized_score = rmse / baseline_rmse` est défini uniquement si la référence couvre **toutes** les vérités valides du groupe et si sa RMSE est strictement positive. Sinon le ratio reste `NaN` (y compris une référence parfaite) ; aucune division par zéro ni comparaison sur des heures différentes. Un ratio inférieur à 1 indique une amélioration sur la référence.
+
+### Validation
+
+`tests/test_evaluate.py` utilise uniquement des DataFrames synthétiques : anti-fuite, gap, 120 heures, fêtes, scores calculés à la main, alignement, données absentes/invalides, arc entièrement sans vérité, prévisions incomplètes, référence manquante/parfaite, moyennes et journal CSV/JSON. La CI installe la dépendance `holidays` déjà épinglée dans `requirements.txt`. Aucun score sur les archives réelles n’est revendiqué.
 
 ## Décisions ouvertes
 
@@ -471,10 +498,10 @@ Le brief fournit les coûts horaires et les durées de vacation. La présentatio
 | `q=0, k>0` | `q` masqué, `k` conservé, ligne `invalide`. | Justifier ou modifier la règle métier avant d'en tirer une conclusion sur les capteurs. |
 | Heure de rendu | Étiquette locale de fin d'heure conservée ; pas de décalage automatique. | Confirmer si le `datetime` du rendu attendu désigne le début ou la fin de l'heure. |
 | Champs-Elysées sans données récentes | Cible conservée, valeurs manquantes explicites ; proxies séparés. | Clarifier l'évaluation avec les organisateurs et tester les proxies ; aucune substitution officielle n'est validée. |
-| Période de travail historique | Backtest 2025 proposé pour le développement. | Choisir les fenêtres ; maintenir la cible officielle de novembre 2026. |
+| Période de travail historique | Huit fenêtres de backtest 2024–2026 configurées. | Vérifier la couverture locale ; maintenir la cible officielle de novembre 2026. |
 | Proxies 4272 et 4265 | Candidats configurés, avec fortes lacunes rapportées. | Mesurer leur utilité séparément pour `q` et `k` ; vérifier les autres candidats avant adoption. |
 | `etat_barre` et `etat_trafic` | Champs conservés dans le contrat ; réserves de l'exploration. | Décider des features selon qualité et disponibilité à l'instant de prévision. |
-| Modèles, enrichissements, scores | Gabarits et bibliothèques préparés. | Choisir une baseline, les backtests, les variables et les expériences sur des critères mesurés. |
+| Modèles, enrichissements, scores | Backtest et référence semaine précédente implémentés ; autres modèles à construire. | Comparer les modèles et variables sur les fenêtres communes. |
 | Reproductibilité finale | Bruts conservés et manifeste des fichiers traités disponible ; pas de provenance complète d'un modèle. | Figer le cutoff et toutes les entrées utilisées pour chaque score et pour le rendu. |
 | Validation réelle 2023 | Support testé sur fixtures Deflate64. | Vérifier le vrai téléchargement et traitement de l'archive quand cette année est nécessaire. |
 
