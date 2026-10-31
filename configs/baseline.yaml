@@ -20,7 +20,7 @@ traffic:
       iu_ac: 191
 
   # Neighboring arcs used as substitutes: the Champs-Elysées sensor (4264)
-  # has no measurements since December 2025.
+  # has no measurements after 2025-11-19 11:00.
   proxy_arcs:
     - name: "Champs-Elysées proxy La Boétie-Berri"
       upstream_node: "Av_Champs_Elysees-La_Boetie"
