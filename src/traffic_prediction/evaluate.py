@@ -49,7 +49,7 @@ class PreviousWeekModel:
     """
 
     def predict(self, history: pd.DataFrame, target_times: pd.DatetimeIndex) -> pd.DataFrame:
-        arcs = history["arc"].unique()
+        arcs = history.loc[history["role"].eq("evalue"), "arc"].unique()
         index = pd.MultiIndex.from_product([arcs, target_times], names=KEYS)
         source = history.loc[history["qualite_mesure"].eq("ok")].set_index(KEYS)
         lookup = pd.MultiIndex.from_arrays(
@@ -99,7 +99,7 @@ def backtest(
 ) -> BacktestResult:
     """Score a model using only history through each Thursday 23:00.
 
-    All supplied arcs are scored.
+    Only role=evalue arcs are scored; proxies remain available in history.
     Missing/invalid truth is ignored per variable and counted on a complete
     arc/hour grid. A missing/nonfinite forecast for valid truth is an error.
     Atypical means Saturday, Sunday or a metropolitan France public holiday.
@@ -110,9 +110,9 @@ def backtest(
     _check_frame(data, [*KEYS, *TARGETS, "role", "qualite_mesure"], "data")
     if data.groupby("arc")["role"].nunique(dropna=False).gt(1).any():
         raise ValueError("data: an arc must have a consistent role")
-    arcs = sorted(data["arc"].unique())
+    arcs = sorted(data.loc[data["role"].eq("evalue"), "arc"].unique())
     if not arcs:
-        raise ValueError("data: no arcs")
+        raise ValueError("data: no evaluated arcs")
     days = list(load_cutoffs() if cutoffs is None else cutoffs)
     windows = [(pd.Timestamp(day), target_window(day)) for day in days]
     if not windows or len({day for day, _ in windows}) != len(windows):
