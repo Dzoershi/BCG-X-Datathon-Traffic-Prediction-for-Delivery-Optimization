@@ -30,3 +30,17 @@ traffic:
       upstream_node: "Av_Champs_Elysees-Washington"
       downstream_node: "Av_Champs_Elysees-Balzac"
       iu_ac: 4265
+
+# Thursday dates only; code includes Thursday 23:00, skips Friday and predicts
+# Saturday 00:00 through Wednesday 23:00. Two normal autumn windows include
+# a recent 2026 window (incremental updates from issue #8 are merged).
+backtest:
+  cutoffs:
+    - "2024-11-07"  # Armistice, Monday
+    - "2024-12-19"  # Christmas, Wednesday
+    - "2024-12-26"  # New Year, Wednesday
+    - "2025-04-17"  # Easter Monday
+    - "2025-07-10"  # Bastille Day, Monday
+    - "2025-10-16"  # Normal autumn week
+    - "2025-11-06"  # Armistice, Tuesday
+    - "2026-10-22"  # Normal autumn week, recent data
