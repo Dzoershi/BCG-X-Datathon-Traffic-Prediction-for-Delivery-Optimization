@@ -11,13 +11,14 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from traffic_prediction.data import calendar_events, traffic
+from traffic_prediction.data import calendar_events, traffic, weather
 from traffic_prediction.data.traffic import Arc, ProcessingStats
 
 DEFAULT_START = "2024-01-01"
 DEFAULT_END = "2025-12-31"
 DEFAULT_TRAFFIC_DIR = traffic.REPO_ROOT / "data" / "processed" / "traffic"
 DEFAULT_CALENDAR_DIR = traffic.REPO_ROOT / "data" / "processed" / "calendar"
+DEFAULT_WEATHER_DIR = traffic.REPO_ROOT / "data" / "processed" / "weather"
 
 TRAFFIC_SCHEMA = pa.schema(
     [
@@ -66,6 +67,80 @@ def build_calendar(
     temporary.replace(path)
     print(f"Saved {path} ({len(table):,} rows)", flush=True)
     return table
+
+
+def build_weather(
+    start: str | None = None,
+    end: str = calendar_events.PREDICTION_END,
+    output_dir: Path = DEFAULT_WEATHER_DIR,
+    *,
+    traffic_dir: Path = DEFAULT_TRAFFIC_DIR,
+    source: str = "historical_forecast",
+    refresh_forecast: bool = False,
+    raw_dir: Path = weather.DEFAULT_RAW_DIR,
+) -> pd.DataFrame:
+    """Write weather.parquet: past Paris days from history, today onward from the forecast.
+
+    A full build downloads history from ``start``, inferred from local traffic like the
+    calendar. ``refresh_forecast`` keeps the stored history, downloads only the missing
+    past days and replaces the forecast. The previous file is kept if anything fails.
+    """
+    path = Path(output_dir) / "weather.parquet"
+    today = weather.today_paris()
+    last_day = pd.Timestamp(end)
+    if refresh_forecast:
+        if start is not None:
+            raise ValueError("A forecast refresh keeps the stored start; omit start.")
+        parts = [_stored_weather_history(path, source, today)]
+        first_day = parts[0]["datetime"].iloc[0]
+        next_day = parts[0]["datetime"].iloc[-1].normalize() + pd.Timedelta(days=1)
+    else:
+        first_day = next_day = pd.Timestamp(start or _first_traffic_day(traffic_dir))
+        parts = []
+    yesterday = min(today - pd.Timedelta(days=1), last_day)
+    if next_day <= yesterday:
+        parts.append(weather.download_history(next_day, yesterday, source=source, raw_dir=raw_dir))
+    if today <= last_day:
+        parts.append(weather.download_forecast(max(today, first_day), last_day, raw_dir=raw_dir))
+
+    table = parts[0]
+    for part in parts[1:]:
+        table = weather.join_consecutive(table, part)
+    weather.validate_weather(table, first_day, last_day)
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.parent / ".weather.parquet.tmp"
+    table.to_parquet(temporary, engine="pyarrow", compression="zstd", index=False)
+    if pq.read_metadata(temporary).num_rows != len(table):
+        raise ValueError("Weather Parquet row count mismatch")
+    temporary.replace(path)
+    print(f"Saved {path} ({len(table):,} rows)", flush=True)
+    print(table.groupby("source", sort=False)["datetime"].agg(["min", "max", "count"]).to_string(), flush=True)
+    return table
+
+
+def _first_traffic_day(traffic_dir: Path) -> str:
+    """First stored traffic day, without loading the history into memory."""
+    from traffic_prediction.data.query import query_traffic
+
+    first = query_traffic("SELECT min(datetime) AS first FROM traffic", path=traffic_dir).iloc[0, 0]
+    if pd.isna(first):
+        raise ValueError("Traffic history is empty; supply a weather start date")
+    return str(pd.Timestamp(first).date())
+
+
+def _stored_weather_history(path: Path, source: str, today: pd.Timestamp) -> pd.DataFrame:
+    """History rows of the stored table before today; forecast rows are dropped."""
+    if not path.exists():
+        raise FileNotFoundError(f"No weather table at {path}; run --weather once before refreshing.")
+    stored = pd.read_parquet(path)
+    history = stored[stored["source"].ne("forecast") & stored["datetime"].lt(today)]
+    if history.empty:
+        raise ValueError("The stored weather has no past history; run --weather without --refresh-forecast.")
+    if not history["source"].eq(source).all():
+        raise ValueError(f"Stored history comes from {sorted(set(history['source']))}, not {source}; "
+                         "rebuild with --weather.")
+    return history.reset_index(drop=True)
 
 
 def build_traffic(
@@ -362,13 +437,23 @@ def percent_missing(values: pd.Series) -> float:
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "Build hourly traffic Parquet, or calendar covariates with --calendar. "
+            "Build hourly traffic Parquet, calendar covariates with --calendar, "
+            "or weather with --weather. "
             "Traffic output files for years in the requested period are replaced."
         )
     )
     parser.add_argument("--calendar", action="store_true", help="Build calendar covariates instead of traffic.")
+    parser.add_argument("--weather", action="store_true",
+                        help="Build hourly weather: history until yesterday, forecast from today.")
+    parser.add_argument("--refresh-forecast", action="store_true",
+                        help="With --weather, keep the stored history, add missing past days "
+                             "and replace the forecast.")
+    parser.add_argument("--weather-source", choices=sorted(weather.HISTORY_URLS),
+                        default="historical_forecast",
+                        help="With --weather, history API: historical_forecast (same models as "
+                             "the forecast, default) or archive (ERA5 reanalysis, for comparison).")
     parser.add_argument("--traffic-dir", type=Path, default=DEFAULT_TRAFFIC_DIR,
-                        help="Processed history used to infer the calendar start.")
+                        help="Processed history used to infer the calendar or weather start.")
     parser.add_argument("--school-holidays-file", type=Path, default=calendar_events.DEFAULT_SCHOOL_PATH,
                         help="Local official Paris school-calendar JSON snapshot.")
     parser.add_argument("--refresh-school-holidays", action="store_true",
@@ -377,13 +462,14 @@ def main() -> None:
         "--start",
         default=None,
         metavar="YYYY-MM-DD",
-        help=f"First day, from 00:00 (traffic: {DEFAULT_START}; calendar: infer from history).",
+        help=f"First day, from 00:00 (traffic: {DEFAULT_START}; calendar and weather: infer from history).",
     )
     parser.add_argument(
         "--end",
         default=None,
         metavar="YYYY-MM-DD",
-        help=f"Last day, until 23:00 (traffic: {DEFAULT_END}; calendar: {calendar_events.PREDICTION_END}).",
+        help=(f"Last day, until 23:00 (traffic: {DEFAULT_END}; "
+              f"calendar and weather: {calendar_events.PREDICTION_END})."),
     )
     parser.add_argument(
         "--raw-dir",
@@ -406,7 +492,7 @@ def main() -> None:
         "--output-dir",
         type=Path,
         default=None,
-        help="Parquet destination; default: data/processed/traffic or data/processed/calendar.",
+        help="Parquet destination; default: data/processed/traffic, calendar or weather.",
     )
     parser.add_argument(
         "--config",
@@ -415,11 +501,21 @@ def main() -> None:
         help="Arc configuration; default: configs/baseline.yaml.",
     )
     args = parser.parse_args()
-    source = "Calendar" if args.calendar else "Traffic"
+    source = "Calendar" if args.calendar else "Weather" if args.weather else "Traffic"
     if args.refresh_school_holidays and not args.calendar:
         parser.error("--refresh-school-holidays requires --calendar")
+    if args.calendar and args.weather:
+        parser.error("choose --calendar or --weather, not both")
+    if args.refresh_forecast and not args.weather:
+        parser.error("--refresh-forecast requires --weather")
 
     try:
+        if args.weather:
+            build_weather(args.start, args.end or calendar_events.PREDICTION_END,
+                          args.output_dir or DEFAULT_WEATHER_DIR,
+                          traffic_dir=args.traffic_dir, source=args.weather_source,
+                          refresh_forecast=args.refresh_forecast)
+            return
         if args.calendar:
             if args.refresh_school_holidays:
                 calendar_events.download_school_holidays(args.school_holidays_file)
