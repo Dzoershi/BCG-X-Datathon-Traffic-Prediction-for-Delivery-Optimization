@@ -491,6 +491,27 @@ La vérité est réindexée sur tous les couples arc × 120 heures. Une heure es
 
 `tests/test_evaluate.py` utilise uniquement des DataFrames synthétiques : anti-fuite, gap, 120 heures, fêtes, scores calculés à la main, alignement, données absentes/invalides, arc entièrement sans vérité, prévisions incomplètes, référence manquante/parfaite, moyennes et journal CSV/JSON. La CI installe la dépendance `holidays` déjà épinglée dans `requirements.txt`. Aucun score sur les archives réelles n’est revendiqué.
 
+## Calendrier horaire (issue #16)
+
+`data/calendar_events.py` produit des covariables connues à l'avance, indépendantes des mesures. Les jours fériés nationaux de France métropolitaine viennent de `holidays.France` (sans particularités d'Alsace-Moselle). Les vacances des élèves de Paris, zone C, viennent du jeu officiel [Le calendrier scolaire sur data.gouv.fr](https://www.data.gouv.fr/datasets/le-calendrier-scolaire), via l'API du ministère. Le téléchargement explicite conserve un petit snapshot JSON dans `data/raw/calendar/paris_school_holidays.json` ; aucun historique de trafic n'est téléchargé.
+
+```powershell
+# Premier appel ou actualisation du calendrier officiel uniquement :
+python -m traffic_prediction.data.build --calendar --refresh-school-holidays
+# Reconstruction hors ligne depuis le snapshot conservé :
+python -m traffic_prediction.data.build --calendar
+# Sans trafic traité localement, fournir explicitement le début souhaité :
+python -m traffic_prediction.data.build --calendar --start 2024-01-01
+```
+
+`build_calendar()` déduit par défaut le début du minimum de `datetime` dans le trafic Parquet local, sans charger les observations en mémoire. La fin par défaut est le **11 novembre 2026 à 23:00 inclus**. `--traffic-dir`, `--school-holidays-file`, `--start`, `--end` et `--output-dir` permettent d'isoler un essai. Le résultat remplace uniquement `data/processed/calendar/calendar.parquet`. Sans historique local, un début explicite est nécessaire ; sans snapshot, lancer d'abord l'actualisation. La fonction pure `calendar_table(start, end, school_holidays_path=...)` ne fait aucun accès réseau.
+
+La clé unique `datetime` est un timestamp ns **Paris sans fuseau**, étiquette de fin d'heure identique au trafic : 24 lignes par jour, y compris aux changements d'heure, sans décalage d'une heure. Les features décrivent la date de cette étiquette, y compris à minuit. `hour` vaut 0–23, `day_of_week` vaut 0 (lundi) à 6 (dimanche) ; les autres colonnes sont booléennes : `is_weekend`, `is_holiday`, `is_day_before_holiday`, `is_day_after_holiday`, `is_bridge`, `is_school_holiday`. Les voisins fériés sont calculés aussi hors des bornes de sortie. Un **pont** désigne ici un lundi non férié avant un mardi férié ou un vendredi non férié après un jeudi férié ; c'est une convention de feature, pas une fermeture systématique des entreprises.
+
+Les bornes scolaires avec fuseau sont converties en dates locales de Paris. À cette résolution journalière, la date de départ est incluse et celle de reprise exclue ; le départ après la classe n'est pas modélisé à l'heure près. Les lignes propres aux enseignants sont exclues, les ponts scolaires publiés sont inclus. Une année scolaire absente du snapshot provoque une erreur plutôt qu'un indicateur silencieusement faux. Conserver ce snapshot pour reproduire une expérience ; il représente le calendrier publié lors de sa récupération, sans reconstruction des versions historiquement connues.
+
+Les tests hors ligne utilisent un extrait officiel limité aux années scolaires 2023–2027 et vérifient la grille complète, la jointure directe au trafic, les changements d'heure, les 11 novembre 2024/2025/2026, les samedi 7 et dimanche 8 novembre 2026, les ponts et les bornes de Toussaint 2026 : **du 17 octobre inclus au 2 novembre exclu**.
+
 ## Décisions ouvertes
 
 | Point | Comportement ou constat actuel | Prochain arbitrage |
