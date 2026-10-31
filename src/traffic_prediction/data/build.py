@@ -11,7 +11,7 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from traffic_prediction.data import calendar_events, traffic, weather
+from traffic_prediction.data import calendar_events, disruptions, traffic, weather
 from traffic_prediction.data.traffic import Arc, ProcessingStats
 
 DEFAULT_START = "2024-01-01"
@@ -19,6 +19,7 @@ DEFAULT_END = "2025-12-31"
 DEFAULT_TRAFFIC_DIR = traffic.REPO_ROOT / "data" / "processed" / "traffic"
 DEFAULT_CALENDAR_DIR = traffic.REPO_ROOT / "data" / "processed" / "calendar"
 DEFAULT_WEATHER_DIR = traffic.REPO_ROOT / "data" / "processed" / "weather"
+DEFAULT_DISRUPTIONS_DIR = traffic.REPO_ROOT / "data" / "processed" / "disruptions"
 
 TRAFFIC_SCHEMA = pa.schema(
     [
@@ -141,6 +142,62 @@ def _stored_weather_history(path: Path, source: str, today: pd.Timestamp) -> pd.
         raise ValueError(f"Stored history comes from {sorted(set(history['source']))}, not {source}; "
                          "rebuild with --weather.")
     return history.reset_index(drop=True)
+
+
+def build_disruptions(
+    start: str = DEFAULT_START,
+    end: str = calendar_events.PREDICTION_END,
+    output_dir: Path = DEFAULT_DISRUPTIONS_DIR,
+    *,
+    config_path: Path = traffic.DEFAULT_CONFIG,
+    events_path: Path = disruptions.DEFAULT_EVENTS_PATH,
+    raw_dir: Path = disruptions.DEFAULT_RAW_DIR,
+) -> pd.DataFrame:
+    """Write chantiers.parquet (works near the evaluated arcs) and the hourly disruptions.parquet.
+
+    The events list is checked before any download. Works are downloaded at each run:
+    the sources only list current and planned works, so rerun just before the forecast.
+    """
+    arcs = [arc for arc in traffic.load_arcs(config_path) if arc.role == "evalue"]
+    names = [arc.name for arc in arcs]
+    events = disruptions.read_events(events_path, names)
+    works = disruptions.download_works(disruptions.download_arc_lines(arcs, raw_dir), raw_dir)
+    table = disruptions.hourly_table(works, events, names, start, end)
+    disruptions.validate_disruptions(table, names, start, end)
+    _write_parquet(works, Path(output_dir) / "chantiers.parquet")
+    _write_parquet(table, Path(output_dir) / "disruptions.parquet")
+    if pd.Timestamp(end) >= pd.Timestamp(disruptions.TEST_START):
+        print_disruptions_check(works, table, end)
+    return table
+
+
+def _write_parquet(table: pd.DataFrame, path: Path) -> None:
+    """Write through a temporary file; the previous file is kept if anything fails."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.parent / f".{path.name}.tmp"
+    table.to_parquet(temporary, engine="pyarrow", compression="zstd", index=False)
+    if pq.read_metadata(temporary).num_rows != len(table):
+        raise ValueError(f"{path.name} row count mismatch")
+    temporary.replace(path)
+    print(f"Saved {path} ({len(table):,} rows)", flush=True)
+
+
+def print_disruptions_check(works: pd.DataFrame, table: pd.DataFrame, end: str) -> None:
+    """Test-period check: relevant works within NEAR_M, and flagged hours per arc."""
+    start = disruptions.TEST_START
+    print(f"\n=== Disruptions from {start} to {end} ===")
+    near = disruptions.works_active(works, start, end).sort_values(["arc", "distance_m"])
+    listed = near[disruptions.relevant(near)]
+    print(f"Works within {disruptions.NEAR_M:.0f} m: {len(near)}; on the roadway, "
+          f"excluding private building works: {len(listed)} (listed below).")
+    if len(listed):
+        print(listed[["arc", "source", "distance_m", "sur_arc", "date_debut", "date_fin",
+                      "description"]].to_string(index=False))
+    period = table[table["datetime"].between(pd.Timestamp(start), pd.Timestamp(end) + pd.Timedelta(hours=23))]
+    print("\nFlagged hours per arc:")
+    print(period.groupby("arc", sort=False)[["chantier_actif", "evenement_actif"]].sum().to_string())
+    for text in period.loc[period["evenement_actif"], "description"].unique():
+        print(f"- {text}")
 
 
 def build_traffic(
@@ -438,7 +495,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
             "Build hourly traffic Parquet, calendar covariates with --calendar, "
-            "or weather with --weather. "
+            "weather with --weather, or road works and events with --disruptions. "
             "Traffic output files for years in the requested period are replaced."
         )
     )
@@ -452,6 +509,11 @@ def main() -> None:
                         default="historical_forecast",
                         help="With --weather, history API: historical_forecast (same models as "
                              "the forecast, default) or archive (ERA5 reanalysis, for comparison).")
+    parser.add_argument("--disruptions", action="store_true",
+                        help="Build road works near the evaluated arcs and the manual events, hourly.")
+    parser.add_argument("--events-file", type=Path, default=disruptions.DEFAULT_EVENTS_PATH,
+                        help="With --disruptions, the hand-checked events CSV; "
+                             "default: data/raw/events_manual.csv.")
     parser.add_argument("--traffic-dir", type=Path, default=DEFAULT_TRAFFIC_DIR,
                         help="Processed history used to infer the calendar or weather start.")
     parser.add_argument("--school-holidays-file", type=Path, default=calendar_events.DEFAULT_SCHOOL_PATH,
@@ -462,14 +524,15 @@ def main() -> None:
         "--start",
         default=None,
         metavar="YYYY-MM-DD",
-        help=f"First day, from 00:00 (traffic: {DEFAULT_START}; calendar and weather: infer from history).",
+        help=(f"First day, from 00:00 (traffic and disruptions: {DEFAULT_START}; "
+              "calendar and weather: infer from history)."),
     )
     parser.add_argument(
         "--end",
         default=None,
         metavar="YYYY-MM-DD",
         help=(f"Last day, until 23:00 (traffic: {DEFAULT_END}; "
-              f"calendar and weather: {calendar_events.PREDICTION_END})."),
+              f"calendar, weather and disruptions: {calendar_events.PREDICTION_END})."),
     )
     parser.add_argument(
         "--raw-dir",
@@ -492,7 +555,7 @@ def main() -> None:
         "--output-dir",
         type=Path,
         default=None,
-        help="Parquet destination; default: data/processed/traffic, calendar or weather.",
+        help="Parquet destination; default: data/processed/traffic, calendar, weather or disruptions.",
     )
     parser.add_argument(
         "--config",
@@ -501,15 +564,23 @@ def main() -> None:
         help="Arc configuration; default: configs/baseline.yaml.",
     )
     args = parser.parse_args()
-    source = "Calendar" if args.calendar else "Weather" if args.weather else "Traffic"
+    source = ("Calendar" if args.calendar else "Weather" if args.weather
+              else "Disruptions" if args.disruptions else "Traffic")
     if args.refresh_school_holidays and not args.calendar:
         parser.error("--refresh-school-holidays requires --calendar")
     if args.calendar and args.weather:
         parser.error("choose --calendar or --weather, not both")
+    if args.disruptions and (args.calendar or args.weather):
+        parser.error("choose --disruptions alone, without --calendar or --weather")
     if args.refresh_forecast and not args.weather:
         parser.error("--refresh-forecast requires --weather")
 
     try:
+        if args.disruptions:
+            build_disruptions(args.start or DEFAULT_START, args.end or calendar_events.PREDICTION_END,
+                              args.output_dir or DEFAULT_DISRUPTIONS_DIR, config_path=args.config,
+                              events_path=args.events_file)
+            return
         if args.weather:
             build_weather(args.start, args.end or calendar_events.PREDICTION_END,
                           args.output_dir or DEFAULT_WEATHER_DIR,
