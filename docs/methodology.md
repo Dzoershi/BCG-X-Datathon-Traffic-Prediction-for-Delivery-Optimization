@@ -23,7 +23,8 @@ Le statut « implémenté » décrit l'arbre de travail ; le statut de publicati
 11. [Backtest](#backtest-issue-15)
 12. [Météo](#météo-issue-21)
 13. [Baselines](#baselines-issue-17)
-14. [Décisions ouvertes](#décisions-ouvertes)
+14. [Chantiers et événements](#chantiers-et-événements-issue-34)
+15. [Décisions ouvertes](#décisions-ouvertes)
 
 ## Périmètre du brief
 
@@ -50,6 +51,7 @@ Le brief LivraisonCo 2026 fourni par les organisateurs est la référence. Les i
 | [`update.py`](../src/traffic_prediction/data/update.py) | Couverture, période de reprise, orchestration des téléchargements, fusion et publication. | Actualiser sans reconstruire toutes les archives ni dupliquer la normalisation. |
 | [`validate.py`](../src/traffic_prediction/data/validate.py) | Contrôles du dataset, manifeste d'intégrité et validation du CSV de prévisions. | Vérifier les artefacts et la complétude sans réimplémenter le nettoyage ou un modèle. |
 | [`weather.py`](../src/traffic_prediction/data/weather.py) | Météo Open-Meteo : historique et prévision, conversion en étiquettes de Paris, raccord et validation. | Fournir une covariable connue à l'avance, sur la même grille horaire que le trafic. |
+| [`disruptions.py`](../src/traffic_prediction/data/disruptions.py) | Chantiers Open Data Paris proches des arcs évalués (distance géométrique) et liste manuelle d'événements, en table horaire validée. | Contrôler la période de test et expliquer des erreurs passées ; ce n'est pas une variable d'entraînement. |
 | [`configs/baseline.yaml`](../configs/baseline.yaml) | Identités, sens des arcs et rôles évalué/proxy. | Éviter de disperser ces paramètres entre notebooks et commandes. |
 | [`notebooks/`](../notebooks/) | Gabarits numérotés pour exploration, nettoyage, features, baseline, expériences et impact livraison. | Organiser le travail exploratoire ; les traitements réutilisables vont dans le package. |
 
@@ -407,6 +409,7 @@ Les tests utilisent de petits fichiers représentatifs et des réponses réseau 
 | [`test_update.py`](../tests/test_update.py) | Ajouts, corrections nulles, répétitions sans réécriture, histoire préservée, couverture source, bootstrap, jours de 23/25 heures, échecs réseau/écriture/validation, rollback, interruption clavier et verrou concurrent. |
 | [`test_data.py`](../tests/test_data.py) | Chaîne HTTP simulée → ingestion → build → SQL → actualisation → manifeste, reprise après interruptions, reproduction dans un autre dossier, erreurs de complétude, intégrité et contrat du CSV officiel. |
 | [`test_weather.py`](../tests/test_weather.py) | Météo sans réseau : requêtes UTC et copie brute, étiquettes de Paris et changements d'heure, jointure avec la grille trafic, raccord historique/prévision, rafraîchissement, nouvelles tentatives, validation et CLI. |
+| [`test_disruptions.py`](../tests/test_disruptions.py) | Chantiers et événements sans réseau : distance à l'arc, seuils de 50 et 200 m, conversion des dates, règle de `chantier_actif`, étiquettes horaires, lignes « non appliqué », liste manuelle mal formée refusée et fichier versionné validé, requêtes, nouvelles tentatives, construction et CLI. |
 | [`test_imports.py`](../tests/test_imports.py) | Import des modules du package, y compris les points d'entrée nouvellement ajoutés. |
 
 La dernière exécution locale consignée a donné **249 tests et 27 sous-tests réussis** sous Python 3.12. Les contrôles de documentation ont aussi parsé les blocs PowerShell, vérifié les options de commandes et les liens locaux, puis exécuté les exemples SQL sur des Parquet de test.
@@ -436,7 +439,7 @@ La configuration du workflow ne constitue pas une exécution distante réussie :
 
 | Sujet | Préparé dans le dépôt | Décision ou travail restant |
 |---|---|---|
-| Données externes | Modules `weather.py`, `calendar_events.py`, `disruptions.py` et dépendance `holidays`. | Météo implémentée : voir [Météo](#météo-issue-21). Pour `disruptions.py`, choisir les sources, contrôler leur disponibilité à la date de prévision et implémenter la collecte. |
+| Données externes | Modules `weather.py`, `calendar_events.py`, `disruptions.py` et dépendance `holidays`. | Météo implémentée : voir [Météo](#météo-issue-21). Chantiers et événements implémentés comme table de contrôle, pas comme variable d'entraînement : voir [Chantiers et événements](#chantiers-et-événements-issue-34). |
 | Feature engineering | `features.py` et notebook 03. | Définir les variables temporelles, retards et agrégats ; contrôler l'absence d'information future. |
 | Baseline | `models/baselines.py` et notebook 04. | Quatre baselines mesurées et consignées ; voir [Baselines](#baselines-issue-17). |
 | Familles de modèles | Répertoire `models/` ; scikit-learn, LightGBM, Chronos et PyTorch préparés dans les dépendances. | Ces bibliothèques sont des possibilités, pas une architecture gagnante ou une décision de modèle final. |
@@ -706,6 +709,83 @@ Exécution du 31 octobre 2026 : données du 1er janvier 2024 au 31 octobre 2026 
 - Point de départ pour la présentation, sur Convention et Saint-Pères (RMSE poolée, toutes heures) : **97,5 véh/h pour le débit et 2,04 points pour l'occupation**.
 - `normalized_score` reste indéfini sur la plupart des fenêtres, car la référence semaine précédente de l'issue #15 ne couvre pas toutes les heures notées ; on compare donc les RMSE directement.
 
+## Chantiers et événements (issue #34)
+
+[`data/disruptions.py`](../src/traffic_prediction/data/disruptions.py) répertorie les chantiers et les événements qui touchent les trois arcs évalués. **La table sert à vérifier la période de test et à expliquer des erreurs passées ; elle ne sert pas de variable d'entraînement** : l'historique des chantiers est partiel et les événements sont saisis à la main. Aucun assemblage avec le trafic n'est fait ici (issue #22).
+
+```powershell
+python -m traffic_prediction.data.build --disruptions
+```
+
+`--start` (par défaut le 1er janvier 2024), `--end` (le 11 novembre 2026), `--output-dir`, `--config` et `--events-file` (par défaut `data/raw/events_manual.csv`) sont disponibles. Chaque exécution retélécharge les chantiers et affiche le contrôle de la période de test.
+
+### Sources
+
+| Source | Contenu | Historique |
+|---|---|---|
+| [`chantiers-perturbants`](https://opendata.paris.fr/explore/dataset/chantiers-perturbants/) | Chantiers principaux qui gênent la circulation : niveau (perturbant, très perturbant), impact, statut. | **Aucun** : en cours et à venir ; un chantier terminé disparaît. |
+| [`chantiers-a-paris`](https://opendata.paris.fr/explore/dataset/chantiers-a-paris/) | Toutes les emprises sur l'espace public, en cours à J-1, avec catégorie et chaussée ou trottoir. | **Aucun**, et aucun chantier qui n'a pas encore commencé. |
+| [`historique-chantiers-a-paris-en-2024`](https://opendata.paris.fr/explore/dataset/historique-chantiers-a-paris-en-2024/) | Emprises en cours pendant 2024, même schéma. | 2024 seulement : **2025 n'est pas publié**. |
+| [`referentiel-comptages-routiers`](https://opendata.paris.fr/explore/dataset/referentiel-comptages-routiers/) | Segment de chaque `iu_ac`. | Sans objet. |
+| [`data/raw/events_manual.csv`](../data/raw/events_manual.csv) | Cérémonies, fermetures, manifestations, grèves, piétonnisations ; une source par ligne. Versionné (exception dans `.gitignore`). | Saisi à la main. |
+
+`circulation_evenement` (PC Lutèce, temps réel) et `fermetures-voirie` (périphérique, tunnels, berges) ne sont pas dans le code : ils sont contrôlés à la main avec la check-list.
+
+### Méthode
+
+- **Les arcs sont repérés par géométrie, pas par nom de voie.** « Chantiers à Paris » n'a pas de colonne voie, et un nom désigne toute la rue alors qu'un arc mesure 120 à 250 m. L'API garde les emprises autour du milieu de l'arc (`within_distance`, rayon = demi-longueur + 250 m), puis la distance exacte entre l'emprise et le segment est calculée en Python, avec une projection plane locale et sans `shapely`.
+- **Seuils.** Les emprises à 200 m ou moins sont listées dans `chantiers.parquet` ; `sur_arc` vaut vrai à 50 m ou moins, environ la demi-largeur des Champs-Élysées. Ce seuil inclut les rues voisines aux carrefours.
+- **`chantier_actif`** : chantier perturbant ou emprise sur la chaussée, à 50 m ou moins, **hors catégorie « Tiers (travaux sur bâtiment) »**. Ces bennes et échafaudages rendaient le drapeau vrai presque tout le temps sur les trois arcs. Les dates de chantier sont des jours entiers, inclus.
+- **`evenement_actif`** : une ligne de la liste manuelle pour l'arc ou pour `toutes`. Une ligne dont la description contient « non appliqué » est gardée pour mémoire, mais ignorée.
+- **Temps.** Comme pour le trafic et la météo, l'étiquette marque la fin de l'heure, en heure de Paris sans fuseau. Une étiquette L est active si l'heure ]L − 1 h, L] chevauche [début, fin) : un événement de 07:00 à 14:00 donne les étiquettes de 08:00 à 14:00, exactement les heures « Barré » du capteur le 11/11.
+- **Fichiers.** `data/processed/disruptions/disruptions.parquet` contient une ligne par arc et par heure (`datetime`, `arc`, `chantier_actif`, `evenement_actif`, `description`), soit 25 104 heures par arc du 01/01/2024 au 11/11/2026, la grille de la météo. `chantiers.parquet` donne `distance_m`, `sur_arc`, `chaussee`, `categorie` et les dates. Les réponses brutes sont gardées dans `data/raw/disruptions/`, avec l'heure UTC du téléchargement.
+- **Validation.** `read_events` refuse toute ligne mal formée et indique son numéro, avant tout téléchargement. `validate_disruptions` exige la grille complète, sans doublon, avec des booléens.
+
+### Liste manuelle
+
+43 lignes : 9 événements (11 Novembre 2024 et 2025, Saint-Sylvestre 2024, 14 Juillet 2025, parade des JOP, Ligue des champions, manifestation du 31/10/2026, grève du 05/11/2026, 11 Novembre 2026), 3 Marathons de Paris (2024 à 2026) et 31 dimanches Paris Respire.
+
+- **11/11/2026 : horaires PROVISOIRES de 7 h à 14 h**, ceux de 2024 et 2025. Ils sont à remplacer par l'arrêté 2026.
+- **Paris Respire** ([paris.fr](https://www.paris.fr/pages/un-dimanche-par-mois-les-champs-elysees-et-le-centre-de-paris-reserves-aux-pietons-7110)) : 1er dimanche du mois, de 10 h à 17 h de novembre à mars, de 11 h à 18 h d'avril à octobre. Janvier est exclu : le capteur est normal en janvier 2024 et 2025, et une ancienne version de la page annonçait « pas de piétonnisation en janvier 2026 ». Les 03/08, 07/09 et 02/11/2025 sont marqués « non appliqué d'après le capteur, raison inconnue » : aucune annulation publiée n'a été trouvée. Le 01/11/2026, annulé selon paris.fr, n'a pas de ligne.
+- **Contrôle par le capteur des Champs-Élysées** : « Barré » et débit quasi nul de 08 h à 13-14 h les 11/11/2024 et 11/11/2025, dès 16 h environ le 31/12/2024, toute la journée le 14/09/2024, le matin des marathons. Pour le marathon 2025, la source ne donne pas d'horaire pour l'avenue : les heures viennent du capteur, comme l'indique la description.
+
+### Période de test (du 7 au 11 novembre 2026), état au 31 octobre
+
+- **Aucun chantier perturbant, aucune fermeture et aucun événement PC Lutèce à 200 m ou moins des trois arcs.** À 500 m ou moins, aucun ne commence ni ne finit entre le 31/10 et le 11/11.
+- `chantier_actif` n'est vrai que sur les Champs-Élysées : chantier de voirie de la Ville à 37 m, du 01/07 au 18/12/2026, au nord du carrefour Berri. Il n'y a rien sur Convention ni sur Saint-Pères.
+- `evenement_actif` : Champs-Élysées le 11/11 de 7 h à 14 h (provisoire).
+- **À proximité de Saint-Pères** : le quai Voltaire, réduit à une voie (« très perturbant », à 248 m), du 01/10/2024 au 30/10/2026. Son début n'a pas créé de rupture mesurable sur Saint-Pères : débit −4,5 % entre les trois semaines avant et après le 01/10/2024, contre −6,5 % pour la même transition en 2026, chantier actif des deux côtés. On trouve aussi un chantier de la Ville rive droite (7 848 m², à 194 m) jusqu'au 08/11, et des travaux de Fraîcheur de Paris rue des Saints-Pères, mais du 04/01 au 26/02/2027.
+- **Semaine de référence** : manifestation du samedi 31/10 (40 stations de métro fermées, rassemblements interdits sur les Champs-Élysées jusqu'au 02/11 à 6 h, piétonnisation du 01/11 annulée) et grève SNCF du jeudi 05/11. Leur effet sur nos arcs n'est pas encore connu.
+
+### Constat sur l'examen blanc
+
+Les erreurs de `HolidayAwarePreviousWeekBaseline` ont été recalculées heure par heure sur les huit fenêtres (RMSE identiques à [`experiments.csv`](experiments.csv)), puis croisées avec la table à l'heure prédite et à l'heure recopiée. **Les grosses erreurs viennent de jours perturbés, soit à l'heure prédite, soit dans la semaine recopiée.**
+
+| Fenêtre | Arc | RMSE débit | Cause | Part de l'erreur² | RMSE sans ces heures |
+|---|---|---:|---|---:|---:|
+| 06/11/2025 | Champs-Élysées | 230 | 11/11/2025 de 08 h à 14 h : 12 à 119 véh/h réels contre 438 à 1 165 prévus | 65 % (7 h) | 140 |
+| 07/11/2024 | Champs-Élysées | 219 | 11/11/2024 de 08 h à 14 h | 38 % (7 h) | 179 |
+| 26/12/2024 | Champs-Élysées | 285 | Saint-Sylvestre (31/12 à partir de 16 h, 01/01 de 03 h à 06 h) | 26 % (8 h) | 255 |
+| 17/04/2025 | Champs-Élysées | 237 | Pâques recopie le dimanche du Marathon (13/04, « Barré » de 07 h à 15 h) : prévision 160 à 650 véh/h trop basse | 36 % (14 h) | 202 |
+
+- Les chantiers n'expliquent rien de mesurable : sur Saint-Pères en novembre 2024, le chantier Enedis est actif à l'heure prédite comme à l'heure recopiée, donc sans changement d'état.
+- Les grosses erreurs sans événement ressemblent à des effets de calendrier : Saint-Pères du 24 au 28/10/2026 (+88 à +180 véh/h chaque jour, la 2e semaine des vacances de la Toussaint recopiant la 1re), Convention le 01/01/2025 et au début des vacances d'été 2025, et l'occupation des Champs-Élysées pendant la semaine de Noël 2024 (cause inconnue).
+
+### Limites
+
+- Historique partiel : 2024 complet, 2025 réduit aux chantiers encore en cours, aucun historique des chantiers perturbants. C'est pourquoi la table n'est pas une variable d'entraînement.
+- Les sources ne décrivent que l'état du jour : la table doit être reconstruite juste avant le rendu.
+- La liste manuelle n'est pas exhaustive (8 mai, Saint-Sylvestre 2025, autres manifestations) et Paris Respire n'est pas toujours appliqué.
+
+### Check-list du vendredi 6 novembre
+
+1. Lancer `python -m traffic_prediction.data.build --disruptions` et lire le contrôle affiché.
+2. Contrôler à la main `circulation_evenement` et `fermetures-voirie` : à 500 m ou moins, les chantiers perturbants et fermetures qui commencent ou finissent entre le 31/10 et le 11/11.
+3. Quai Voltaire (`CP002700` dans `chantiers-perturbants`) : vérifier que le chantier est vraiment terminé (`date_fin`, `statut`), puis comparer le trafic de Saint-Pères du 03 au 05/11 à celui du 13 au 15/10.
+4. Remplacer les horaires provisoires du 11/11/2026 dans `events_manual.csv` par ceux de l'arrêté de la préfecture de police, retirer « PROVISOIRES », relancer l'étape 1.
+5. Confirmer la grève du 05/11 avec les plans de transport SNCF publiés le 04/11.
+6. Comparer le samedi 31/10 et le dimanche 01/11 sur Saint-Pères et Convention à un samedi et un dimanche normaux. S'ils sont perturbés, la semaine recopiée par `HolidayAwarePreviousWeek` est biaisée pour le 07/11, le 08/11 et le 11/11.
+
 ## Décisions ouvertes
 
 | Point | Comportement ou constat actuel | Prochain arbitrage |
@@ -720,6 +800,7 @@ Exécution du 31 octobre 2026 : données du 1er janvier 2024 au 31 octobre 2026 
 | Météo dans le backtest | Historique Historical Forecast : prévisions à très courte échéance, presque observées. Le gain mesuré grâce à la météo est un plafond. | Backtest strict avec l'API Previous Runs (`*_previous_dayN`) si le temps le permet. |
 | Reproductibilité finale | Bruts conservés et manifeste des fichiers traités disponible ; pas de provenance complète d'un modèle. | Figer le cutoff et toutes les entrées utilisées pour chaque score et pour le rendu. |
 | Validation réelle 2023 | Support testé sur fixtures Deflate64. | Vérifier le vrai téléchargement et traitement de l'archive quand cette année est nécessaire. |
+| Jours perturbés dans le rendu | Les grosses erreurs de l'examen blanc viennent de jours perturbés, à l'heure prédite ou dans la semaine recopiée. Pour le rendu : Champs-Élysées fermés le 11/11 de 7 h à 14 h (horaires provisoires) ; week-end de référence du 31/10 au 01/11 avec manifestation. | #19 et #18 : décider comment traiter ces heures (prévision dédiée, autre semaine de référence) ; confirmer avec la [check-list du 6 novembre](#check-list-du-vendredi-6-novembre). |
 
 ## Mise à jour de ce document
 
