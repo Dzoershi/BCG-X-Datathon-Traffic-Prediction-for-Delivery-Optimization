@@ -28,7 +28,8 @@ Le statut « implémenté » décrit l'arbre de travail ; le statut de publicati
 16. [Table de modélisation](#table-de-modélisation-issue-22)
 17. [Timestral](#timestral-issue-20)
 18. [Variables tabulaires](#variables-tabulaires-issue-30)
-19. [Décisions ouvertes](#décisions-ouvertes)
+19. [LightGBM](#lightgbm-issue-31)
+20. [Décisions ouvertes](#décisions-ouvertes)
 
 ## Périmètre du brief
 
@@ -57,6 +58,7 @@ Le brief LivraisonCo 2026 fourni par les organisateurs est la référence. Les i
 | [`weather.py`](../src/traffic_prediction/data/weather.py) | Météo Open-Meteo : historique et prévision, conversion en étiquettes de Paris, raccord et validation. | Fournir une covariable connue à l'avance, sur la même grille horaire que le trafic. |
 | [`disruptions.py`](../src/traffic_prediction/data/disruptions.py) | Chantiers Open Data Paris proches des arcs évalués (distance géométrique) et liste manuelle d'événements, en table horaire validée. | Contrôler la période de test et expliquer des erreurs passées ; ce n'est pas une variable d'entraînement. |
 | [`features.py`](../src/traffic_prediction/features.py) | Variables tabulaires ajustées à un cutoff : calendrier cyclique, décalages hebdomadaires, profils historiques, météo disponible. | Partager le même calcul entre apprentissage et prévision, avec des tests anti-fuite (#30). |
+| [`train.py`](../src/traffic_prediction/train.py) | Deux régressions LightGBM globales, réentraînées au cutoff, avec importance des variables et repli explicite. | Comparer une famille tabulaire aux modèles de fondation sur les mêmes fenêtres (#31). |
 | [`configs/baseline.yaml`](../configs/baseline.yaml) | Identités, sens des arcs et rôles évalué/proxy. | Éviter de disperser ces paramètres entre notebooks et commandes. |
 | [`notebooks/`](../notebooks/) | Gabarits numérotés pour exploration, nettoyage, features, baseline, expériences et impact livraison. | Organiser le travail exploratoire ; les traitements réutilisables vont dans le package. |
 
@@ -466,7 +468,7 @@ Le brief impose la RMSE. Le backtest publie séparément les deux cibles, leurs 
 
 La simulation d'octobre 2025 avec test début novembre 2025 a été évoquée par l'équipe pour avancer malgré les manques récents. C'est une proposition de backtest ; elle ne remplace pas la période officielle de novembre 2026 sans validation des organisateurs.
 
-Les états contemporains du trafic, les observations futures ou une météo observée après le cutoff ne doivent pas être supposés disponibles lors d'une prévision. Les [variables tabulaires et leurs tests anti-fuite](#variables-tabulaires-issue-30) sont implémentés en #30 ; l'entraînement LightGBM reste la #31.
+Les états contemporains du trafic, les observations futures ou une météo observée après le cutoff ne doivent pas être supposés disponibles lors d'une prévision. Les [variables tabulaires et leurs tests anti-fuite](#variables-tabulaires-issue-30) sont implémentés en #30 ; [LightGBM](#lightgbm-issue-31) les utilise sans fournir de labels de validation à l'entraînement.
 
 ### Suivi des expériences
 
@@ -1225,6 +1227,72 @@ Les tests garantissent les bornes et l'absence d'accès aux mesures ultérieures
 La vérification locale porte aussi sur les **huit fenêtres configurées**, avec le dataset d'empreinte `9e714afe6479d9a22e680b0e70893e06fd04c574219a2ec28f9ceffb237c391d` : 360 lignes de prévision et les mêmes 27 entrées par fenêtre, références directes pour les lags/profils et invariance après corruption des valeurs futures. Les tables et le rapport de provenance restent hors Git sous `outputs/metrics/features_20261101/`. Aucune RMSE de nouveau modèle n'est revendiquée en #30 ; les scores et importances seront mesurés en #31.
 
 Validation sous Windows/Python 3.12 : **42 tests de features**, et **615 tests + 27 sous-tests** pour la suite complète. Cinq mutations en mémoire (historique futur autorisé, mauvais décalage, profils calculés avec des labels ultérieurs, masque qualité retiré, météo émise trop tard autorisée) sont chacune détectées par une assertion des tests correspondants ; le code sur disque reste inchangé. Le résultat est consigné dans `outputs/metrics/features_20261101/mutations.json`.
+
+## LightGBM (issue #31)
+
+### Interface et entraînement
+
+[`train.py`](../src/traffic_prediction/train.py) définit `LightGBMForecaster(covariates=None, ...)`, conforme à `predict(history, target_times)`. L'historique attendu est le dataset assemblé #22. Les covariables sans mesures sont fournies au constructeur ou lues dans `data/processed/dataset/covariates.parquet`. Rien n'est téléchargé ; LightGBM n'est importé que lorsqu'un apprentissage natif est nécessaire. `lightgbm==4.7.0` et `scikit-learn==1.7.2` figuraient déjà dans les dépendances du dépôt.
+
+Chaque appel ajuste **deux régressions globales indépendantes**, une pour le débit et une pour l'occupation, sur les trois arcs évalués réunis. `arc` reste une catégorie Pandas déclarée explicitement à LightGBM ; ce n'est pas une quantité ordonnée. Les 26 autres variables sont celles de #30. La [documentation officielle de l'API](https://lightgbm.readthedocs.io/en/stable/pythonapi/lightgbm.LGBMRegressor.html) décrit l'interface de régression et la déclaration des catégories ; les [paramètres officiels](https://lightgbm.readthedocs.io/en/stable/Parameters.html) précisent la reproductibilité CPU.
+
+L'apprentissage conserve les paires `evalue`, `qualite_mesure == "ok"`, finies et physiquement admissibles, jusqu'à la dernière heure de l'historique transmis. Les variables sont ajustées de nouveau au cutoff ; les profils des lignes d'apprentissage ont la marge de sept jours de #30. Aucun label de validation, jeu d'évaluation LightGBM, early stopping, jointure future de trafic ou état ajusté sur une autre fenêtre n'est réutilisé. Les valeurs manquantes des variables sont transmises à LightGBM ; aucun remplissage par des observations futures. Le modèle prédit **directement les 120 heures cibles**, sans réinjection de prévisions du vendredi.
+
+La configuration initiale reste `lightgbm_raw` : objectif L2, 200 arbres, profondeur maximale 6, au plus 31 feuilles, taux d'apprentissage 0,05, au moins 30 exemples par feuille et régularisation L2 = 1. Quatre threads CPU, graine 42, `deterministic=True` et `force_col_wise=True`. Une configuration est un point de comparaison ; le défaut n'est pas remplacé automatiquement par le gagnant d'une RMSE.
+
+`log_flow=True` ajuste le débit sur `log1p(q)` et applique `expm1` avant toute évaluation. L'occupation reste sur son échelle originale. Cela optimise une erreur dans l'espace logarithmique, différente de la RMSE demandée ; aucun correctif de biais appris sur la validation n'est appliqué. Les valeurs non finies ou de forme incorrecte, y compris un débordement à l'inversion du log, provoquent une erreur. Après inversion, débit borné à 0 et occupation à [0, 100], comme les autres modèles.
+
+### Pannes et traces
+
+La règle commune aux modèles de fondation est conservée : **moins de 168 paires valides pendant les 28 derniers jours ⇒ repli `HolidayAwarePreviousWeekBaseline` pour cet arc**. Les anciens exemples de cet arc peuvent participer à l'apprentissage global, mais ses heures à prévoir utilisent explicitement le repli. Les proxies ne sont jamais des labels ou des cibles. Les observations invalides sont masquées avant le repli aussi, sans modifier l'entrée. Un manque d'historique empêchant toute prévision provoque une erreur plutôt qu'une valeur arbitraire.
+
+Après `predict`, `models_` contient les deux régressions ajustées, `features_` le constructeur de variables, `training_rows_` le nombre de paires d'apprentissage, `sources_` l'origine par arc/heure (`lightgbm` ou `fallback_<règle>`), et `feature_importances_` les colonnes `variable`, `feature`, `gain`, `split`. Ces états sont remplacés à chaque appel. Si tous les arcs prennent le repli, aucun LightGBM n'est entraîné. `describe()` consigne les paramètres, le type de cible, les lags, la météo et la règle de repli dans le journal.
+
+### Six essais sur les mêmes fenêtres
+
+`LIGHTGBM_RUNS` dans `train.py` définit trois réglages, chacun essayé avec le débit brut et avec `log1p(q)` :
+
+| Réglage | Arbres | Profondeur maximale | Taux d'apprentissage | Feuilles maximales |
+|---|---:|---:|---:|---:|
+| Initial (`raw`, `log`) | 200 | 6 | 0,05 | 31 |
+| Peu profond (`shallow`, `shallow_log`) | 100 | 3 | 0,05 | 8 |
+| Plus profond (`deep`, `deep_log`) | 400 | 8 | 0,03 | 31 |
+
+Les huit cutoffs, le dataset d'empreinte `9e714afe6479d9a22e680b0e70893e06fd04c574219a2ec28f9ceffb237c391d` et les règles de score sont identiques à la comparaison #20. Les 26 anciennes lignes du journal sont conservées et six runs #31 ajoutés. Le notebook sélectionne un seul modèle par défaut (`lightgbm_raw`) et permet la comparaison des **18 essais** ou une nouvelle exécution du seul modèle choisi. Les nouveaux runs enregistrent aussi leurs importances par fenêtre, sous un dossier horodaté ; ils ne remplacent pas les résultats enregistrés.
+
+RMSE **poolées sur les trois arcs officiels et les huit fenêtres**, en agrégeant les erreurs quadratiques par nombre d'heures valides, avec les replis inclus :
+
+| Modèle / run | Débit (véh/h) | Occupation (points) | Temps des 8 fenêtres (s) |
+|---|---:|---:|---:|
+| Baseline profil de jour | 135,039 | 4,240 | 0,73 |
+| Chronos-2 calendrier, cibles jointes | 152,920 | 3,877 | 67,58 |
+| Timestral-5M calendrier, cibles séparées | 143,813 | **3,817** | 24,00 |
+| LightGBM initial brut | 127,382 | 3,970 | 10,04 |
+| LightGBM initial log | 160,480 | 3,970 | 7,97 |
+| LightGBM peu profond brut | 127,372 | 4,043 | 4,82 |
+| LightGBM peu profond log | 142,982 | 4,043 | 4,88 |
+| LightGBM profond brut | **126,924** | 3,991 | 13,22 |
+| LightGBM profond log | 160,948 | 3,991 | 12,81 |
+
+Les temps sont des mesures locales : LightGBM utilise quatre threads, les modèles de fondation six ; ne pas les interpréter comme un benchmark matériel contrôlé. Chaque run produit 2 880 prévisions arc/heure, avec **1 684 vérités valides et 1 196 heures ignorées par cible** ; la couverture est 58,47 %. Parmi les prévisions, 1 920 heures viennent de LightGBM et 960 du repli, indépendamment de la présence d'une vérité. Champs-Elysées conserve sa cible et son manque de vérité récent.
+
+La revue de simplicité conserve cette séparation des responsabilités. Le repli ne copie que ses six colonnes nécessaires, et les scalaires NumPy des grilles de paramètres sont convertis en nombres Python pour que `describe()` reste sérialisable en JSON. Les prévisions initiales et profondes restent identiques après ces changements.
+
+Le débit brut profond améliore la RMSE de la meilleure baseline enregistrée d'environ **6 %** sur cette comparaison. Le gain sur le réglage initial est faible (0,458 véh/h) ; le log n'aide aucun des trois réglages. Les variantes d'occupation d'une même paire brut/log sont exactement identiques, car cette cible et ses paramètres ne changent pas. L'occupation reste moins bonne que la meilleure variante Timestral enregistrée. Les runs sont des essais de développement sur des fenêtres réutilisées pour comparer les paramètres : aucune performance sur un test final intact ni supériorité générale n'est déduite. Aucun choix de modèle final ou ensemble n'est imposé ; cela reste #32.
+
+### Importance des variables
+
+Le gain et le nombre de divisions sont enregistrés **par cible et cutoff**. Le notebook normalise les gains dans chaque paire cible/fenêtre puis moyenne les pourcentages, afin de ne pas mélanger les échelles du débit brut, du log-débit et de l'occupation. Pour `lightgbm_raw`, le profil de la cible représente environ **70 %** du gain moyen pour chaque cible. Le débit à 168 h représente environ **13,9 %** pour le débit ; l'occupation à 168 h environ **5,8 %** pour l'occupation. Ce sont des importances d'entraînement, pas une causalité ou une mesure par permutation hors échantillon ; aucune ablation ne prouve ici la contribution marginale d'une variable.
+
+### Conservation et validation
+
+- `docs/experiments.csv` : six nouvelles lignes, scores complets par fenêtre/arc/cible/sous-ensemble, paramètres et empreinte.
+- `outputs/metrics/lightgbm_20261101/` : prédictions Parquet, scores/agrégats CSV, importances par fenêtre, `comparison.csv`, `importance_summary.csv`, `runs.json` (temps, paramètres, tailles d'entraînement, origines), manifeste du dataset, versions, empreintes du code et `audit.json` ; hors Git.
+- `notebooks/05_model_experiments.ipynb` : résultats propres au modèle, couverture, importances, comparaison optionnelle, graphique et exécution optionnelle reproductible. Le précédent état local a été copié et vérifié dans `.venv/notebook-backups/` avant les modifications.
+
+L'audit indépendant recalcule **1 728 enregistrements de score à partir de 51 840 prévisions** pour les 18 modèles/réglages. Les six lignes #31 correspondent aux fichiers locaux ; les 5 760 heures de repli LightGBM reproduisent exactement la baseline. Les prévisions initiales et profondes sont répétées à l'identique sur la dernière fenêtre. Le log ne change aucune prévision d'occupation de sa paire.
+
+La suite locale complète passe : **644 tests et 27 sous-tests**, dont 29 tests #31. Ils couvrent les deux modèles globaux, les catégories, les labels et leur transformation, la séparation temporelle dans le backtest, les états remis à zéro, les entrées invalides, les débordements, les limites physiques, le repli et la reproductibilité LightGBM native. Un test intègre le modèle au constructeur de rendu officiel et vérifie les **360 lignes du 7 au 11 novembre 2026**. La CI installe les deux dépendances de modélisation déjà épinglées pour exécuter également le test natif sous Windows/Linux et Python 3.10/3.13. Le rendu opérationnel avec les dernières observations reste à effectuer avant la date du brief.
 
 ## Décisions ouvertes
 
