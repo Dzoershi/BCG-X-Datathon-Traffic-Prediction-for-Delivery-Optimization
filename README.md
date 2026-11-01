@@ -133,15 +133,29 @@ Use `--data-dir`, `--config`, or paired `--start` / `--end` dates to choose what
 
 ## 8. Backtest a forecasting model
 
+Prepare the calendar required by the baseline (see [calendar features](docs/methodology.md#calendrier-horaire-issue-16)):
+
+```powershell
+python -m traffic_prediction.data.build --calendar --refresh-school-holidays
+```
+
+This downloads only the small school-calendar snapshot and builds calendar features
+covering the existing local traffic history; it does not download traffic data.
+If the snapshot is already available, omit `--refresh-school-holidays`.
+Then run in a notebook or Python session:
+
 ```python
 from traffic_prediction.data.query import query_traffic
-from traffic_prediction.evaluate import backtest, PreviousWeekModel
+from traffic_prediction.evaluate import backtest
+from traffic_prediction.models.baselines import HolidayAwarePreviousWeekBaseline
+
 data = query_traffic("SELECT * FROM traffic")
-result = backtest(PreviousWeekModel(), data, author="your-name", description="Weekly reference")
+result = backtest(HolidayAwarePreviousWeekBaseline(), data, author="your-name", description="Holiday-aware baseline")
 print(result.summary)
 ```
 
-Replace `PreviousWeekModel()` with any model implementing `predict(history, target_times)`.
+Replace `HolidayAwarePreviousWeekBaseline()` with any model implementing `predict(history, target_times)`.
+`PreviousWeekModel` is only the internal reference for `normalized_score`, not a model to score: it has no fallback for sensor outages.
 The eight configured Thursday cutoffs produce Saturday–Wednesday forecasts after a Friday gap.
 Results contain per-window/arc scores (`scores`), means by arc (`per_arc`), and overall means
 (`summary`), including atypical days, coverage counts, and ratios to the previous-week baseline.
