@@ -1058,10 +1058,12 @@ Dans l'environnement du README, installer le PyTorch CPU épinglé puis le paque
 
 ```powershell
 python -m pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
-python -m pip install "timestral @ git+https://github.com/mistralai/timestral.git@a534bdbd244d64f3d9d743f46c7bf6fc330ed4ff"
+python -m pip install -r requirements-timestral.txt
 ```
 
-Le paquet importe ses dépendances lourdes au chargement du modèle. Le premier appel télécharge les poids épinglés dans `models/huggingface/`, hors Git ; les appels suivants réutilisent le backend. Après le premier téléchargement, `HF_HUB_OFFLINE=1` permet l'inférence sans réseau. La dépendance Git demande Git installé. Le code amont est sous Apache-2.0 et les poids sous Modified MIT : [source officielle](https://github.com/mistralai/timestral/tree/a534bdbd244d64f3d9d743f46c7bf6fc330ed4ff), [fiche des poids 5M](https://huggingface.co/mistralai/Timestral-5M).
+Timestral n'est pas publié sur PyPI et son dépôt n'a ni version publiée ni tag : [`requirements-timestral.txt`](../requirements-timestral.txt) l'installe depuis le commit officiel `a534bdbd`, avec les versions de `requirements.txt`. Ce fichier demande Git et un accès à GitHub ; il est séparé de `requirements.txt` (issue #44) pour qu'une panne de GitHub ou l'absence de Git ne bloque pas le reste de l'installation.
+
+Le paquet importe ses dépendances lourdes au chargement du modèle. Le premier appel télécharge les poids épinglés dans `models/huggingface/`, hors Git ; les appels suivants réutilisent le backend. Après le premier téléchargement, `HF_HUB_OFFLINE=1` permet l'inférence sans réseau. Le code amont est sous Apache-2.0 et les poids sous Modified MIT : [source officielle](https://github.com/mistralai/timestral/tree/a534bdbd244d64f3d9d743f46c7bf6fc330ed4ff), [fiche des poids 5M](https://huggingface.co/mistralai/Timestral-5M).
 
 ```python
 import pandas as pd
@@ -1070,26 +1072,28 @@ from traffic_prediction.models.timestral import TimestralForecaster
 
 data = pd.read_parquet("data/processed/dataset/dataset.parquet")
 calendar = pd.read_parquet("data/processed/calendar/calendar.parquet")
-# Essais 1 et 2 : mêmes données, fenêtres et contexte ; seul le calendrier change.
+# Essais 1 et 2 de la #20 : mêmes données, fenêtres et contexte ; seul le calendrier change.
+# Leurs réglages sont explicites, car les valeurs par défaut ont changé en #44.
+first_runs = {"model_size": "5M", "context_hours": 8192, "multivariate": False}
 for options in [{"calendar_covariates": ()}, {}]:
-    model = TimestralForecaster(calendar, **options)
+    model = TimestralForecaster(calendar, **first_runs, **options)
     result = backtest(model, data, author="your-name", description=model.describe())
     print(result.summary)
 ```
 
-Le défaut est 5M, univarié, calendrier et contexte de 8 192 heures. `model_size="28M"` sélectionne le checkpoint supérieur et `multivariate=True` joint débit et occupation dans chaque arc. Pour reproduire l'essai univarié après une modification de configuration, préciser `multivariate=False`. Le CLI de rendu conserve ses baselines actuelles ; `build_submission(history, model)` accepte déjà cet adaptateur et son contrat de 360 lignes est testé.
+Depuis la #44, le défaut est la configuration retenue : **209M, contexte de 32 768 heures, multivarié, calendrier, médiane** ; `TimestralForecaster(calendar)` suffit pour un rendu. Les essais de la #20 se reproduisent avec `model_size="5M", context_hours=8192, multivariate=False` (ou `model_size="28M"`, ou `multivariate=True`) ; ceux de la #44 sont nommés et rejoués par [`scripts/run_timestral_44.py`](../scripts/run_timestral_44.py). Le CLI de rendu conserve ses baselines actuelles ; `build_submission(history, model)` accepte déjà cet adaptateur et son contrat de 360 lignes est testé.
 
 ### Choix et garanties
 
 | Élément | Choix et raison |
 |---|---|
-| Versions | Source Timestral `a534bdbd244d64f3d9d743f46c7bf6fc330ed4ff`, paquet 1.0.0. Poids 5M `bdd20cfc15a3fea0e4cb5ccef37f8d3ca7aa335f`, 28M `49b26409ac87b5935539a5d8ffe7f397b720db47`. Les révisions 123M et 209M sont déclarées pour un essai ultérieur ; ces tailles n'ont pas été exécutées. |
-| Contexte | 8 192 heures, comme les premières comparaisons Chronos-2. L'API accepte jusqu'à 32 768 ; le contexte long n'a pas été évalué. Les fonctions de préparation et d'éligibilité de Chronos-2 sont réutilisées. |
+| Versions | Source Timestral `a534bdbd244d64f3d9d743f46c7bf6fc330ed4ff`, paquet 1.0.0. Poids 5M `bdd20cfc15a3fea0e4cb5ccef37f8d3ca7aa335f`, 28M `49b26409ac87b5935539a5d8ffe7f397b720db47`, 123M `5a147287addda85f6acd8da3fb8858fe9af7e8f7`, 209M `9874d252ab0aae16f7f7c999f98f98d6ad7d8365` (20 Mo à 799 Mo). Les quatre tailles ont été exécutées ; le 209M est le défaut depuis la #44. |
+| Contexte | 32 768 heures par défaut depuis la #44 (8 192 dans les essais de la #20, comme Chronos-2). Au rendu, tout l'historique disponible tient dans le contexte (24 960 heures), dont les 11/11 de 2024 et 2025. Les fonctions de préparation et d'éligibilité de Chronos-2 sont réutilisées. |
 | Mesures et arcs | Seules les heures `qualite_mesure == "ok"` des arcs évalués entrent dans le modèle ; les autres valeurs sont des NaN sur une grille régulière. Les proxies restent séparés et ne servent pas de vérité. |
 | Tenseurs | Une série par arc et variable en univarié, ou deux variables par arc en multivarié : `(séries, variables, heures)`. Les tests vérifient l'ordre de chaque arc et variable au retour. |
 | Calendrier | Six colonnes identiques à Chronos-2 : `is_holiday`, `is_school_holiday`, `is_day_before_holiday`, `is_bridge`, `is_sunday_or_holiday`, `day_type`. Valeurs numériques float32 couvrant contexte et horizon ; aucun trafic futur, météo ou indicateur de chantier ne leur est ajouté. |
 | Horizon | Depuis l'heure suivant le dernier historique jusqu'à la dernière cible. Chaque fenêtre commune contient 144 heures : vendredi, puis les 120 heures du samedi au mercredi retenues pour le score. |
-| Sortie | Médiane, avec les deux options amont `symmetric_averaging=True` et `clip_nonnegative=True` : l'amont combine la prévision du contexte et de son opposé. Débit borné à zéro et occupation à [0, 100]. Une forme incorrecte ou une valeur non finie échoue explicitement. |
+| Sortie | Médiane, avec les deux options amont `symmetric_averaging=True` et `clip_nonnegative=True` : l'amont combine la prévision du contexte et de son opposé. Option `point_by_day_type` (#44) : un des 21 quantiles natifs par type de jour, commun aux deux variables ou propre à chacune ; désactivée par défaut (voir [l'essai écarté](#quantile-par-type-de-jour--écarté-pour-le-209m)). `raw_forecast_` garde les 21 quantiles des arcs Timestral. Débit borné à zéro et occupation à [0, 100]. Une forme incorrecte ou une valeur non finie échoue explicitement. |
 | Repli | Moins de 168 heures `ok` dans les 28 derniers jours du contexte retenu : `HolidayAwarePreviousWeekBaseline`. `sources_` nomme les heures Timestral et les règles de repli. Le calendrier est donc également nécessaire au repli d'un essai « historique seul ». |
 | Exécution | CPU si CUDA indisponible, graine torch 42. Les tests de l'adaptateur fonctionnent sans torch ni Timestral ; le chargement des poids est différé. |
 
@@ -1135,9 +1139,82 @@ Temps : une mesure sur cette machine Windows, Python 3.12.10, torch 2.14.1+cpu, 
 - La baseline adaptée aux fériés conserve le meilleur débit sur Convention et Saint-Pères (97,5) et les meilleurs scores atypiques (100,1 / 1,27). Sur les trois arcs, la baseline par type de jour garde le meilleur débit de ce tableau. Le bilan varie donc avec l'arc, la variable et le type de jour.
 - Pour la #32, comparer une combinaison Timestral/baseline et vérifier ses poids sur des fenêtres séparées. Les fermetures des Champs-Élysées, les lacunes des capteurs et le repli doivent rester visibles. Aucun remplacement du modèle de rendu n'est décidé ici.
 
+### Contexte long, grandes tailles et quantile (issue #44)
+
+Essais rejoués avec [`scripts/run_timestral_44.py`](../scripts/run_timestral_44.py) sur le dataset local `9db768308f7d3d8cbafc05a1775dd02a858c92c1aa716efebc54adc13e61b679`, les huit cutoffs partagés, CPU i7-13700H à 6 threads, Python 3.13, torch 2.14.1+cpu. Chaque essai est une ligne `Issue #44; <essai>; …; fingerprint <empreinte>` de [`experiments.csv`](experiments.csv) ; prévisions horaires, quantiles natifs et sélection des quantiles sont dans `outputs/metrics/timestral_44/`, hors Git. Chaque essai fixe sa taille, son contexte et son mode : changer les défauts de la classe ne change pas ce qu'il désigne.
+
+```powershell
+python scripts/run_timestral_44.py --list
+python scripts/run_timestral_44.py timestral_209m_calendar_multivariate_ctx32768 --window 2026-10-22  # durée d'une fenêtre, rien n'est écrit
+python scripts/run_timestral_44.py timestral_209m_calendar_multivariate_ctx32768 --author "Prénom Nom"
+python scripts/run_timestral_44.py timestral_209m_calendar_multivariate_ctx32768 --select-quantiles
+```
+
+**Référence rejouée.** Timestral-5M multivarié à 8 192 heures donne 98,605 / 1,7952 sur ce dataset, contre 98,607 / 1,7950 sur `9e714afe` (écart d'au plus 0,016 véh/h par fenêtre et par arc) : les essais #20 et #44 sont comparables, Timestral n'utilisant ni météo ni chantiers. Les prévisions médianes sont identiques bit à bit avant et après l'ajout de l'option de quantile.
+
+RMSE poolée Convention + Saint-Pères, débit en véh/h et occupation en points ; 442 heures ouvrées, 432 de week-end et 120 fériées (quatre dates) par variable. Tous les essais sont multivariés, avec calendrier et médiane.
+
+| Essai | Débit | Ouvrés | Week-ends | Fériés | Occupation | Ouvrés | Week-ends | Fériés | Backtest |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 5M, 8 192 h (meilleur essai #20) | 98,6 | 74,8 | 89,1 | 177,2 | 1,80 | 2,09 | 1,40 | 1,89 | 15 s |
+| 5M, 32 768 h | 98,2 | 73,9 | 88,9 | 176,8 | 1,78 | 2,06 | 1,37 | 1,96 | 25 s |
+| 123M, 32 768 h | 93,8 | 78,6 | 91,7 | 141,0 | 1,72 | 2,10 | 1,38 | 1,11 | 6 min |
+| **209M, 32 768 h (défaut)** | **92,0** | 77,6 | 92,3 | 131,5 | 1,73 | 2,13 | 1,37 | 1,10 | 8 min 20 |
+
+- **Contexte long (32 768 h).** Gain global inférieur au bruit entre versions du dataset (environ 2 véh/h). Les fenêtres anciennes ont moins de 8 192 heures d'historique et ne changent pas ; les deux fenêtres les plus proches du rendu s'améliorent (2025-11-06 : 64,0 → 60,8 ; 2026-10-22 : 111,7 → 108,6 et 1,85 → 1,78), ainsi que le 11/11/2025 (108,2 → 95,5). Retenu pour son faible coût et sa ressemblance avec le rendu (24 960 heures d'historique), sans gain démontré.
+- **Taille.** Règle d'équipe : retenir un grand modèle s'il gagne au moins 2 véh/h en débit global, ou s'il gagne nettement sur les fenêtres 2025-11-06 et 2026-10-22. Le 209M gagne 6,2 véh/h en global ; il gagne sur 2025-11-06 (60,8 → 45,2) mais perd sur 2026-10-22 (108,6 → 114,8). Il est retenu sur le premier critère. Le 123M est équivalent (écart de 1,8 véh/h, sous le bruit) et 40 % plus rapide.
+- **Le gain vient des fériés, de façon régulière.** Débit des fériés, 5M → 123M → 209M (32 768 h) : 11/11/2024 124,8 → 40,7 → 37,1 ; 01/01/2025 306,6 → 283,7 → 262,7 ; 14/07/2025 168,9 → 106,1 → 95,4 ; 11/11/2025 95,5 → 54,8 → 58,8. L'occupation des fériés passe de 1,96 à 1,10, mieux que la baseline (1,22). En contrepartie, les grands modèles sont un peu moins bons les jours ouvrés (+3,7 véh/h) et les week-ends (+3,4).
+- **Durée au rendu.** Une fenêtre de 2026-10-22 prend 142 s avec le 209M (103 s avec le 123M, 6,6 s avec le 5M), plus 51 s au premier chargement des poids (799 Mo).
+
+#### Quantile par type de jour : écarté pour le 209M
+
+**Méthode**, identique à celle de la #19 : les quantiles natifs 0,2 à 0,8 de l'essai 209M sont sauvegardés une fois ; pour chaque fenêtre mise de côté, le niveau qui minimise l'erreur poolée des sept autres est choisi par type de jour et par variable, puis mesuré sur la fenêtre mise de côté. La grille va dans les deux sens, le biais de Timestral n'étant pas connu d'avance.
+
+| 209M, 32 768 h | Débit | Ouvrés | Week-ends | Fériés | Occupation | Ouvrés | Week-ends | Fériés |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| **Médiane (défaut)** | **92,0** | **77,6** | **92,3** | **131,5** | **1,73** | **2,13** | **1,37** | **1,10** |
+| Quantile choisi sur 7 fenêtres, mesuré sur la 8e | 95,4 | 81,4 | 96,2 | 132,8 | 1,81 | 2,21 | 1,49 | 1,11 |
+| Quantile choisi sur les 8 fenêtres (optimiste) | 89,5 | 77,6 | 86,5 | 131,5 | 1,71 | 2,13 | 1,32 | 1,06 |
+
+- **Résultat négatif.** Mesuré honnêtement, le quantile dégrade le 209M (+3,4 véh/h et +0,08 point). Choisi sur les huit fenêtres, il aurait semblé gagner 2,5 véh/h : c'est l'illusion que la validation croisée écarte.
+- **Pourquoi : un seul week-end de vacances.** Le niveau 0,3 du week-end est choisi dans sept tours sur huit ; quand la fenêtre d'octobre 2026 est mise de côté, les sept autres préfèrent la médiane. Son week-end (24 et 25/10/2026) tombe dans les vacances de la Toussaint de la zone C (17/10–01/11/2026 dans le calendrier scolaire), avec des samedis très bas sur Saint-Pères (voir les [pistes de la #19](#pistes-chiffrées-pour-la-32)). Sur ce seul week-end, le quantile 0,3 réduit le débit de 142,7 à 117,8 véh/h (occupation 2,02 → 1,61) ; sur les sept autres fenêtres, il l'aggrave de 71,6 à 75,1 (1,11 → 1,22). **Le week-end du rendu (7 et 8/11/2026) n'est pas en vacances scolaires** : rien ne justifie d'y baisser le quantile.
+- **Ouvrés et fériés.** Le choix oscille entre 0,4 et 0,5 les jours ouvrés (du bruit) et reste à 0,5 ou 0,6 les fériés : le 209M ne surestime pas les fériés, contrairement à Chronos-2.
+- **Le 5M en profite, lui.** Même méthode sur le 5M à 8 192 heures : 98,6 / 1,80 → 93,4 / 1,82 en validation croisée (fériés 177,2 → 154,8), parce qu'il surestime les fériés comme Chronos-2. L'option `point_by_day_type` reste donc disponible et testée, désactivée par défaut.
+
+#### Pistes pour la #32
+
+Chiffres calculés à partir des prévisions horaires sauvegardées, sur le dataset `9db76830` et les huit fenêtres ; le choix final revient à la #32. Baseline, Chronos-2 (essai 4) et LightGBM ont été rejoués sur ce dataset sans écrire dans le journal : la baseline et Chronos-2 reproduisent leurs scores consignés, LightGBM varie d'au plus 1,8 véh/h avec la version du dataset. RMSE poolée Convention + Saint-Pères.
+
+**Fériés, variable par variable.** LightGBM a le meilleur débit férié au total (123,1 contre 131,5 pour Timestral-209M), mais seulement grâce au 1er janvier, lendemain de réveillon où tous les modèles se trompent de plus de 200 véh/h. Sur les trois autres dates, dont les deux 11/11, le 209M est meilleur ; il est aussi le meilleur en occupation.
+
+| Férié | Heures | Débit : baseline | LightGBM brut | LightGBM deep_log | Timestral-209M | Occupation : baseline | LightGBM brut | Timestral-209M |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 11/11/2024 | 24 | 105,5 | 58,9 | 80,5 | **37,1** | 1,39 | 1,50 | **1,03** |
+| 01/01/2025 | 24 | 251,5 | 215,8 | **213,6** | 262,7 | **1,64** | 2,53 | 1,78 |
+| 14/07/2025 | 24 | 114,6 | 135,2 | 128,5 | **95,4** | 0,91 | 2,59 | **0,65** |
+| 11/11/2025 | 48 | 82,8 | 61,0 | 65,3 | **58,8** | 1,00 | 1,19 | **0,83** |
+| Total | 120 | 142,3 | **123,1** | 124,2 | 131,5 | 1,22 | 1,91 | **1,10** |
+
+**Combinaisons par type de jour** (règles sans poids ajustés, mais repérées sur ce même backtest : scores un peu optimistes). « Semaine du rendu » repondère les erreurs par type de jour : 48 heures de week-end (7 et 8/11), 48 heures ouvrées (9 et 10/11), 24 heures fériées (11/11) ; c'est une estimation, pas une mesure.
+
+| Combinaison | Débit | Semaine du rendu | Occupation | Semaine du rendu | Timestral requis |
+|---|---:|---:|---:|---:|---|
+| Baseline seule (référence #17) | 97,5 | 102,3 | 2,04 | 1,98 | non |
+| Timestral-209M seul (défaut #44) | 92,0 | 96,3 | 1,73 | 1,68 | oui |
+| C1 : Chronos-2 ouvrés, baseline week-ends et fériés (piste #19) | 89,9 | 95,9 | 1,69 | 1,65 | non |
+| C2 : comme C1, LightGBM brut pour le débit des fériés | 86,4 | 90,4 | 1,69 | 1,65 | non |
+| **C3 : Timestral-5M 32 768 h ouvrés, baseline week-ends, Timestral-209M fériés** | 87,4 | 92,3 | **1,66** | **1,61** | oui |
+| C4 : comme C3, LightGBM brut pour le débit des fériés | **85,9** | **89,9** | **1,66** | **1,61** | oui |
+| C5 : Chronos-2 ouvrés, baseline week-ends, Timestral-209M fériés | 87,9 | 92,7 | 1,68 | 1,64 | oui |
+
+- **Piste principale : C3**, même règle pour les deux variables. Chaque type de jour prend son meilleur modèle : Timestral-5M en semaine (73,9 / 2,06), la baseline le week-end (84,7 / 1,28), Timestral-209M les fériés, meilleur sur les deux 11/11 et en occupation. L'avance de C4 (−1,5 véh/h) ne vient que du 1er janvier et reste sous le bruit.
+- **Variante avec Timestral : C5** (87,9 / 1,68) si l'équipe préfère garder Chronos-2, déjà évalué en #19, pour les jours ouvrés : Timestral-5M et Chronos-2 y sont équivalents (73,9 contre 75,4).
+- **Plan B si Timestral ne peut pas être installé le 6 novembre** (dépendance GitHub, voir [`requirements-timestral.txt`](../requirements-timestral.txt)) : **C2** (86,4 / 1,69), qui n'utilise que Chronos-2, la baseline et LightGBM ; LightGBM bat la baseline sur le débit des deux 11/11 (58,9 et 61,0 contre 105,5 et 82,8). **C1** (89,9 / 1,69) reste le plan le plus simple. C5 n'est pas un plan B d'installation : il utilise Timestral-209M pour les fériés.
+- **Réserves.** Quatre fériés seulement ; le week-end du rendu recopiera celui des 31/10 et 01/11, en vacances de la Toussaint avec une manifestation (à contrôler après la mise à jour du 6 novembre, voir la [check-list](#check-list-du-vendredi-6-novembre)). Hors #44 : le CLI de rendu ne branche encore que les baselines, et la fermeture des Champs-Élysées le 11/11 (7 h–14 h) n'est corrigée par aucun modèle. Au rendu, compter environ 2 min 30 pour Timestral-209M et quelques secondes pour le 5M.
+
 ### Vérification et limites
 
-[`test_timestral.py`](../tests/test_timestral.py) vérifie les deux dispositions de tenseurs, le masque des heures non valides, la limite du contexte, l'alignement du calendrier, le vendredi écarté, les bornes, les erreurs de sortie, le repli, les imports sans dépendances lourdes, le chargement épinglé et le CSV de rendu via `build_submission`. Un espion du backtest reçoit uniquement l'historique antérieur au cutoff ; modifier les mesures ultérieures ne change pas ses prévisions.
+[`test_timestral.py`](../tests/test_timestral.py) vérifie les deux dispositions de tenseurs, le masque des heures non valides, la limite du contexte, l'alignement du calendrier, le vendredi écarté, les bornes, les erreurs de sortie, le repli, les imports sans dépendances lourdes, le chargement épinglé et le CSV de rendu via `build_submission`. Depuis la #44, ils couvrent aussi le quantile par type de jour (commun ou par variable, heures de repli inchangées, `raw_forecast_`), ses réglages invalides et les valeurs par défaut retenues. Un espion du backtest reçoit uniquement l'historique antérieur au cutoff ; modifier les mesures ultérieures ne change pas ses prévisions.
 
 Les essais réels 5M et 28M multivariés ont été rejoués sur la dernière fenêtre : deux appels donnent des prévisions identiques bit à bit, qui reproduisent les fichiers de l'essai enregistré sur cette machine. Les versions, SHA-256 des poids et vérifications sont dans `outputs/metrics/timestral_20261101/verification.json` ; les prévisions par cutoff, scores et temps sont dans le même dossier, hors Git. Le paquet officiel installé correspond au commit déclaré. De petits écarts numériques entre environnements restent possibles.
 
