@@ -20,6 +20,8 @@ holidays==0.107
 # Forecasting models
 lightgbm==4.7.0
 chronos-forecasting==2.3.2
+# Optional model inference; pinned official source (keep heavy model packages out of data CI).
+timestral @ git+https://github.com/mistralai/timestral.git@a534bdbd244d64f3d9d743f46c7bf6fc330ed4ff
 # Installed by chronos-forecasting; pinned so every Python version gets the same build.
 # On Linux, install the CPU build first (see README).
 torch==2.14.1
