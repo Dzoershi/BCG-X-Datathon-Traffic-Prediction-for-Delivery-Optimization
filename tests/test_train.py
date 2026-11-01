@@ -1,5 +1,6 @@
 """Global training contract, target transforms, outage policy and native smoke tests."""
 
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -177,6 +178,18 @@ def test_invalid_target_hours(tables, times):
 def test_invalid_configuration(setting):
     with pytest.raises(ValueError):
         LightGBMForecaster(**setting)
+
+
+def test_numpy_tuning_values_can_be_logged():
+    model = LightGBMForecaster(
+        n_estimators=np.int64(10), max_depth=np.int64(3), n_jobs=np.int64(1),
+        min_child_samples=np.int64(5), learning_rate=np.float32(0.1),
+        reg_lambda=np.float32(2), lags=(np.int64(168),),
+    )
+    serialized = json.loads(json.dumps(model.parameters))
+    assert serialized["n_estimators"] == 10 and serialized["num_leaves"] == 8
+    assert serialized["learning_rate"] == pytest.approx(0.1)
+    assert "lags [168] h" in model.describe()
 
 
 def test_backtest_cuts_future_values_and_does_not_use_evaluation_labels(tables, fake):

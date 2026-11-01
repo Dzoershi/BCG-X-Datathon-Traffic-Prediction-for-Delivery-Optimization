@@ -54,10 +54,15 @@ class LightGBMForecaster:
             raise ValueError("reg_lambda must be finite and nonnegative")
         if not isinstance(log_flow, bool):
             raise ValueError("log_flow must be a boolean")
+        # Tuning grids can supply NumPy scalars; journal parameters must be JSON-safe.
+        n_estimators, max_depth, min_child_samples, n_jobs = map(
+            int, (n_estimators, max_depth, min_child_samples, n_jobs)
+        )
+        learning_rate, reg_lambda = float(learning_rate), float(reg_lambda)
         TabularFeatures(lags, weather=weather)  # Validate feature settings before any fit.
         self.covariates = covariates
         self.log_flow = log_flow
-        self.lags, self.weather = tuple(lags), weather
+        self.lags, self.weather = tuple(int(lag) for lag in lags), weather
         self.parameters = dict(
             objective="regression", n_estimators=n_estimators, max_depth=max_depth,
             num_leaves=min(31, 2 ** max_depth), learning_rate=learning_rate,
@@ -150,7 +155,7 @@ class LightGBMForecaster:
             calendar = covariates[["datetime", "is_holiday"]].drop_duplicates().copy()
             calendar["day_of_week"] = calendar["datetime"].dt.dayofweek
             baseline = HolidayAwarePreviousWeekBaseline(calendar)
-            fallback_history = history.copy()
+            fallback_history = history[[*KEYS, "role", "qualite_mesure", *TARGETS]].copy()
             fallback_history.loc[~valid, list(TARGETS)] = np.nan
             fallback = baseline.predict(fallback_history, times).set_index(KEYS)
             missing = index[~index.get_level_values("arc").isin(active)]
