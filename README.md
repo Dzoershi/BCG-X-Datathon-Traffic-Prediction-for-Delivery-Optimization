@@ -75,6 +75,8 @@ python -m traffic_prediction.data.build --start 2024-01-01 --end 2025-12-31
 
 To include a recent download, add `--recent-file "data/raw/recent/YOUR_SNAPSHOT.jsonl"`; repeat the option for multiple files. See [processing rules](docs/methodology.md#contrat-de-données) for timestamps, missing values, and overlap handling.
 
+**Modelling dataset:** `python -m traffic_prediction.data.build --dataset --end 2026-10-30` joins traffic, calendar, weather, and disruption flags into `data/processed/dataset/dataset.parquet` (one row per traffic row) and `covariates.parquet` (covariates of every hour until November 11, for target hours), and prints the fingerprint to compare with the team. [Columns, rules, and frozen version](docs/methodology.md#table-de-modélisation-issue-22).
+
 ## 4. Refresh data without rebuilding history
 
 ```powershell

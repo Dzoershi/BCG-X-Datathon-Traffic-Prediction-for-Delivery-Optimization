@@ -24,7 +24,8 @@ Le statut « implémenté » décrit l'arbre de travail ; le statut de publicati
 12. [Météo](#météo-issue-21)
 13. [Baselines](#baselines-issue-17)
 14. [Chantiers et événements](#chantiers-et-événements-issue-34)
-15. [Décisions ouvertes](#décisions-ouvertes)
+15. [Table de modélisation](#table-de-modélisation-issue-22)
+16. [Décisions ouvertes](#décisions-ouvertes)
 
 ## Périmètre du brief
 
@@ -52,6 +53,7 @@ Le brief LivraisonCo 2026 fourni par les organisateurs est la référence. Les i
 | [`validate.py`](../src/traffic_prediction/data/validate.py) | Contrôles du dataset, manifeste d'intégrité et validation du CSV de prévisions. | Vérifier les artefacts et la complétude sans réimplémenter le nettoyage ou un modèle. |
 | [`weather.py`](../src/traffic_prediction/data/weather.py) | Météo Open-Meteo : historique et prévision, conversion en étiquettes de Paris, raccord et validation. | Fournir une covariable connue à l'avance, sur la même grille horaire que le trafic. |
 | [`disruptions.py`](../src/traffic_prediction/data/disruptions.py) | Chantiers Open Data Paris proches des arcs évalués (distance géométrique) et liste manuelle d'événements, en table horaire validée. | Contrôler la période de test et expliquer des erreurs passées ; ce n'est pas une variable d'entraînement. |
+| [`dataset.py`](../src/traffic_prediction/data/dataset.py) | Table de modélisation : trafic joint au calendrier, à la météo et aux masques de perturbation ; covariables jusqu'au 11 novembre ; validation et manifeste de version. | Une seule table partagée : tous les modèles s'entraînent sur les mêmes données, sans refaire leurs jointures. |
 | [`configs/baseline.yaml`](../configs/baseline.yaml) | Identités, sens des arcs et rôles évalué/proxy. | Éviter de disperser ces paramètres entre notebooks et commandes. |
 | [`notebooks/`](../notebooks/) | Gabarits numérotés pour exploration, nettoyage, features, baseline, expériences et impact livraison. | Organiser le travail exploratoire ; les traitements réutilisables vont dans le package. |
 
@@ -785,6 +787,113 @@ Les erreurs de `HolidayAwarePreviousWeekBaseline` ont été recalculées heure p
 4. Remplacer les horaires provisoires du 11/11/2026 dans `events_manual.csv` par ceux de l'arrêté de la préfecture de police, retirer « PROVISOIRES », relancer l'étape 1.
 5. Confirmer la grève du 05/11 avec les plans de transport SNCF publiés le 04/11.
 6. Comparer le samedi 31/10 et le dimanche 01/11 sur Saint-Pères et Convention à un samedi et un dimanche normaux. S'ils sont perturbés, la semaine recopiée par `HolidayAwarePreviousWeek` est biaisée pour le 07/11, le 08/11 et le 11/11.
+
+## Table de modélisation (issue #22)
+
+[`data/dataset.py`](../src/traffic_prediction/data/dataset.py) assemble le trafic, le calendrier, la météo et les masques de perturbation en une table que tous les modèles lisent : chacun s'entraîne sur les mêmes données, sans refaire ses jointures. Aucune variable n'est calculée ici ; les décalages, profils et indicateurs relèvent de l'issue #30.
+
+```powershell
+# Version figée, partagée jusqu'au 5 novembre :
+python -m traffic_prediction.data.build --dataset --end 2026-10-30
+# Rendu (vendredi 6 novembre), après l'actualisation du trafic, --weather --refresh-forecast et --disruptions :
+python -m traffic_prediction.data.build --dataset --end 2026-11-05
+```
+
+`--start` et `--end` sont des jours de Paris inclus ; par défaut, ceux du trafic stocké. Une période qui dépasse le trafic stocké est refusée. `--output-dir`, `--traffic-dir` et `--config` fonctionnent comme pour les autres sources ; `--dataset` ne se combine pas avec `--calendar`, `--weather` ou `--disruptions`. Les quatre sources doivent avoir été construites avant (#6 et #8, #16, #21, #34). Aucun accès réseau n'est nécessaire.
+
+### Deux fichiers et un manifeste
+
+Dans `data/processed/dataset/`, non versionné :
+
+| Fichier | Lignes | Usage |
+|---|---|---|
+| `dataset.parquet` | Une par ligne de trafic de la période : 5 arcs × heures, soit 124 080 pour la version figée. | Entraînement ; `history` du backtest et de `predict`. |
+| `covariates.parquet` | Une par arc configuré et par heure, du premier jour au 11 novembre 2026 à 23:00, **sans aucune mesure** : 125 520. | Covariables des heures à prédire, en backtest comme pour le rendu. |
+| `_manifest.json` | | Version : empreinte, période, lignes par arc, SHA-256 des entrées. |
+
+**Pourquoi deux fichiers.** Le backtest ne transmet au modèle que l'historique jusqu'au jeudi 23:00 : les heures à prédire n'y figurent pas, ni leur calendrier ni leur météo. Le modèle doit donc lire leurs covariables ailleurs, dans une table sans mesure pour qu'aucune fuite ne soit possible. Un fichier limité aux heures postérieures au dernier trafic ne suffirait pas, car les heures cibles du backtest sont dans le passé. `dataset.parquet` garde exactement autant de lignes que le trafic de la période, et aucune colonne « futur » ne change de sens à chaque actualisation.
+
+Lire chaque fichier séparément (le dossier contient deux schémas) :
+
+```python
+import pandas as pd
+from traffic_prediction.data.build import DEFAULT_DATASET_DIR
+
+data = pd.read_parquet(DEFAULT_DATASET_DIR / "dataset.parquet")
+covariates = pd.read_parquet(DEFAULT_DATASET_DIR / "covariates.parquet")
+
+# Covariables des heures à prédire, ici celles du rendu ; même code en backtest.
+targets = pd.MultiIndex.from_product(
+    [["Champs-Elysées", "Convention", "Saint-Pères"],
+     pd.date_range("2026-11-07", "2026-11-11 23:00", freq="h")],
+    names=["arc", "datetime"],
+)
+known = covariates.set_index(["arc", "datetime"]).loc[targets]
+```
+
+`dataset.parquet` contient toutes les colonnes du trafic : il peut remplacer `query_traffic("SELECT * FROM traffic")` dans `backtest(model, data)`. Sur la version figée, `HolidayAwarePreviousWeekBaseline` obtient exactement les mêmes scores avec les deux entrées.
+
+### Colonnes
+
+| Colonne | Type | Origine | Sens | Variable de modèle ? |
+|---|---|---|---|---|
+| `arc` | string | trafic | Nom de l'arc ; pour les arcs évalués, celui du rendu. | Oui, catégorielle. |
+| `role` | string | trafic | `evalue` ou `proxy`. | Non : filtre. |
+| `iu_ac` | int32 | trafic | Identifiant Open Data. | Non : redondant avec `arc`. |
+| `datetime` | timestamp ns sans fuseau | trafic (clé) | Heure de Paris, fin de l'heure mesurée. | Non directement : clé ; variables dérivées en #30. |
+| `debit_horaire` | float64 | trafic | Véhicules par heure. | **Cible** ; ses valeurs passées en #30. |
+| `taux_occupation` | float64 | trafic | % du temps, de 0 à 100. | **Cible** ; ses valeurs passées en #30. |
+| `etat_trafic` | Int8 nullable | trafic | État 0 à 4, déduit de `k`. | Non : contemporain de la cible. |
+| `etat_barre` | Int8 nullable | trafic | 0 à 3, incohérent entre les sources. | Non. |
+| `qualite_mesure` | string | trafic | `ok`, `partielle`, `vide`, `invalide`, `absente`. | Non : filtre ; la vérité du backtest exige `ok`. |
+| `hour` | int8 | calendrier #16 | Heure de l'étiquette, 0 à 23. | Oui. |
+| `day_of_week` | int8 | calendrier #16 | 0 lundi à 6 dimanche, date de l'étiquette. | Oui. |
+| `is_weekend`, `is_holiday`, `is_day_before_holiday`, `is_day_after_holiday`, `is_bridge`, `is_school_holiday` | bool | calendrier #16 | Voir [Calendrier horaire](#calendrier-horaire-issue-16). | Oui. |
+| `precipitation_mm` | float64 | météo #21 | Cumul de l'heure, mm. | Oui ; un indicateur ou un cumul sur plusieurs heures (#30) sera plus robuste. Gain mesuré en backtest = plafond. |
+| `temperature_c` | float64 | météo #21 | °C à l'étiquette. | Oui ; gain mesuré = plafond. |
+| `wind_speed_kmh` | float64 | météo #21 | Vent moyen à l'étiquette, km/h. | Oui ; gain mesuré = plafond. |
+| `weather_source` | string | météo #21 (`source` renommée) | `historical_forecast` (ou `archive`), puis `forecast`. | Non : audit. |
+| `chantier_actif` | boolean nullable | disruptions #34 | Chantier sur la chaussée à 50 m ou moins ; `<NA>` pour les proxies. | Non : masque seulement. |
+| `evenement_actif` | boolean nullable | disruptions #34 | Événement de la liste manuelle ; `<NA>` pour les proxies. | Non : masque seulement. |
+
+`covariates.parquet` contient `arc`, `role`, `datetime`, puis les colonnes de `hour` à `evenement_actif`, avec les mêmes types.
+
+### Règles
+
+- **Jointures.** Calendrier et météo sur `datetime`, avec `validate="many_to_one"` : une heure sert aux cinq arcs. Drapeaux sur (`arc`, `datetime`), avec `validate="one_to_one"`, qui refuse aussi une ligne de trafic en double. Ce sont des jointures à gauche : aucune ligne de trafic n'est ajoutée ni retirée. Ordre : arcs de la configuration (évalués d'abord), puis heure.
+- **Proxies : `<NA>`, pas `False`.** Les chantiers n'ont pas été cherchés autour des proxies, et la cérémonie du 11/11 ferme aussi leurs tronçons des Champs-Élysées : `False` serait une fausse information. `description` reste dans `disruptions.parquet`, avec la même clé. Aucun masque combiné n'est créé : `chantier_actif`, vrai sur 2 952 à 4 632 heures par arc de 2024 à 2026, noierait les événements ; le choix revient aux issues #30 et #31.
+- **Rien n'est imputé** : les NaN du trafic restent. Le 29/03/2026 à 02:00, heure qui n'existe pas, garde sa ligne `absente`, avec calendrier et météo remplis.
+- **Météo.** Avec `--end 2026-10-30`, toute la météo de `dataset.parquet` est `historical_forecast` ; sans `--end`, le 31/10 serait en `forecast`. Dans `covariates.parquet`, la météo passe en `forecast` à partir du jour de son téléchargement.
+
+### Validation et écriture
+
+Avant les jointures, chaque source passe par son propre validateur : `validate_traffic` (#6), `check_calendar`, `validate_weather` (#21) et `validate_disruptions` (#34), sur toutes les heures du premier jour au 11 novembre. Le message nomme la source et la commande à relancer, par exemple `Invalid weather input: … 24 missing hours … rebuild it with: python -m traffic_prediction.data.build --weather`. Après les jointures, `validate_tables` exige :
+
+- les colonnes et les types attendus ;
+- autant de lignes que le trafic de la période, une clé (`arc`, `datetime`) unique, et les neuf colonnes du trafic identiques à la source ;
+- le calendrier et la météo à chaque ligne, les drapeaux sur les arcs évalués et `<NA>` sur les proxies ;
+- une ligne de covariables par arc configuré et par heure, jusqu'au 11 novembre.
+
+Le premier écart arrête la construction avant toute écriture ; les fichiers précédents sont conservés. Chaque table est écrite dans un fichier temporaire caché, **relue en entier** et comparée à la table validée par son empreinte, puis renommée. Le manifeste est écrit en dernier ; l'ancien est supprimé juste avant l'écriture, de sorte qu'une écriture interrompue ne laisse pas un manifeste qui décrirait d'autres fichiers.
+
+### Version figée
+
+- **`fingerprint`** : SHA-256 des empreintes de contenu des deux fichiers (noms, types et valeurs, avec `pd.util.hash_pandas_object`). Elle ne dépend pas de l'encodage Parquet : deux ordinateurs qui ont les mêmes données obtiennent la même empreinte, avec les versions épinglées. `<NA>` et `False` donnent des empreintes différentes. La commande l'affiche : comparer ses 8 premiers caractères et les noter `dataset=<8 caractères>` dans la `description` de [`experiments.csv`](experiments.csv).
+- **`inputs_sha256`** : SHA-256 de chaque partition du trafic, du calendrier, de la météo et des disruptions, avec la fonction du manifeste de `validate.py` ; il sert à retrouver la source qui diffère. Le manifeste de `validate.py` lui-même n'est pas réutilisé : il n'accepte que des Parquet au schéma du trafic.
+- **Exécution du 1er novembre 2026**, `--end 2026-10-30` : 124 080 lignes (5 arcs × 24 816 heures, du 01/01/2024 00:00 au 30/10/2026 23:00), covariables 125 520 lignes jusqu'au 11/11 23:00, dont 1 440 après l'historique, toutes en `forecast`. Empreinte **`9db76830`**, identique à une seconde construction. Version à confirmer par l'équipe.
+
+Valeurs manquantes de cette version : `debit_horaire` 53,6 % et `taux_occupation` 33,1 % (pannes de capteurs, Champs-Élysées sans mesure depuis le 19/11/2025, proxy La Boétie-Berri presque sans débit) ; `etat_trafic` et `etat_barre` 2,6 %, exactement les heures `absente` ; drapeaux 40 %, exactement les deux proxies. Le calendrier et la météo sont complets.
+
+### Tests
+
+[`test_dataset.py`](../tests/test_dataset.py) compte 35 tests sans réseau, sur des sources synthétiques : trois jours autour du changement d'heure de mars 2026, une météo dont la température encode l'heure de l'étiquette. Ils vérifient la jointure à la main, les lignes du trafic conservées à l'identique, l'heure du 29/03 à 02:00, les `<NA>` des proxies, le refus de sources incomplètes avec conservation des fichiers précédents, le contrat des sorties, le manifeste et l'empreinte, et les options de la commande. Un contrôle par mutation a été fait : joindre les drapeaux en `inner`, les garder en `bool`, décaler la météo d'une heure, ignorer `--end` ou retirer le contrôle du nombre de lignes fait chaque fois échouer au moins un test. Sur la branche, avant fusion de la #19, la suite complète a donné 489 tests et 27 sous-tests réussis sous Python 3.13.
+
+### Limites
+
+- La table reflète les sources au moment de la construction : après une actualisation du trafic ou de la météo, reconstruire et comparer de nouveau l'empreinte.
+- La commande ne copie pas les sources : une source reconstruite entre-temps change `inputs_sha256` et, si ses valeurs changent, l'empreinte. La prévision météo, les chantiers et les dernières heures du trafic dépendent du moment du téléchargement : pour partager la version figée, le plus sûr est de copier ensemble les trois fichiers de `data/processed/dataset/` (2 Mo), puis de lire le `fingerprint` de `_manifest.json`.
+- L'empreinte dépend de la version de pandas, épinglée et inscrite dans le manifeste. Aucune commande de vérification n'est fournie : on compare l'empreinte affichée.
+- En backtest, la météo des heures cibles est `historical_forecast`, presque observée : le gain dû à la météo reste un plafond (voir [Météo](#météo-issue-21)). Le backtest strict avec Previous Runs n'est pas implémenté.
 
 ## Décisions ouvertes
 
