@@ -27,7 +27,8 @@ Le statut « implémenté » décrit l'arbre de travail ; le statut de publicati
 15. [Chronos-2](#chronos-2-issue-19)
 16. [Table de modélisation](#table-de-modélisation-issue-22)
 17. [Timestral](#timestral-issue-20)
-18. [Décisions ouvertes](#décisions-ouvertes)
+18. [Variables tabulaires](#variables-tabulaires-issue-30)
+19. [Décisions ouvertes](#décisions-ouvertes)
 
 ## Périmètre du brief
 
@@ -55,6 +56,7 @@ Le brief LivraisonCo 2026 fourni par les organisateurs est la référence. Les i
 | [`validate.py`](../src/traffic_prediction/data/validate.py) | Contrôles du dataset, manifeste d'intégrité et validation du CSV de prévisions. | Vérifier les artefacts et la complétude sans réimplémenter le nettoyage ou un modèle. |
 | [`weather.py`](../src/traffic_prediction/data/weather.py) | Météo Open-Meteo : historique et prévision, conversion en étiquettes de Paris, raccord et validation. | Fournir une covariable connue à l'avance, sur la même grille horaire que le trafic. |
 | [`disruptions.py`](../src/traffic_prediction/data/disruptions.py) | Chantiers Open Data Paris proches des arcs évalués (distance géométrique) et liste manuelle d'événements, en table horaire validée. | Contrôler la période de test et expliquer des erreurs passées ; ce n'est pas une variable d'entraînement. |
+| [`features.py`](../src/traffic_prediction/features.py) | Variables tabulaires ajustées à un cutoff : calendrier cyclique, décalages hebdomadaires, profils historiques, météo disponible. | Partager le même calcul entre apprentissage et prévision, avec des tests anti-fuite (#30). |
 | [`configs/baseline.yaml`](../configs/baseline.yaml) | Identités, sens des arcs et rôles évalué/proxy. | Éviter de disperser ces paramètres entre notebooks et commandes. |
 | [`notebooks/`](../notebooks/) | Gabarits numérotés pour exploration, nettoyage, features, baseline, expériences et impact livraison. | Organiser le travail exploratoire ; les traitements réutilisables vont dans le package. |
 
@@ -464,7 +466,7 @@ Le brief impose la RMSE. Le backtest publie séparément les deux cibles, leurs 
 
 La simulation d'octobre 2025 avec test début novembre 2025 a été évoquée par l'équipe pour avancer malgré les manques récents. C'est une proposition de backtest ; elle ne remplace pas la période officielle de novembre 2026 sans validation des organisateurs.
 
-Les états contemporains du trafic, les observations futures ou une météo observée après le cutoff ne doivent pas être supposés disponibles lors d'une prévision. Les features et leurs tests de disponibilité temporelle restent à construire.
+Les états contemporains du trafic, les observations futures ou une météo observée après le cutoff ne doivent pas être supposés disponibles lors d'une prévision. Les [variables tabulaires et leurs tests anti-fuite](#variables-tabulaires-issue-30) sont implémentés en #30 ; l'entraînement LightGBM reste la #31.
 
 ### Suivi des expériences
 
@@ -1156,6 +1158,73 @@ Les sections 6 et 7 sont indépendantes : `SHOW_COMPARISONS=True` lit les scores
 
 La vue par défaut a été exécutée et sauvegardée avec ses douze cellules de code et son graphique. Les sélections 5M, 28M, baseline et Chronos avec artefacts absents ont été vérifiées ; les statistiques reproduisent les valeurs archivées. La comparaison refuse des fenêtres différentes entre runs. Une réexécution de baseline a aussi vérifié la sauvegarde dans un dossier isolé, sans modifier le journal partagé. Le notebook précédent, avec les sorties de l'utilisateur, a été conservé localement dans `.venv/notebook-backups/` avant cette réorganisation.
 
+
+## Variables tabulaires (issue #30)
+
+[`features.py`](../src/traffic_prediction/features.py) définit `TabularFeatures(lags=(168, 336, 504, 672), weather="lagged")`. Aucun modèle n'est entraîné, aucune donnée n'est téléchargée, aucun fichier du dataset partagé n'est modifié. Les fonctions utilisent Pandas et NumPy déjà installés.
+
+### Utilisation : apprentissage et prévision
+
+```python
+import pandas as pd
+from traffic_prediction.data.build import DEFAULT_DATASET_DIR
+from traffic_prediction.evaluate import target_window
+from traffic_prediction.features import TabularFeatures
+
+data = pd.read_parquet(DEFAULT_DATASET_DIR / "dataset.parquet")
+covariates = pd.read_parquet(DEFAULT_DATASET_DIR / "covariates.parquet")
+cutoff = pd.Timestamp("2026-10-22 23:00")  # Exemple de backtest ; pas le cutoff du rendu.
+builder = TabularFeatures().fit(data, cutoff=cutoff)
+
+# Seules ces lignes fournissent des labels d'apprentissage. Conserver leur ordre.
+training = data.loc[data["datetime"].le(cutoff) & data["role"].eq("evalue")
+                    & data["qualite_mesure"].eq("ok")].reset_index(drop=True)
+train_table = builder.transform(training, covariates)
+X_train = train_table[builder.feature_columns]
+y_train = training[["debit_horaire", "taux_occupation"]]  # Une cible par modèle en #31.
+
+rows = pd.MultiIndex.from_product(
+    [builder.arcs_, target_window(cutoff.normalize())], names=["arc", "datetime"]
+).to_frame(index=False)
+forecast_table = builder.transform(rows, covariates)
+X_forecast = forecast_table[builder.feature_columns]
+```
+
+`fit` est rappelé **dans chaque appel au modèle du backtest** avec son historique et son cutoff. Passer une table contenant aussi des dates ultérieures est autorisé : toutes les observations après cutoff sont exclues avant les statistiques. Un nouvel appel remplace l'état précédent. `transform` conserve l'ordre demandé et renvoie `arc`, `datetime`, puis les variables numériques. Les catégories d'`arc` sont les mêmes en apprentissage et en prévision. Le modèle ne reçoit jamais `datetime` comme variable.
+
+### Colonnes : 27 entrées par défaut
+
+| Colonnes | Type / sens | Disponibilité |
+|---|---|---|
+| `arc` | Catégorie Pandas ; un modèle global peut distinguer les trois arcs. | Identité statique ; seuls les arcs `evalue` de l'historique ajusté sont acceptés. |
+| `hour_sin/cos`, `day_of_week_sin/cos`, `month_sin/cos` | Six flottants : `sin(2πx/p)`, `cos(2πx/p)`, périodes 24, 7 et 12. Lundi = 0 ; janvier = 0. | Calculés à partir de l'heure cible locale de Paris. |
+| `is_weekend`, `is_holiday`, `is_day_before_holiday`, `is_day_after_holiday`, `is_bridge`, `is_school_holiday` | Six indicateurs `int8`, issus du calendrier #16. | Calendrier connu ; une couverture manquante provoque une erreur. |
+| `debit_horaire_lag_{168,336,504,672}h`, `taux_occupation_lag_{168,336,504,672}h` | Huit flottants, à l'heure locale exactement correspondante. | Source `t − lag`, au plus au cutoff. Décalages configurables, uniques et entiers ≥ 168 h. |
+| `precipitation_mm_lag_168h`, `temperature_c_lag_168h`, `wind_speed_kmh_lag_168h` | Trois variables météo **de la semaine précédente** ; pas une prévision météo de l'heure cible. | Source `t − 168 h`, dans l'historique ajusté. Indépendantes de la validité du capteur routier. |
+| `debit_horaire_profile`, `taux_occupation_profile` | Moyennes historiques par `(arc, type de jour, heure)`. Type de jour = lundi…dimanche ; un férié prend le type dimanche, comme les baselines #17. | Prévision : données jusqu'au cutoff. Apprentissage : données jusqu'à `t − 168 h` inclus. |
+| `profile_count` | Nombre de paires valides dans le profil, entier `int32` ; 0 si aucun historique correspondant. | Même limite que les deux profils. |
+
+Le profil d'une ligne d'apprentissage n'utilise ni son label, ni les mesures de ses sept jours précédents : cette marge conservatrice respecte l'horizon opérationnel de 25 à 144 h. Les profils sont des statistiques cumulées alignées par jointure temporelle `merge_asof`, pas des moyennes calculées sur toute la table puis recopiées sur ses lignes. Les profils des heures à prévoir utilisent tout l'historique autorisé par le cutoff.
+
+Les décalages sont des **recherches par clé**, pas `shift(168)` : une ligne horaire absente ne déplace jamais l'observation voisine. La grille reste celle de Paris sans fuseau, y compris aux changements d'heure, comme le contrat traité. Seules les paires `qualite_mesure == "ok"`, finies et physiquement admissibles (débit ≥ 0 ; occupation entre 0 et 100) alimentent les lags de trafic et les profils. Une paire invalide masque les deux mesures, conformément aux modèles existants. Les proxies sont ignorés ; aucun arc sans mesure n'est remplacé par un proxy.
+
+Pas d'imputation, de normalisation apprise, de sélection de variables, d'encodage du label ni de suppression silencieuse de lignes. Les premiers jours, les longues pannes et les groupes sans historique restent `NaN`, avec un compte nul si nécessaire. `role`, `qualite_mesure`, les deux cibles contemporaines, `etat_trafic`, `etat_barre`, `weather_source` et les masques de perturbation ne sont pas des variables. Les labels sont sélectionnés séparément dans `training` ; le traitement des prédictions et des replis appartient à #31.
+
+### Météo de l'heure cible : disponibilité explicite
+
+La table #22 contient `weather_source`, mais **pas la date d'émission**. En particulier, `historical_forecast` assemble des prévisions à courte échéance ; cela ne prouve pas qu'une valeur était connue six jours auparavant. Par défaut, #30 utilise donc la météo de la semaine précédente, dont l'heure est déjà passée au cutoff. Son utilité prédictive reste à mesurer en #31.
+
+Le mode optionnel `TabularFeatures(weather="known")` remplace les trois variables météo décalées par `precipitation_mm`, `temperature_c`, `wind_speed_kmh` de l'heure cible. Il exige dans les covariables une colonne datetime `weather_available_at` en heure locale de Paris sans fuseau, renseignée à partir de la **véritable émission du forecast**. Cette colonne n'est jamais une entrée du modèle. Une émission après le cutoff, après l'origine `t − 168 h` d'une ligne d'apprentissage, ou inconnue (`NaT`) rend les valeurs météo manquantes. Une colonne absente provoque une erreur. Ne pas inventer ces timestamps à partir de l'heure cible ni marquer arbitrairement tout un historique comme disponible : il faudra des forecasts archivés au bon horizon pour tester ce mode strictement. Aucun changement de la collecte météo ou du dataset d'un autre contributeur n'est fait en #30.
+
+Les tests garantissent les bornes et l'absence d'accès aux mesures ultérieures dans les entrées fournies. Ils ne reconstruisent pas les versions historiques des observations corrigées ou des calendriers ; la version des sources doit toujours être conservée avec l'expérience.
+
+### Vérifications
+
+`tests/test_features.py` vérifie des valeurs calculées à la main, les heures source exactes, les fériés, les lacunes, les valeurs invalides, l'ordre des lignes, les types nullable, les arcs sans historique, les proxies et le remplacement d'état entre deux cutoffs. Les tests anti-fuite changent volontairement les mesures et la météo futures : les variables restent identiques. Un test séparé empoisonne les sept jours avant un label d'apprentissage. Le mode météo connu refuse une absence de provenance et masque les forecasts publiés trop tard. Le contrat est exercé à l'intérieur du backtest partagé, sans entraîner LightGBM.
+
+La vérification locale porte aussi sur les **huit fenêtres configurées**, avec le dataset d'empreinte `9e714afe6479d9a22e680b0e70893e06fd04c574219a2ec28f9ceffb237c391d` : 360 lignes de prévision et les mêmes 27 entrées par fenêtre, références directes pour les lags/profils et invariance après corruption des valeurs futures. Les tables et le rapport de provenance restent hors Git sous `outputs/metrics/features_20261101/`. Aucune RMSE de nouveau modèle n'est revendiquée en #30 ; les scores et importances seront mesurés en #31.
+
+Validation sous Windows/Python 3.12 : **42 tests de features**, et **615 tests + 27 sous-tests** pour la suite complète. Cinq mutations en mémoire (historique futur autorisé, mauvais décalage, profils calculés avec des labels ultérieurs, masque qualité retiré, météo émise trop tard autorisée) sont chacune détectées par une assertion des tests correspondants ; le code sur disque reste inchangé. Le résultat est consigné dans `outputs/metrics/features_20261101/mutations.json`.
 
 ## Décisions ouvertes
 
