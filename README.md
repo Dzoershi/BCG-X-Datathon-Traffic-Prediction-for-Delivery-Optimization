@@ -2,7 +2,7 @@
 
 BCG X Datathon: forecast hourly traffic flow and occupancy on three Paris road segments.
 
-**Status:** data download, processing, updates, SQL queries, dataset/submission validation, chronological backtesting, four baseline models, and final submission export are implemented.
+**Status:** data pipelines, validation, chronological backtests, four baselines, Chronos-2, Timestral, LightGBM, and submission export are implemented.
 
 Run commands from the repository root. Terminal examples use PowerShell.
 
@@ -158,11 +158,11 @@ Each successful call appends a run to `docs/experiments.csv`; use `experiments_p
 skip logging. Data is read only from existing local Parquet files; no download is triggered.
 [Model contract, metric definitions, and limitations](docs/methodology.md#backtest-issue-15).
 
-### Review Timestral results (issue #20)
+### Review saved model results
 
-Open [05_model_experiments.ipynb](notebooks/05_model_experiments.ipynb). It starts with a single-model report for Timestral-5M with calendar features and joint flow/occupancy forecasts: settings, evaluation dates, errors, coverage, fallbacks, and an observed-versus-forecast plot when local data is available.
+Open [05_model_experiments.ipynb](notebooks/05_model_experiments.ipynb). It starts with LightGBM's raw-flow report: settings, evaluation dates, errors, coverage, feature importance, fallbacks, and an observed-versus-forecast plot when local data is available.
 
-Change `MODEL_RUN` to select another recorded model. `SHOW_COMPARISONS = True` displays the saved comparison; `RERUN_MODEL = True` runs only the selected model again. Both switches default to `False`.
+Change `MODEL_RUN` to select another recorded model, such as `timestral_5m_calendar_multivariate`. `SHOW_COMPARISONS = True` displays the 18 saved runs; `RERUN_MODEL = True` runs only the selected model again. Both switches default to `False`.
 
 To evaluate the same configuration directly in Python:
 
@@ -203,7 +203,30 @@ Refit at every backtest cutoff. The same `transform` builds training features;
 training profiles exclude the preceding seven days. Target-hour weather requires
 verified issuance timestamps via `weather="known"`; the current dataset lacks these.
 [Training example, columns, and availability rules](docs/methodology.md#variables-tabulaires-issue-30).
-LightGBM training belongs to #31.
+### Train and evaluate LightGBM (issue #31)
+
+```powershell
+python -m pip install lightgbm==4.7.0 scikit-learn==1.7.2
+```
+
+```python
+import pandas as pd
+from traffic_prediction.data.build import DEFAULT_DATASET_DIR
+from traffic_prediction.evaluate import backtest
+from traffic_prediction.train import LightGBMForecaster
+
+data = pd.read_parquet(DEFAULT_DATASET_DIR / "dataset.parquet")
+covariates = pd.read_parquet(DEFAULT_DATASET_DIR / "covariates.parquet")
+model = LightGBMForecaster(covariates)  # One global regressor per target; raw flow by default.
+result = backtest(model, data, description=model.describe())
+print(result.summary)
+```
+
+Use `log_flow=True` to test the log target, or settings from `LIGHTGBM_RUNS` in
+`train.py`. Every call refits on cutoff-limited history; arcs with insufficient
+recent measurements use the explicit holiday-aware fallback. The notebook can
+rerun each configuration and save its forecasts and feature importance.
+[Six-run comparison, retained artifacts, and limitations](docs/methodology.md#lightgbm-issue-31).
 
 ## 10. Generate the final submission (issue #18)
 
