@@ -109,6 +109,27 @@ def test_previous_week_falls_back_to_two_weeks_then_to_the_profile(data, calenda
     np.testing.assert_allclose(result.loc[("A", two_gaps)], profile.loc[("A", two_gaps)])
 
 
+def test_readme_backtest_baseline_handles_sensor_outages(data, calendar):
+    """Valid truth still scores when weekly sources and recent arc history are absent."""
+    times = target_window(CUTOFF)
+    gap = times[10]  # Saturday: exercise the ordinary-day weekly fallbacks.
+    hide(data, data.arc.eq("A") & data.datetime.isin([gap - WEEK, gap - 2 * WEEK]))
+    # Keep B's target truth, but remove its recent source measurements.
+    hide(data, data.arc.eq("B") & data.datetime.between(
+        pd.Timestamp("2025-09-01"), CUTOFF + pd.Timedelta(hours=23)))
+    model = HolidayAwarePreviousWeekBaseline(calendar)
+
+    result = backtest(model, data, [CUTOFF], experiments_path=None)
+
+    assert result.scores.rmse.notna().all()
+    assert (result.scores.n_scored == result.scores.n_expected).all()
+    assert model.sources_[("A", gap)] == "day_type_profile"
+    assert model.sources_.loc["B"].eq("day_type_profile").all()
+    # The unfilled internal reference still reports incomplete coverage.
+    assert (result.scores.baseline_n_scored < result.scores.n_scored).all()
+    assert result.scores.normalized_score.isna().all()
+
+
 def test_four_week_mean_averages_the_available_weeks(data, calendar):
     times = target_window(CUTOFF)
     hide(data, data.arc.eq("A") & data.datetime.eq(times[5] - WEEK))
