@@ -1,6 +1,6 @@
 # Méthodologie
 
-Ce document consigne les choix présents dans le code au **31 octobre 2026**, leurs raisons, leurs limites et les questions encore ouvertes. Le [README](../README.md) reste le guide de commandes rapide.
+Ce document consigne les choix présents dans le code au **1er novembre 2026**, leurs raisons, leurs limites et les questions encore ouvertes. Le [README](../README.md) reste le guide de commandes rapide.
 
 - **Implémenté** : comportement observable dans les modules et couvert par les tests indiqués.
 - **Provisoire** : règle ou hypothèse en place qui doit encore être justifiée par les données ou le métier.
@@ -26,7 +26,8 @@ Le statut « implémenté » décrit l'arbre de travail ; le statut de publicati
 14. [Chantiers et événements](#chantiers-et-événements-issue-34)
 15. [Chronos-2](#chronos-2-issue-19)
 16. [Table de modélisation](#table-de-modélisation-issue-22)
-17. [Décisions ouvertes](#décisions-ouvertes)
+17. [Timestral](#timestral-issue-20)
+18. [Décisions ouvertes](#décisions-ouvertes)
 
 ## Périmètre du brief
 
@@ -54,7 +55,6 @@ Le brief LivraisonCo 2026 fourni par les organisateurs est la référence. Les i
 | [`validate.py`](../src/traffic_prediction/data/validate.py) | Contrôles du dataset, manifeste d'intégrité et validation du CSV de prévisions. | Vérifier les artefacts et la complétude sans réimplémenter le nettoyage ou un modèle. |
 | [`weather.py`](../src/traffic_prediction/data/weather.py) | Météo Open-Meteo : historique et prévision, conversion en étiquettes de Paris, raccord et validation. | Fournir une covariable connue à l'avance, sur la même grille horaire que le trafic. |
 | [`disruptions.py`](../src/traffic_prediction/data/disruptions.py) | Chantiers Open Data Paris proches des arcs évalués (distance géométrique) et liste manuelle d'événements, en table horaire validée. | Contrôler la période de test et expliquer des erreurs passées ; ce n'est pas une variable d'entraînement. |
-| [`dataset.py`](../src/traffic_prediction/data/dataset.py) | Table de modélisation : trafic joint au calendrier, à la météo et aux masques de perturbation ; covariables jusqu'au 11 novembre ; validation et manifeste de version. | Une seule table partagée : tous les modèles s'entraînent sur les mêmes données, sans refaire leurs jointures. |
 | [`configs/baseline.yaml`](../configs/baseline.yaml) | Identités, sens des arcs et rôles évalué/proxy. | Éviter de disperser ces paramètres entre notebooks et commandes. |
 | [`notebooks/`](../notebooks/) | Gabarits numérotés pour exploration, nettoyage, features, baseline, expériences et impact livraison. | Organiser le travail exploratoire ; les traitements réutilisables vont dans le package. |
 
@@ -122,7 +122,7 @@ Le ZIP 2023 utilise Deflate64, non pris en charge par `zipfile` seul. Le choix a
 
 Les ZIP ordinaires gardent l'ordre des noms de membres ; le lecteur Deflate64 suit l'ordre physique de l'archive pour rester en flux. Ce choix est déterministe pour une même archive, mais ne constitue pas un tri chronologique supplémentaire.
 
-Le support Deflate64 a été vérifié avec de véritables petites archives compressées, dont un champ de plus de 64 KiB, et avec des corruptions injectées. **Le téléchargement et le traitement complets du vrai ZIP 2023 n'ont pas été exécutés pendant cette vérification.**
+Le support Deflate64 a été vérifié avec de petites archives compressées, dont un champ de plus de 64 KiB, et avec des corruptions injectées. Le 1er novembre 2026, le vrai ZIP 2023 a aussi été téléchargé et intégralement contrôlé par taille et CRC. Seuls ses deux derniers membres ont été interprétés pour récupérer la frontière du 1er janvier 2024 ; l'année 2023 entière n'a pas été transformée en Parquet.
 
 ### Observations récentes : issue #5
 
@@ -414,9 +414,11 @@ Les tests utilisent de petits fichiers représentatifs et des réponses réseau 
 | [`test_weather.py`](../tests/test_weather.py) | Météo sans réseau : requêtes UTC et copie brute, étiquettes de Paris et changements d'heure, jointure avec la grille trafic, raccord historique/prévision, rafraîchissement, nouvelles tentatives, validation et CLI. |
 | [`test_disruptions.py`](../tests/test_disruptions.py) | Chantiers et événements sans réseau : distance à l'arc, seuils de 50 et 200 m, conversion des dates, règle de `chantier_actif`, étiquettes horaires, lignes « non appliqué », liste manuelle mal formée refusée et fichier versionné validé, requêtes, nouvelles tentatives, construction et CLI. |
 | [`test_chronos.py`](../tests/test_chronos.py) | Chronos-2 sans torch ni chronos : un faux pipeline enregistre ce que le modèle recevrait. Format, 120 heures par arc, horizon de 144 heures, espion anti-fuite, heures non `ok` en NaN, bornes, repli au seuil de 168 heures, covariables sur tout l'horizon, médiane, moyenne ou quantile par type de jour, rendu officiel valide, réglages par défaut. La comparaison avec la vraie signature de `predict_df` n'est exécutée que si chronos est installé. |
+| [`test_dataset.py`](../tests/test_dataset.py) | Jointures et colonnes de la table de modélisation, grille des covariables, masques des proxies, empreintes, validation des entrées et CLI. |
+| [`test_timestral.py`](../tests/test_timestral.py) | Disposition des tenseurs, horizon, calendrier, masques, bornes, repli, cutoff, poids épinglés, absence de dépendances lourdes et intégration au rendu. |
 | [`test_imports.py`](../tests/test_imports.py) | Import des modules du package, y compris les points d'entrée nouvellement ajoutés. |
 
-La dernière exécution locale consignée (1er novembre 2026, issue #19) a donné **479 tests et 27 sous-tests réussis** sous Python 3.13 ; sans torch ni chronos, comme en CI, 478 réussis et 1 sauté. Les contrôles de documentation ont aussi parsé les blocs PowerShell, vérifié les options de commandes et les liens locaux, puis exécuté les exemples SQL sur des Parquet de test.
+La dernière exécution locale (1er novembre 2026, issue #20 et assembleur de la PR #39) a donné **573 tests et 27 sous-tests réussis** sous Python 3.12.10, avec les dépendances de modèles installées. Sans torch, chronos ou Timestral, les tests utilisent des backends simulés ; le contrôle de signature Chronos est sauté. Les contrôles de documentation ont aussi parsé les blocs PowerShell, vérifié les options de commandes et les liens locaux, puis exécuté les exemples SQL sur des Parquet de test.
 
 Un snapshot récent réel de **2 974 observations** a auparavant été converti en **120 lignes horaires** pour les cinq arcs configurés sur une journée, avec contrôle du schéma Parquet. Ce contrôle ponctuel ne remplace pas un test exhaustif de toutes les années ou de l'API en production.
 
@@ -446,7 +448,7 @@ La configuration du workflow ne constitue pas une exécution distante réussie :
 | Données externes | Modules `weather.py`, `calendar_events.py`, `disruptions.py` et dépendance `holidays`. | Météo implémentée : voir [Météo](#météo-issue-21). Chantiers et événements implémentés comme table de contrôle, pas comme variable d'entraînement : voir [Chantiers et événements](#chantiers-et-événements-issue-34). |
 | Feature engineering | `features.py` et notebook 03. | Définir les variables temporelles, retards et agrégats ; contrôler l'absence d'information future. |
 | Baseline | `models/baselines.py` et notebook 04. | Quatre baselines mesurées et consignées ; voir [Baselines](#baselines-issue-17). |
-| Familles de modèles | Répertoire `models/` ; scikit-learn, LightGBM, Chronos et PyTorch préparés dans les dépendances. | Chronos-2 mesuré : voir [Chronos-2](#chronos-2-issue-19). Le modèle final reste à choisir (#32). |
+| Familles de modèles | Répertoire `models/` ; Chronos-2 et Timestral implémentés ; LightGBM prévu en #31. | Comparaisons mesurées dans [Chronos-2](#chronos-2-issue-19) et [Timestral](#timestral-issue-20). Le modèle final reste à choisir (#32). |
 | Entraînement | `train.py`. | Implémenter la préparation sur les données d'entraînement, l'ajustement et la sauvegarde. |
 | Évaluation | `evaluate.py`, contrat `models/base.py` et huit fenêtres configurées. | Backtest implémenté ; mesurer les modèles sur les données locales disponibles. |
 | Prévision et export | `predict.py` ; contrôle du format disponible dans `data/validate.py`. | Produire les 120 heures × 3 arcs et exporter le CSV demandé ; le validateur ne génère pas les valeurs. |
@@ -930,7 +932,7 @@ result = backtest(Chronos2Forecaster(), data, experiments_path=None)  # Essai 4.
 [`data/dataset.py`](../src/traffic_prediction/data/dataset.py) assemble le trafic, le calendrier, la météo et les masques de perturbation en une table que tous les modèles lisent : chacun s'entraîne sur les mêmes données, sans refaire ses jointures. Aucune variable n'est calculée ici ; les décalages, profils et indicateurs relèvent de l'issue #30.
 
 ```powershell
-# Version figée, partagée jusqu'au 5 novembre :
+# Version proposée dans la PR #39 :
 python -m traffic_prediction.data.build --dataset --end 2026-10-30
 # Rendu (vendredi 6 novembre), après l'actualisation du trafic, --weather --refresh-forecast et --disruptions :
 python -m traffic_prediction.data.build --dataset --end 2026-11-05
@@ -948,7 +950,7 @@ Dans `data/processed/dataset/`, non versionné :
 | `covariates.parquet` | Une par arc configuré et par heure, du premier jour au 11 novembre 2026 à 23:00, **sans aucune mesure** : 125 520. | Covariables des heures à prédire, en backtest comme pour le rendu. |
 | `_manifest.json` | | Version : empreinte, période, lignes par arc, SHA-256 des entrées. |
 
-**Pourquoi deux fichiers.** Le backtest ne transmet au modèle que l'historique jusqu'au jeudi 23:00 : les heures à prédire n'y figurent pas, ni leur calendrier ni leur météo. Le modèle doit donc lire leurs covariables ailleurs, dans une table sans mesure pour qu'aucune fuite ne soit possible. Un fichier limité aux heures postérieures au dernier trafic ne suffirait pas, car les heures cibles du backtest sont dans le passé. `dataset.parquet` garde exactement autant de lignes que le trafic de la période, et aucune colonne « futur » ne change de sens à chaque actualisation.
+**Pourquoi deux fichiers.** Le backtest ne transmet au modèle que l'historique jusqu'au jeudi 23:00 : les heures à prédire n'y figurent pas, ni leur calendrier ni leur météo. Le modèle doit donc lire leurs covariables ailleurs, dans une table sans mesure pour éviter de transmettre les mesures futures. La disponibilité historique de chaque covariable reste à vérifier, notamment pour la météo. Un fichier limité aux heures postérieures au dernier trafic ne suffirait pas, car les heures cibles du backtest sont dans le passé. `dataset.parquet` garde exactement autant de lignes que le trafic de la période, et aucune colonne « futur » ne change de sens à chaque actualisation.
 
 Lire chaque fichier séparément (le dossier contient deux schémas) :
 
@@ -1000,7 +1002,7 @@ known = covariates.set_index(["arc", "datetime"]).loc[targets]
 - **Jointures.** Calendrier et météo sur `datetime`, avec `validate="many_to_one"` : une heure sert aux cinq arcs. Drapeaux sur (`arc`, `datetime`), avec `validate="one_to_one"`, qui refuse aussi une ligne de trafic en double. Ce sont des jointures à gauche : aucune ligne de trafic n'est ajoutée ni retirée. Ordre : arcs de la configuration (évalués d'abord), puis heure.
 - **Proxies : `<NA>`, pas `False`.** Les chantiers n'ont pas été cherchés autour des proxies, et la cérémonie du 11/11 ferme aussi leurs tronçons des Champs-Élysées : `False` serait une fausse information. `description` reste dans `disruptions.parquet`, avec la même clé. Aucun masque combiné n'est créé : `chantier_actif`, vrai sur 2 952 à 4 632 heures par arc de 2024 à 2026, noierait les événements ; le choix revient aux issues #30 et #31.
 - **Rien n'est imputé** : les NaN du trafic restent. Le 29/03/2026 à 02:00, heure qui n'existe pas, garde sa ligne `absente`, avec calendrier et météo remplis.
-- **Météo.** Avec `--end 2026-10-30`, toute la météo de `dataset.parquet` est `historical_forecast` ; sans `--end`, le 31/10 serait en `forecast`. Dans `covariates.parquet`, la météo passe en `forecast` à partir du jour de son téléchargement.
+- **Météo.** Avec la reconstruction du 1er novembre et `--end 2026-10-30`, toute la météo de `dataset.parquet` est `historical_forecast`. Dans `covariates.parquet`, la météo passe en `forecast` à partir du jour de son téléchargement.
 
 ### Validation et écriture
 
@@ -1017,7 +1019,7 @@ Le premier écart arrête la construction avant toute écriture ; les fichiers p
 
 - **`fingerprint`** : SHA-256 des empreintes de contenu des deux fichiers (noms, types et valeurs, avec `pd.util.hash_pandas_object`). Elle ne dépend pas de l'encodage Parquet : deux ordinateurs qui ont les mêmes données obtiennent la même empreinte, avec les versions épinglées. `<NA>` et `False` donnent des empreintes différentes. La commande l'affiche : comparer ses 8 premiers caractères et les noter `dataset=<8 caractères>` dans la `description` de [`experiments.csv`](experiments.csv).
 - **`inputs_sha256`** : SHA-256 de chaque partition du trafic, du calendrier, de la météo et des disruptions, avec la fonction du manifeste de `validate.py` ; il sert à retrouver la source qui diffère. Le manifeste de `validate.py` lui-même n'est pas réutilisé : il n'accepte que des Parquet au schéma du trafic.
-- **Exécution du 1er novembre 2026**, `--end 2026-10-30` : 124 080 lignes (5 arcs × 24 816 heures, du 01/01/2024 00:00 au 30/10/2026 23:00), covariables 125 520 lignes jusqu'au 11/11 23:00, dont 1 440 après l'historique, toutes en `forecast`. Empreinte **`9db76830`**, identique à une seconde construction. Version à confirmer par l'équipe.
+- **Exécution décrite dans la PR #39 (Hassan, 1er novembre 2026)**, `--end 2026-10-30` : 124 080 lignes (5 arcs × 24 816 heures, du 01/01/2024 00:00 au 30/10/2026 23:00), covariables 125 520 lignes jusqu'au 11/11 23:00, dont 1 440 après l'historique, toutes en `forecast`. Empreinte **`9db76830`**, identique à une seconde construction. Version à confirmer par l'équipe.
 
 Valeurs manquantes de cette version : `debit_horaire` 53,6 % et `taux_occupation` 33,1 % (pannes de capteurs, Champs-Élysées sans mesure depuis le 19/11/2025, proxy La Boétie-Berri presque sans débit) ; `etat_trafic` et `etat_barre` 2,6 %, exactement les heures `absente` ; drapeaux 40 %, exactement les deux proxies. Le calendrier et la météo sont complets.
 
@@ -1033,6 +1035,128 @@ Valeurs manquantes de cette version : `debit_horaire` 53,6 % et `taux_occupation
 - En backtest, la météo des heures cibles est `historical_forecast`, presque observée : le gain dû à la météo reste un plafond (voir [Météo](#météo-issue-21)). Le backtest strict avec Previous Runs n'est pas implémenté.
 
 
+### Reconstruction locale pour la #20
+
+Le 1er novembre, les sources publiques ont été téléchargées et reconstruites localement avec la même période du 1er janvier 2024 au 30 octobre 2026. Les 124 080 lignes et les 125 520 covariables sont validées ; deux constructions donnent l'empreinte **`9e714afe6479d9a22e680b0e70893e06fd04c574219a2ec28f9ceffb237c391d`**. Cette version locale est distincte de la proposition `9db76830` de la PR #39. Les quatre baselines et les deux familles de modèles de la #20 ont été évaluées sur cette seule version.
+
+Les archives complètes 2023, 2024 et les deux pièces jointes 2025 ont passé le contrôle d'intégrité. Les deux ZIP 2025 sont identiques et un seul est traité. Pour récupérer minuit le 1er janvier 2024, les deux derniers membres 2023 ont été lus directement et contrôlés par taille et CRC, puis leurs dix observations des cinq arcs ont été placées dans un petit ZIP de frontière. Le dossier local `data/interim/rebuild_archives/` réunit ce ZIP et des liens physiques vers les ZIP 2024–2025 ; le processeur standard conserve ainsi son ordre de résolution des doublons. Cinq extractions API distinctes couvrent 2026 jusqu'au 30 octobre. Les sources complètes restent dans `data/raw/`.
+
+La reconstruction et les empreintes sont consignées dans `outputs/metrics/rebuild_20261101/rebuild.json` (hors Git). Les 96 scores détaillés, 12 agrégats par arc et 4 agrégats globaux de la baseline adaptée aux fériés reproduisent le journal de l'équipe à 1e-8 près. Cela vérifie la comparaison du trafic ; les covariables rafraîchies peuvent différer. Les manques du trafic restent explicites.
+
+
+## Timestral (issue #20)
+
+[`models/timestral.py`](../src/traffic_prediction/models/timestral.py) expose `TimestralForecaster.predict(history, target_times)`. L'issue compare un second modèle de fondation sur les mêmes données que Chronos-2. La sélection finale et l'assemblage des modèles restent dans la #32.
+
+### Installation et utilisation
+
+Dans l'environnement du README, installer le PyTorch CPU épinglé puis le paquet officiel Timestral :
+
+```powershell
+python -m pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
+python -m pip install "timestral @ git+https://github.com/mistralai/timestral.git@a534bdbd244d64f3d9d743f46c7bf6fc330ed4ff"
+```
+
+Le paquet importe ses dépendances lourdes au chargement du modèle. Le premier appel télécharge les poids épinglés dans `models/huggingface/`, hors Git ; les appels suivants réutilisent le backend. Après le premier téléchargement, `HF_HUB_OFFLINE=1` permet l'inférence sans réseau. La dépendance Git demande Git installé. Le code amont est sous Apache-2.0 et les poids sous Modified MIT : [source officielle](https://github.com/mistralai/timestral/tree/a534bdbd244d64f3d9d743f46c7bf6fc330ed4ff), [fiche des poids 5M](https://huggingface.co/mistralai/Timestral-5M).
+
+```python
+import pandas as pd
+from traffic_prediction.evaluate import backtest
+from traffic_prediction.models.timestral import TimestralForecaster
+
+data = pd.read_parquet("data/processed/dataset/dataset.parquet")
+calendar = pd.read_parquet("data/processed/calendar/calendar.parquet")
+# Essais 1 et 2 : mêmes données, fenêtres et contexte ; seul le calendrier change.
+for options in [{"calendar_covariates": ()}, {}]:
+    model = TimestralForecaster(calendar, **options)
+    result = backtest(model, data, author="your-name", description=model.describe())
+    print(result.summary)
+```
+
+Le défaut est 5M, univarié, calendrier et contexte de 8 192 heures. `model_size="28M"` sélectionne le checkpoint supérieur et `multivariate=True` joint débit et occupation dans chaque arc. Pour reproduire l'essai univarié après une modification de configuration, préciser `multivariate=False`. Le CLI de rendu conserve ses baselines actuelles ; `build_submission(history, model)` accepte déjà cet adaptateur et son contrat de 360 lignes est testé.
+
+### Choix et garanties
+
+| Élément | Choix et raison |
+|---|---|
+| Versions | Source Timestral `a534bdbd244d64f3d9d743f46c7bf6fc330ed4ff`, paquet 1.0.0. Poids 5M `bdd20cfc15a3fea0e4cb5ccef37f8d3ca7aa335f`, 28M `49b26409ac87b5935539a5d8ffe7f397b720db47`. Les révisions 123M et 209M sont déclarées pour un essai ultérieur ; ces tailles n'ont pas été exécutées. |
+| Contexte | 8 192 heures, comme les premières comparaisons Chronos-2. L'API accepte jusqu'à 32 768 ; le contexte long n'a pas été évalué. Les fonctions de préparation et d'éligibilité de Chronos-2 sont réutilisées. |
+| Mesures et arcs | Seules les heures `qualite_mesure == "ok"` des arcs évalués entrent dans le modèle ; les autres valeurs sont des NaN sur une grille régulière. Les proxies restent séparés et ne servent pas de vérité. |
+| Tenseurs | Une série par arc et variable en univarié, ou deux variables par arc en multivarié : `(séries, variables, heures)`. Les tests vérifient l'ordre de chaque arc et variable au retour. |
+| Calendrier | Six colonnes identiques à Chronos-2 : `is_holiday`, `is_school_holiday`, `is_day_before_holiday`, `is_bridge`, `is_sunday_or_holiday`, `day_type`. Valeurs numériques float32 couvrant contexte et horizon ; aucun trafic futur, météo ou indicateur de chantier ne leur est ajouté. |
+| Horizon | Depuis l'heure suivant le dernier historique jusqu'à la dernière cible. Chaque fenêtre commune contient 144 heures : vendredi, puis les 120 heures du samedi au mercredi retenues pour le score. |
+| Sortie | Médiane, avec les deux options amont `symmetric_averaging=True` et `clip_nonnegative=True` : l'amont combine la prévision du contexte et de son opposé. Débit borné à zéro et occupation à [0, 100]. Une forme incorrecte ou une valeur non finie échoue explicitement. |
+| Repli | Moins de 168 heures `ok` dans les 28 derniers jours du contexte retenu : `HolidayAwarePreviousWeekBaseline`. `sources_` nomme les heures Timestral et les règles de repli. Le calendrier est donc également nécessaire au repli d'un essai « historique seul ». |
+| Exécution | CPU si CUDA indisponible, graine torch 42. Les tests de l'adaptateur fonctionnent sans torch ni Timestral ; le chargement des poids est différé. |
+
+### Comparaison mesurée le 1er novembre 2026
+
+Dataset local `9e714afe`, 1er janvier 2024–30 octobre 2026, huit cutoffs du fichier de configuration. Les quatre baselines, les trois variantes Chronos-2 et les cinq variantes Timestral ci-dessous ont été exécutées de nouveau sur cette version. Les huit essais de fondation sont ajoutés à [`experiments.csv`](experiments.csv), avec révisions, contexte, repli, durée de chargement et durée du backtest.
+
+Pour rester comparable à l'analyse #19, le premier tableau est la **RMSE poolée sur Convention et Saint-Pères** : `sqrt(sum(n * RMSE²) / sum(n))`, avec `n` heures de vérité valide par arc et fenêtre. Les 994 heures notées par variable, dont 552 atypiques, sont les mêmes pour tous les essais. « Atypique » regroupe week-ends et jours fériés. Les résumés de `backtest` conservent leur moyenne non pondérée de RMSE ; les valeurs du tableau sont recalculées depuis les scores détaillés et ne doivent pas être confondues avec `result.summary`.
+
+Temps : une mesure sur cette machine Windows, Python 3.12.10, torch 2.14.1+cpu, **6 threads**, sans téléchargement ni chargement des poids. Les essais de performance ont été lancés séquentiellement. Le temps est indicatif et dépend de la machine et de sa charge.
+
+| Essai | Débit | Occupation | Débit atypique | Occupation atypique | Backtest (s) |
+|---|---:|---:|---:|---:|---:|
+| Baseline semaine précédente | 112,8 | 2,27 | 125,8 | 1,84 | 1,1 |
+| Baseline moyenne 4 semaines | 118,8 | 2,42 | 139,5 | 2,15 | 0,8 |
+| Baseline profil par type de jour | 104,3 | 2,24 | 114,3 | 1,75 | 0,7 |
+| Baseline adaptée aux fériés | 97,5 | 2,04 | 100,1 | 1,27 | 0,8 |
+| Chronos-2, historique seul | 107,2 | 1,99 | 126,6 | 1,89 | 21,8 |
+| Chronos-2, calendrier, univarié | 104,3 | 1,94 | 122,8 | 1,79 | 124,4 |
+| Chronos-2 retenu, calendrier, multivarié | 104,4 | 1,91 | 122,8 | 1,73 | 67,6 |
+| Timestral-5M, historique seul | 107,9 | 2,05 | 126,7 | 1,98 | 3,0 |
+| Timestral-5M, calendrier, univarié (défaut) | 98,3 | 1,82 | 113,8 | 1,55 | 24,0 |
+| Timestral-5M, calendrier, multivarié | 98,6 | 1,79 | 114,2 | 1,52 | 12,7 |
+| Timestral-28M, calendrier, univarié | 97,7 | 1,81 | 111,3 | 1,56 | 68,5 |
+| Timestral-28M, calendrier, multivarié | 98,1 | 1,78 | 112,0 | 1,51 | 41,0 |
+
+**Les trois arcs officiels restent évalués.** Leur agrégation poolée utilise 1 684 heures de vérité valide par variable, avec des périodes différentes selon les capteurs. Elle donne :
+
+| Essai | Débit, trois arcs | Occupation, trois arcs |
+|---|---:|---:|
+| Baseline profil par type de jour | 135,0 | 4,24 |
+| Baseline adaptée aux fériés | 157,7 | 5,81 |
+| Chronos-2 retenu, calendrier, multivarié | 152,9 | 3,88 |
+| Timestral-5M, calendrier, univarié (défaut) | 143,8 | 3,82 |
+| Timestral-5M, calendrier, multivarié | 143,1 | 3,87 |
+| Timestral-28M, calendrier, univarié | 140,1 | 3,91 |
+| Timestral-28M, calendrier, multivarié | 141,6 | 3,97 |
+
+### Lecture des résultats et suite #32
+
+- Le calendrier améliore Timestral-5M par rapport à son historique seul. Les configurations avec calendrier font mieux que Chronos-2 retenu sur les deux métriques globales de Convention et Saint-Pères.
+- Timestral-5M multivarié fournit un compromis utile : 98,6 / 1,79, en 12,7 secondes. Le 28M multivarié atteint 98,1 / 1,78, en 41,0 secondes ; cet écart inférieur à 1 % ne suffit pas à établir un avantage robuste du 28M sur huit fenêtres.
+- La baseline adaptée aux fériés conserve le meilleur débit sur Convention et Saint-Pères (97,5) et les meilleurs scores atypiques (100,1 / 1,27). Sur les trois arcs, la baseline par type de jour garde le meilleur débit de ce tableau. Le bilan varie donc avec l'arc, la variable et le type de jour.
+- Pour la #32, comparer une combinaison Timestral/baseline et vérifier ses poids sur des fenêtres séparées. Les fermetures des Champs-Élysées, les lacunes des capteurs et le repli doivent rester visibles. Aucun remplacement du modèle de rendu n'est décidé ici.
+
+### Vérification et limites
+
+[`test_timestral.py`](../tests/test_timestral.py) vérifie les deux dispositions de tenseurs, le masque des heures non valides, la limite du contexte, l'alignement du calendrier, le vendredi écarté, les bornes, les erreurs de sortie, le repli, les imports sans dépendances lourdes, le chargement épinglé et le CSV de rendu via `build_submission`. Un espion du backtest reçoit uniquement l'historique antérieur au cutoff ; modifier les mesures ultérieures ne change pas ses prévisions.
+
+Les essais réels 5M et 28M multivariés ont été rejoués sur la dernière fenêtre : deux appels donnent des prévisions identiques bit à bit, qui reproduisent les fichiers de l'essai enregistré sur cette machine. Les versions, SHA-256 des poids et vérifications sont dans `outputs/metrics/timestral_20261101/verification.json` ; les prévisions par cutoff, scores et temps sont dans le même dossier, hors Git. Le paquet officiel installé correspond au commit déclaré. De petits écarts numériques entre environnements restent possibles.
+
+Les 994 heures notées sur Convention et Saint-Pères représentent seulement une partie des 1 920 heures attendues ; les capteurs manquants réduisent surtout les fenêtres fériées. Le choix des variantes utilise ce même backtest et n'est pas une évaluation sur un jeu final indépendant. Le respect du cutoff protège les entrées de l'adaptateur ; le recouvrement éventuel entre les séries publiques et les données de pré-entraînement des modèles n'a pas été vérifié.
+
+### Conservation et lecture des résultats
+
+| Emplacement | Contenu | Conservation |
+|---|---|---|
+| `docs/experiments.csv` | Scores par fenêtre, arc, variable et type de jour, agrégats, configuration, empreinte des données et temps. Les douze runs de la comparaison locale sont consignés : quatre baselines, trois Chronos et cinq Timestral. | Versionné dans Git ; les quatorze runs antérieurs restent inchangés. |
+| [`05_model_experiments.ipynb`](../notebooks/05_model_experiments.ipynb) | Rapport d'un modèle : configuration, fenêtres, RMSE globale et par arc, couverture, exemple horaire et origine modèle/repli. Comparaison et nouvelle inférence ont des contrôles distincts. | Versionné ; lecture des scores sans données ni poids, comparaisons et inférence désactivées par défaut. |
+| `outputs/metrics/timestral_20261101/*_predictions.parquet` | 2 880 lignes par run : cutoff, arc, heure, deux prévisions et source du modèle/repli. Indispensable pour tester un ensemble en #32. | Local, hors Git ; à partager séparément avec l'empreinte du dataset. |
+| `outputs/metrics/timestral_20261101/` | CSV détaillés, `runs.json` (temps et RMSE poolées), `verification.json` (versions, poids, répétabilité), `audit.json` (recalcul indépendant). | Local ; le bundle `outputs/metrics/timestral_20261101.zip` permet de partager ces petits artefacts sans les poids ni les données brutes. |
+
+La revue du 1er novembre a recalculé **1 152 enregistrements de score à partir de 34 560 prévisions horaires** : mêmes RMSE, nombres d'heures et comparaisons à la référence. Les 7 680 heures de repli des essais de fondation reproduisent exactement la baseline. Les scores du journal versionné correspondent à ces fichiers locaux. Le notebook permet de consulter les résultats après un clone ; il ne dépend plus du script temporaire de `.venv` pour relancer les expériences. Ses nouvelles exécutions créent un dossier daté, vérifient le contenu du dataset et le calendrier, gardent la configuration et les versions, puis ajoutent un run au journal après sauvegarde des prévisions.
+
+**Organisation du notebook.** La section 1 choisit `MODEL_RUN` et décrit le modèle ; la section 2 explique les huit fenêtres et les 144 heures prévues dont 120 notées. La section 3 présente les statistiques du seul modèle sélectionné sur les trois arcs officiels, puis sur les heures atypiques. La section 4 détaille les erreurs par arc et pour une fenêtre choisie. Les groupes sans vérité valide sont affichés « Not scored » ; les valeurs numériques originales restent NaN dans le journal. La section 5 compte les prévisions natives et les replis, affiche un exemple et trace observations/prévisions si le dataset local correspond à l'empreinte. Les observations non `ok` restent des trous dans le graphique. Les figures sont exportées dans `outputs/figures/`.
+
+Les sections 6 et 7 sont indépendantes : `SHOW_COMPARISONS=True` lit les scores des douze expériences du même snapshot, sans inférence ; `RERUN_MODEL=True` réexécute uniquement le modèle sélectionné sur le dataset local. Les deux options sont initialement désactivées. Le rapport démarre sur l'essai Timestral-5M multivarié avec calendrier ; ce choix de lecture conserve les paramètres par défaut de la classe et du CLI de rendu. Le calcul de RMSE reste poolé sur les observations valides ; il conserve ses unités, véhicules/heure pour le débit et points de pourcentage pour l'occupation.
+
+La vue par défaut a été exécutée et sauvegardée avec ses douze cellules de code et son graphique. Les sélections 5M, 28M, baseline et Chronos avec artefacts absents ont été vérifiées ; les statistiques reproduisent les valeurs archivées. La comparaison refuse des fenêtres différentes entre runs. Une réexécution de baseline a aussi vérifié la sauvegarde dans un dossier isolé, sans modifier le journal partagé. Le notebook précédent, avec les sorties de l'utilisateur, a été conservé localement dans `.venv/notebook-backups/` avant cette réorganisation.
+
+
 ## Décisions ouvertes
 
 | Point | Comportement ou constat actuel | Prochain arbitrage |
@@ -1043,10 +1167,10 @@ Valeurs manquantes de cette version : `debit_horaire` 53,6 % et `taux_occupation
 | Période de travail historique | Huit fenêtres de backtest 2024–2026 configurées. | Vérifier la couverture locale ; maintenir la cible officielle de novembre 2026. |
 | Proxies 4272 et 4265 | Candidats configurés, avec fortes lacunes rapportées. | Mesurer leur utilité séparément pour `q` et `k` ; vérifier les autres candidats avant adoption. |
 | `etat_barre` et `etat_trafic` | Champs conservés dans le contrat ; réserves de l'exploration. | Décider des features selon qualité et disponibilité à l'instant de prévision. |
-| Modèles, enrichissements, scores | Backtest, référence semaine précédente, quatre baselines et Chronos-2 implémentés et mesurés. Chronos-2 gagne les jours ouvrés, la baseline les week-ends et fériés. | #32 : choisir la combinaison ; chiffres dans [Pistes pour la #32](#pistes-chiffrées-pour-la-32). |
+| Modèles, enrichissements, scores | Backtest, quatre baselines, Chronos-2 et Timestral mesurés. Timestral fournit un compromis utile avec calendrier ; la baseline reste forte les jours atypiques. | #32 : comparer les combinaisons et contrôler leur stabilité ; voir [Timestral](#timestral-issue-20) et [Pistes pour la #32](#pistes-chiffrées-pour-la-32). |
 | Météo dans le backtest | Historique Historical Forecast : prévisions à très courte échéance, presque observées. Le gain mesuré grâce à la météo est un plafond. | Backtest strict avec l'API Previous Runs (`*_previous_dayN`) si le temps le permet. |
 | Reproductibilité finale | Bruts conservés et manifeste des fichiers traités disponible ; pas de provenance complète d'un modèle. | Figer le cutoff et toutes les entrées utilisées pour chaque score et pour le rendu. |
-| Validation réelle 2023 | Support testé sur fixtures Deflate64. | Vérifier le vrai téléchargement et traitement de l'archive quand cette année est nécessaire. |
+| Validation réelle 2023 | Archive complète téléchargée et CRC vérifiés le 1er novembre ; frontière 2024 récupérée depuis les deux derniers membres. | Transformer l'année entière uniquement si un modèle a besoin de cet historique supplémentaire. |
 | Jours perturbés dans le rendu | Les grosses erreurs de l'examen blanc viennent de jours perturbés, à l'heure prédite ou dans la semaine recopiée. Pour le rendu : Champs-Élysées fermés le 11/11 de 7 h à 14 h (horaires provisoires) ; week-end de référence du 31/10 au 01/11 avec manifestation. | #32 et #18 : décider comment traiter ces heures ; une correction simple est chiffrée en #19 ([jours perturbés](#jours-perturbés-pour-lessai-retenu)) ; confirmer avec la [check-list du 6 novembre](#check-list-du-vendredi-6-novembre). |
 
 ## Mise à jour de ce document

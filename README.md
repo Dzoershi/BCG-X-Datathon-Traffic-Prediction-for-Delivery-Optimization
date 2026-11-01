@@ -75,7 +75,13 @@ python -m traffic_prediction.data.build --start 2024-01-01 --end 2025-12-31
 
 To include a recent download, add `--recent-file "data/raw/recent/YOUR_SNAPSHOT.jsonl"`; repeat the option for multiple files. See [processing rules](docs/methodology.md#contrat-de-données) for timestamps, missing values, and overlap handling.
 
-**Modelling dataset:** `python -m traffic_prediction.data.build --dataset --end 2026-10-30` joins traffic, calendar, weather, and disruption flags into `data/processed/dataset/dataset.parquet` (one row per traffic row) and `covariates.parquet` (covariates of every hour until November 11, for target hours), and prints the fingerprint to compare with the team. [Columns, rules, and frozen version](docs/methodology.md#table-de-modélisation-issue-22).
+Once traffic, calendar, weather and disruptions are processed, assemble the modelling inputs:
+
+```powershell
+python -m traffic_prediction.data.build --dataset --end 2026-10-30
+```
+
+Writes `dataset.parquet`, `covariates.parquet`, and `_manifest.json` under `data/processed/dataset/`. Read each Parquet separately. [Columns and reproducibility](docs/methodology.md#table-de-modélisation-issue-22).
 
 ## 4. Refresh data without rebuilding history
 
@@ -151,6 +157,25 @@ Results contain per-window/arc scores (`scores`), means by arc (`per_arc`), and 
 Each successful call appends a run to `docs/experiments.csv`; use `experiments_path=None` to
 skip logging. Data is read only from existing local Parquet files; no download is triggered.
 [Model contract, metric definitions, and limitations](docs/methodology.md#backtest-issue-15).
+
+### Review Timestral results (issue #20)
+
+Open [05_model_experiments.ipynb](notebooks/05_model_experiments.ipynb). It starts with a single-model report for Timestral-5M with calendar features and joint flow/occupancy forecasts: settings, evaluation dates, errors, coverage, fallbacks, and an observed-versus-forecast plot when local data is available.
+
+Change `MODEL_RUN` to select another recorded model. `SHOW_COMPARISONS = True` displays the saved comparison; `RERUN_MODEL = True` runs only the selected model again. Both switches default to `False`.
+
+To evaluate the same configuration directly in Python:
+
+```python
+from traffic_prediction.models.timestral import TimestralForecaster
+
+model = TimestralForecaster(multivariate=True)  # 5M, calendar, joint targets.
+result = backtest(model, data, description=model.describe())
+```
+
+Use `calendar_covariates=()` for history only, `multivariate=True` for joint flow/occupancy, or `model_size="28M"` for the larger checkpoint. Install the pinned Timestral package and PyTorch first; [installation, results, and limitations](docs/methodology.md#timestral-issue-20). The final submission model remains a team decision in #32.
+
+The notebook's scores remain readable without local data or weights. Fresh runs save hourly predictions locally for ensemble work; plots are exported under `outputs/figures/`.
 
 ## 9. Generate the final submission (issue #18)
 

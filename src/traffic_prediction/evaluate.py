@@ -190,7 +190,7 @@ def _append_experiment(result: BacktestResult, path: Path, author: str, model: s
         if header is not None and header != LOG_COLUMNS:
             raise ValueError(f"Experiment CSV must have columns {LOG_COLUMNS}")
         stream.seek(0, 2)
-        writer = csv.writer(stream)
+        writer = csv.writer(stream, lineterminator="\n")
         if header is None:
             writer.writerow(LOG_COLUMNS)
         writer.writerow([datetime.now(timezone.utc).isoformat(), author, model, description,
