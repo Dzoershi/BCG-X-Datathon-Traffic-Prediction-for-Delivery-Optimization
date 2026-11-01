@@ -2,7 +2,7 @@
 
 BCG X Datathon: forecast hourly traffic flow and occupancy on three Paris road segments.
 
-**Status:** data download, processing, updates, SQL queries, dataset/submission validation, and chronological backtesting are implemented. Forecasting models and final prediction export are still to do.
+**Status:** data download, processing, updates, SQL queries, dataset/submission validation, chronological backtesting, four baseline models, and final submission export are implemented.
 
 Run commands from the repository root. Terminal examples use PowerShell.
 
@@ -148,6 +148,54 @@ Results contain per-window/arc scores (`scores`), means by arc (`per_arc`), and 
 Each successful call appends a run to `docs/experiments.csv`; use `experiments_path=None` to
 skip logging. Data is read only from existing local Parquet files; no download is triggered.
 [Model contract, metric definitions, and limitations](docs/methodology.md#backtest-issue-15).
+
+## 9. Generate the final submission (issue #18)
+
+```powershell
+python -m traffic_prediction.predict --team-name your_team
+```
+
+This command refreshes recent traffic with the issue #8 updater, builds calendar
+features, fits the selected baseline on local history through **2026-11-05 23:00**,
+predicts, and calls the unchanged organizer `test_format_and_export_output` function.
+The default `holiday-aware` model is the safety baseline selected by issue #17.
+Use `--model previous-week`, `four-week-mean`, or `day-type-profile` to select
+another implemented baseline. Baselines fit their lag/profile features inside
+`predict`; no separate model artifact is needed.
+
+The result is `outputs/submissions/output_your_team.csv`: 360 rows, three official
+arcs, and all hourly labels from November 7, 2026 00:00 through November 11 23:00.
+Prediction columns are `arc`, `datetime`, `debit_horaire`, `taux_occupation`;
+the semicolon-separated CSV also retains the index written by the organizer's
+unchanged function. Dates use `%Y-%m-%d %H:%M`, values are floats, flow is clipped
+at zero, and occupancy to [0, 100]. Checks run before publication, and an existing
+submission is preserved if an update or export fails. Local end-of-hour labels
+are retained pending clarification from BCG X.
+
+Prerequisite: processed local traffic containing the three evaluated arcs.
+The default refresh overlaps the latest source day by seven days. For a first
+recent-only collection, pass `--update-start 2026-10-01`; no historical archive
+download is triggered. Recent-only history can be insufficient for fallback
+profiles, especially Champs-Elysées, so retain the prepared historical data.
+The small school-calendar snapshot is downloaded if absent; an existing snapshot
+is reused. `--data-dir`, `--raw-dir`, `--config`, `--school-holidays-file`, and
+`--output-dir` allow isolated runs.
+
+To reproduce a submission from frozen local inputs with no network access:
+
+```powershell
+python -m traffic_prediction.predict --team-name your_team --skip-update
+python -m traffic_prediction.data.validate --submission outputs/submissions/output_your_team.csv
+```
+
+Keep pandas **2.x** (pinned to 2.3.3): the organizer requires object text dtypes.
+Python and NumPy seeds are fixed at 42; row ordering and the CSV index are stable.
+Frozen inputs produce identical file bytes on the same environment. A live
+refresh can change predictions when new or corrected observations arrive.
+On **November 5 evening**, run the live command as a dry run, validate the file,
+then run twice with `--skip-update` and compare file hashes. Repeat the live
+command on November 6 for delivery, retaining the November 5 cutoff. That future
+operational dry run has not yet been performed.
 
 ## Project deliverables
 

@@ -263,6 +263,11 @@ def main() -> None:
             table = pd.read_csv(args.submission, sep=";", dtype={
                 "arc": str, "datetime": str, "debit_horaire": float, "taux_occupation": float,
             })
+            # The organizer's unchanged exporter writes its default RangeIndex.
+            if list(table.columns) == ["Unnamed: 0", *SUBMISSION_COLUMNS]:
+                if not table["Unnamed: 0"].equals(pd.Series(range(len(table)))):
+                    raise ValueError("Submission CSV index must be consecutive from zero.")
+                table = table.drop(columns="Unnamed: 0")
             validate_submission(table)
             print(f"Valid submission: {args.submission} (360 rows).")
             return
