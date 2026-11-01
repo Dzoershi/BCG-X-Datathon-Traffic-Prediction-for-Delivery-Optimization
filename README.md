@@ -177,7 +177,35 @@ Use `calendar_covariates=()` for history only, `multivariate=True` for joint flo
 
 The notebook's scores remain readable without local data or weights. Fresh runs save hourly predictions locally for ensemble work; plots are exported under `outputs/figures/`.
 
-## 9. Generate the final submission (issue #18)
+## 9. Build features for tabular models (issue #30)
+
+```python
+import pandas as pd
+from traffic_prediction.data.build import DEFAULT_DATASET_DIR
+from traffic_prediction.evaluate import target_window
+from traffic_prediction.features import TabularFeatures
+
+data = pd.read_parquet(DEFAULT_DATASET_DIR / "dataset.parquet")
+covariates = pd.read_parquet(DEFAULT_DATASET_DIR / "covariates.parquet")
+cutoff = pd.Timestamp("2026-10-22 23:00")
+builder = TabularFeatures().fit(data, cutoff=cutoff)
+rows = pd.MultiIndex.from_product(
+    [builder.arcs_, target_window(cutoff.normalize())], names=["arc", "datetime"]
+).to_frame(index=False)
+table = builder.transform(rows, covariates)
+X = table[builder.feature_columns]  # Categorical arc + numeric features; no datetime or labels.
+print(X.shape, table.head())
+```
+
+Produces 27 inputs: cyclical time/calendar features, 7/14/21/28-day traffic lags,
+historical profiles, and weather from seven days earlier. Missing values stay `NaN`.
+Refit at every backtest cutoff. The same `transform` builds training features;
+training profiles exclude the preceding seven days. Target-hour weather requires
+verified issuance timestamps via `weather="known"`; the current dataset lacks these.
+[Training example, columns, and availability rules](docs/methodology.md#variables-tabulaires-issue-30).
+LightGBM training belongs to #31.
+
+## 10. Generate the final submission (issue #18)
 
 ```powershell
 python -m traffic_prediction.predict --team-name your_team
