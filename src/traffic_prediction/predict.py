@@ -101,7 +101,7 @@ def run_submission(
         raise ValueError(f"Unknown model: {model_name}")
     if not skip_update:
         update.update_traffic(
-            update_start, "2026-11-05", output_dir=data_dir,
+            update_start, CUTOFF.strftime("%Y-%m-%d"), output_dir=data_dir,
             raw_dir=raw_dir, config_path=config_path,
         )
     history = query.query_traffic(
