@@ -20,6 +20,7 @@ holidays==0.107
 # Forecasting models
 lightgbm==4.7.0
 chronos-forecasting==2.3.2
+# Timestral is optional and installed from GitHub: see requirements-timestral.txt.
 # Installed by chronos-forecasting; pinned so every Python version gets the same build.
 # On Linux, install the CPU build first (see README).
 torch==2.14.1

@@ -4,6 +4,7 @@ One ``build_<source>`` function per source, with separate output datasets.
 """
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -11,7 +12,7 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from traffic_prediction.data import calendar_events, disruptions, traffic, weather
+from traffic_prediction.data import calendar_events, dataset, disruptions, traffic, weather
 from traffic_prediction.data.traffic import Arc, ProcessingStats
 
 DEFAULT_START = "2024-01-01"
@@ -20,6 +21,7 @@ DEFAULT_TRAFFIC_DIR = traffic.REPO_ROOT / "data" / "processed" / "traffic"
 DEFAULT_CALENDAR_DIR = traffic.REPO_ROOT / "data" / "processed" / "calendar"
 DEFAULT_WEATHER_DIR = traffic.REPO_ROOT / "data" / "processed" / "weather"
 DEFAULT_DISRUPTIONS_DIR = traffic.REPO_ROOT / "data" / "processed" / "disruptions"
+DEFAULT_DATASET_DIR = traffic.REPO_ROOT / "data" / "processed" / "dataset"
 
 TRAFFIC_SCHEMA = pa.schema(
     [
@@ -198,6 +200,107 @@ def print_disruptions_check(works: pd.DataFrame, table: pd.DataFrame, end: str) 
     print(period.groupby("arc", sort=False)[["chantier_actif", "evenement_actif"]].sum().to_string())
     for text in period.loc[period["evenement_actif"], "description"].unique():
         print(f"- {text}")
+
+
+def build_dataset(
+    start: str | None = None,
+    end: str | None = None,
+    output_dir: Path = DEFAULT_DATASET_DIR,
+    *,
+    traffic_dir: Path = DEFAULT_TRAFFIC_DIR,
+    calendar_dir: Path = DEFAULT_CALENDAR_DIR,
+    weather_dir: Path = DEFAULT_WEATHER_DIR,
+    disruptions_dir: Path = DEFAULT_DISRUPTIONS_DIR,
+    config_path: Path = traffic.DEFAULT_CONFIG,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Write dataset.parquet, covariates.parquet and _manifest.json; return (dataset, covariates).
+
+    dataset: the traffic rows of the period (default: the stored days) with their
+    covariates. covariates: the same covariates for every configured arc and hour, up to
+    the last day to predict, without measurements. Each input is checked by its own
+    validator before the joins, and both outputs after; any problem stops the build
+    before anything is written.
+    """
+    arcs = traffic.load_arcs(config_path)
+    history = dataset.read_traffic(Path(traffic_dir), arcs, start, end)
+    dataset.check_source("traffic", validate_traffic, history, arcs,
+                         history["datetime"].min(), history["datetime"].max())
+    first, last = traffic.period_bounds(history["datetime"].min(), calendar_events.PREDICTION_END)
+    paths = {
+        "calendar": Path(calendar_dir) / "calendar.parquet",
+        "weather": Path(weather_dir) / "weather.parquet",
+        "disruptions": Path(disruptions_dir) / "disruptions.parquet",
+    }
+    sources = _read_dataset_sources(paths, arcs, first, last)
+
+    table = dataset.add_covariates(history, *sources)
+    covariates = dataset.add_covariates(dataset.covariate_grid(arcs, first, last), *sources)
+    dataset.validate_tables(table, covariates, history, arcs, first, last)
+
+    inputs = dataset.input_hashes(Path(traffic_dir), paths)
+    report = write_dataset(table, covariates, inputs, Path(output_dir))
+    print_dataset_summary(table, report)
+    return table, covariates
+
+
+def _read_dataset_sources(
+    paths: dict[str, Path], arcs: list[Arc], first: pd.Timestamp, last: pd.Timestamp
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Calendar, weather and disruptions from first to last, each checked by its own validator."""
+    calendar, weather_hours, disruption_hours = (
+        dataset.read_hourly(paths[name], first, last) for name in ("calendar", "weather", "disruptions")
+    )
+    evaluated = [arc.name for arc in arcs if arc.role == "evalue"]
+    dataset.check_source("calendar", dataset.check_calendar, calendar, first, last)
+    dataset.check_source("weather", weather.validate_weather, weather_hours, first, last)
+    dataset.check_source("disruptions", disruptions.validate_disruptions, disruption_hours,
+                         evaluated, first, last)
+    return calendar, weather_hours, disruption_hours
+
+
+def write_dataset(table: pd.DataFrame, covariates: pd.DataFrame, inputs: dict, output_dir: Path) -> dict:
+    """Write both tables, then the manifest last; return the manifest.
+
+    The previous manifest is removed first: a build interrupted while writing leaves
+    no manifest, rather than one that describes other files.
+    """
+    manifest_path = output_dir / dataset.MANIFEST_FILE
+    manifest_path.unlink(missing_ok=True)
+    content = {name: _write_checked(frame, output_dir / name)
+               for name, frame in [(dataset.DATASET_FILE, table), (dataset.COVARIATES_FILE, covariates)]}
+    report = dataset.manifest(table, covariates, inputs, content)
+    temporary = output_dir / f".{dataset.MANIFEST_FILE}.tmp"
+    temporary.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    temporary.replace(manifest_path)
+    print(f"Saved {manifest_path}", flush=True)
+    return report
+
+
+def _write_checked(table: pd.DataFrame, path: Path) -> str:
+    """Write through a temporary file, re-read it whole, then replace; return its content SHA-256.
+
+    The previous file is kept if the re-read content differs from the validated table.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.parent / f".{path.name}.tmp"
+    table.to_parquet(temporary, engine="pyarrow", compression="zstd", index=False)
+    expected = dataset.content_sha256(table)
+    if dataset.content_sha256(pd.read_parquet(temporary)) != expected:
+        temporary.unlink()
+        raise ValueError(f"{path.name}: the re-read file differs from the validated table.")
+    temporary.replace(path)
+    print(f"Saved {path} ({len(table):,} rows)", flush=True)
+    return expected
+
+
+def print_dataset_summary(table: pd.DataFrame, report: dict) -> None:
+    """Period, rows per arc, weather sources and the fingerprint to compare with the team."""
+    span, covariates = report["dataset"], report["covariates"]
+    print(f"\n=== Dataset {span['first_hour']} to {span['last_hour']}, "
+          f"covariates to {covariates['last_hour']} ===")
+    print(pd.Series(span["rows_per_arc"], name="rows").to_string())
+    print(f"weather_source: {table['weather_source'].value_counts().to_dict()}")
+    print(f"Fingerprint: {report['fingerprint']}\nCompare with the team: {report['fingerprint'][:8]}")
 
 
 def build_traffic(
@@ -495,7 +598,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
             "Build hourly traffic Parquet, calendar covariates with --calendar, "
-            "weather with --weather, or road works and events with --disruptions. "
+            "weather with --weather, road works and events with --disruptions, "
+            "or join them all into the modelling dataset with --dataset. "
             "Traffic output files for years in the requested period are replaced."
         )
     )
@@ -514,8 +618,13 @@ def main() -> None:
     parser.add_argument("--events-file", type=Path, default=disruptions.DEFAULT_EVENTS_PATH,
                         help="With --disruptions, the hand-checked events CSV; "
                              "default: data/raw/events_manual.csv.")
+    parser.add_argument("--dataset", action="store_true",
+                        help="Join processed traffic, calendar, weather and disruption flags "
+                             "into dataset.parquet, and the covariates up to the last day to "
+                             "predict into covariates.parquet.")
     parser.add_argument("--traffic-dir", type=Path, default=DEFAULT_TRAFFIC_DIR,
-                        help="Processed history used to infer the calendar or weather start.")
+                        help="Processed history used to infer the calendar or weather start, "
+                             "and read by --dataset.")
     parser.add_argument("--school-holidays-file", type=Path, default=calendar_events.DEFAULT_SCHOOL_PATH,
                         help="Local official Paris school-calendar JSON snapshot.")
     parser.add_argument("--refresh-school-holidays", action="store_true",
@@ -525,13 +634,13 @@ def main() -> None:
         default=None,
         metavar="YYYY-MM-DD",
         help=(f"First day, from 00:00 (traffic and disruptions: {DEFAULT_START}; "
-              "calendar and weather: infer from history)."),
+              "calendar, weather and dataset: infer from history)."),
     )
     parser.add_argument(
         "--end",
         default=None,
         metavar="YYYY-MM-DD",
-        help=(f"Last day, until 23:00 (traffic: {DEFAULT_END}; "
+        help=(f"Last day, until 23:00 (traffic: {DEFAULT_END}; dataset: last stored traffic day; "
               f"calendar, weather and disruptions: {calendar_events.PREDICTION_END})."),
     )
     parser.add_argument(
@@ -555,7 +664,7 @@ def main() -> None:
         "--output-dir",
         type=Path,
         default=None,
-        help="Parquet destination; default: data/processed/traffic, calendar, weather or disruptions.",
+        help="Parquet destination; default: data/processed/traffic, calendar, weather, disruptions or dataset.",
     )
     parser.add_argument(
         "--config",
@@ -565,17 +674,23 @@ def main() -> None:
     )
     args = parser.parse_args()
     source = ("Calendar" if args.calendar else "Weather" if args.weather
-              else "Disruptions" if args.disruptions else "Traffic")
+              else "Disruptions" if args.disruptions else "Dataset" if args.dataset else "Traffic")
     if args.refresh_school_holidays and not args.calendar:
         parser.error("--refresh-school-holidays requires --calendar")
     if args.calendar and args.weather:
         parser.error("choose --calendar or --weather, not both")
     if args.disruptions and (args.calendar or args.weather):
         parser.error("choose --disruptions alone, without --calendar or --weather")
+    if args.dataset and (args.calendar or args.weather or args.disruptions):
+        parser.error("choose --dataset alone, without --calendar, --weather or --disruptions")
     if args.refresh_forecast and not args.weather:
         parser.error("--refresh-forecast requires --weather")
 
     try:
+        if args.dataset:
+            build_dataset(args.start, args.end, args.output_dir or DEFAULT_DATASET_DIR,
+                          traffic_dir=args.traffic_dir, config_path=args.config)
+            return
         if args.disruptions:
             build_disruptions(args.start or DEFAULT_START, args.end or calendar_events.PREDICTION_END,
                               args.output_dir or DEFAULT_DISRUPTIONS_DIR, config_path=args.config,

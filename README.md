@@ -2,7 +2,7 @@
 
 BCG X Datathon: forecast hourly traffic flow and occupancy on three Paris road segments.
 
-**Status:** data download, processing, updates, SQL queries, dataset/submission validation, chronological backtesting, four baseline models, and final submission export are implemented.
+**Status:** data pipelines, validation, chronological backtests, four baselines, Chronos-2, Timestral, LightGBM, and submission export are implemented.
 
 Run commands from the repository root. Terminal examples use PowerShell.
 
@@ -17,7 +17,7 @@ python -m pip install numpy==2.2.6 pandas==2.3.3 pyarrow==25.0.1 `
 python -m pip install stream-unzip==0.0.100 stream-inflate==0.0.43 pycryptodome==4.2.0
 ```
 
-Use Python 3.10–3.13; development is tested on 3.12. Select `.venv` in VS Code and your notebook kernel. These commands install the current data workflow; all project pins are in [requirements.txt](requirements.txt).
+Use Python 3.10–3.13; development is tested on 3.12. Select `.venv` in VS Code and your notebook kernel. These commands install the current data workflow; all project pins are in [requirements.txt](requirements.txt), which needs neither Git nor GitHub. Timestral is optional and not on PyPI: `python -m pip install -r requirements-timestral.txt` adds it from its pinned GitHub commit, which requires Git ([details](docs/methodology.md#installation-et-utilisation)).
 
 ## 2. Download data
 
@@ -74,6 +74,14 @@ python -m traffic_prediction.data.build --start 2024-01-01 --end 2025-12-31
 **A build replaces each annual file it covers.** Use the update command below to preserve existing history. Use `--output-dir PATH` for experiments.
 
 To include a recent download, add `--recent-file "data/raw/recent/YOUR_SNAPSHOT.jsonl"`; repeat the option for multiple files. See [processing rules](docs/methodology.md#contrat-de-données) for timestamps, missing values, and overlap handling.
+
+Once traffic, calendar, weather and disruptions are processed, assemble the modelling inputs:
+
+```powershell
+python -m traffic_prediction.data.build --dataset --end 2026-10-30
+```
+
+Writes `dataset.parquet`, `covariates.parquet`, and `_manifest.json` under `data/processed/dataset/`. Read each Parquet separately. [Columns and reproducibility](docs/methodology.md#table-de-modélisation-issue-22).
 
 ## 4. Refresh data without rebuilding history
 
@@ -156,6 +164,7 @@ print(result.summary)
 
 Replace `HolidayAwarePreviousWeekBaseline()` with any model implementing `predict(history, target_times)`.
 `PreviousWeekModel` is only the internal reference for `normalized_score`, not a model to score: it has no fallback for sensor outages.
+Chronos-2 (#19) is `Chronos2Forecaster()` in `models/chronos.py`; it needs `torch`, `chronos-forecasting` and the pretrained weights (478 MB, download once): [installation, offline use and results](docs/methodology.md#chronos-2-issue-19).
 The eight configured Thursday cutoffs produce Saturday–Wednesday forecasts after a Friday gap.
 Results contain per-window/arc scores (`scores`), means by arc (`per_arc`), and overall means
 (`summary`), including atypical days, coverage counts, and ratios to the previous-week baseline.
@@ -163,7 +172,77 @@ Each successful call appends a run to `docs/experiments.csv`; use `experiments_p
 skip logging. Data is read only from existing local Parquet files; no download is triggered.
 [Model contract, metric definitions, and limitations](docs/methodology.md#backtest-issue-15).
 
-## 9. Generate the final submission (issue #18)
+### Review saved model results
+
+Open [05_model_experiments.ipynb](notebooks/05_model_experiments.ipynb). It starts with LightGBM's raw-flow report: settings, evaluation dates, errors, coverage, feature importance, fallbacks, and an observed-versus-forecast plot when local data is available.
+
+Change `MODEL_RUN` to select another recorded model, such as `timestral_5m_calendar_multivariate`. `SHOW_COMPARISONS = True` displays the 18 saved runs; `RERUN_MODEL = True` runs only the selected model again. Both switches default to `False`.
+
+To evaluate the same configuration directly in Python:
+
+```python
+from traffic_prediction.models.timestral import TimestralForecaster
+
+model = TimestralForecaster(multivariate=True)  # Defaults since #44: 209M, 32,768 h context, calendar, joint targets.
+result = backtest(model, data, description=model.describe())
+```
+
+Use `calendar_covariates=()` for history only, `multivariate=False` for separate flow/occupancy series, or `model_size="5M", context_hours=8192` for the #20 setting; `scripts/run_timestral_44.py` reruns the #44 comparisons. Install the pinned Timestral package and PyTorch first; [installation, results, and limitations](docs/methodology.md#timestral-issue-20). The final submission model remains a team decision in #32.
+
+The notebook's scores remain readable without local data or weights. Fresh runs save hourly predictions locally for ensemble work; plots are exported under `outputs/figures/`.
+
+## 9. Build features for tabular models (issue #30)
+
+```python
+import pandas as pd
+from traffic_prediction.data.build import DEFAULT_DATASET_DIR
+from traffic_prediction.evaluate import target_window
+from traffic_prediction.features import TabularFeatures
+
+data = pd.read_parquet(DEFAULT_DATASET_DIR / "dataset.parquet")
+covariates = pd.read_parquet(DEFAULT_DATASET_DIR / "covariates.parquet")
+cutoff = pd.Timestamp("2026-10-22 23:00")
+builder = TabularFeatures().fit(data, cutoff=cutoff)
+rows = pd.MultiIndex.from_product(
+    [builder.arcs_, target_window(cutoff.normalize())], names=["arc", "datetime"]
+).to_frame(index=False)
+table = builder.transform(rows, covariates)
+X = table[builder.feature_columns]  # Categorical arc + numeric features; no datetime or labels.
+print(X.shape, table.head())
+```
+
+Produces 27 inputs: cyclical time/calendar features, 7/14/21/28-day traffic lags,
+historical profiles, and weather from seven days earlier. Missing values stay `NaN`.
+Refit at every backtest cutoff. The same `transform` builds training features;
+training profiles exclude the preceding seven days. Target-hour weather requires
+verified issuance timestamps via `weather="known"`; the current dataset lacks these.
+[Training example, columns, and availability rules](docs/methodology.md#variables-tabulaires-issue-30).
+### Train and evaluate LightGBM (issue #31)
+
+```powershell
+python -m pip install lightgbm==4.7.0 scikit-learn==1.7.2
+```
+
+```python
+import pandas as pd
+from traffic_prediction.data.build import DEFAULT_DATASET_DIR
+from traffic_prediction.evaluate import backtest
+from traffic_prediction.train import LightGBMForecaster
+
+data = pd.read_parquet(DEFAULT_DATASET_DIR / "dataset.parquet")
+covariates = pd.read_parquet(DEFAULT_DATASET_DIR / "covariates.parquet")
+model = LightGBMForecaster(covariates)  # One global regressor per target; raw flow by default.
+result = backtest(model, data, description=model.describe())
+print(result.summary)
+```
+
+Use `log_flow=True` to test the log target, or settings from `LIGHTGBM_RUNS` in
+`train.py`. Every call refits on cutoff-limited history; arcs with insufficient
+recent measurements use the explicit holiday-aware fallback. The notebook can
+rerun each configuration and save its forecasts and feature importance.
+[Six-run comparison, retained artifacts, and limitations](docs/methodology.md#lightgbm-issue-31).
+
+## 10. Generate the final submission (issue #18)
 
 ```powershell
 python -m traffic_prediction.predict --team-name your_team
