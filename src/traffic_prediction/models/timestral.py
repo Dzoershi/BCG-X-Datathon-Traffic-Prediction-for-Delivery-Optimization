@@ -7,7 +7,7 @@ Neither torch nor the upstream timestral package is imported until inference.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 import numpy as np
@@ -17,8 +17,8 @@ from traffic_prediction.data.traffic import REPO_ROOT
 from traffic_prediction.evaluate import KEYS, TARGETS, _check_frame
 from traffic_prediction.models.baselines import DEFAULT_CALENDAR, HolidayAwarePreviousWeekBaseline
 from traffic_prediction.models.chronos import (
-    CALENDAR_COVARIATES, MIN_RECENT_OK_HOURS, SEED, calendar_features,
-    context_values, forecast_horizon, has_recent_history,
+    CALENDAR_COVARIATES, DAY_KINDS, MIN_RECENT_OK_HOURS, SEED, calendar_features,
+    context_values, day_kinds, forecast_horizon, has_recent_history,
 )
 
 SOURCE_REVISION = "a534bdbd244d64f3d9d743f46c7bf6fc330ed4ff"
@@ -29,24 +29,51 @@ MODEL_REVISIONS = {
     "209M": "9874d252ab0aae16f7f7c999f98f98d6ad7d8365",
 }
 MAX_CONTEXT_HOURS = 32768
-DEFAULT_CONTEXT_HOURS = 8192  # Match the first Chronos-2 comparisons.
+# Retained in #44: the whole history fits at the final cutoff (24,960 h), with both previous 11/11.
+DEFAULT_CONTEXT_HOURS = MAX_CONTEXT_HOURS
+DEFAULT_MODEL_SIZE = "209M"  # Best #44 backtest; the gain comes from public holidays.
+# The checkpoints' 21 native levels: a selected level is read as is, without interpolation.
+QUANTILE_LEVELS = (0.01, *(round(0.05 * k, 2) for k in range(1, 20)), 0.99)
+
+
+def _levels_by_kind(point_by_day_type: Mapping[str, Any] | None) -> dict[str, dict[str, float]]:
+    """``{kind: level}`` or ``{kind: {variable: level}}`` -> one level per kind and variable."""
+    by_kind = {}
+    for kind, level in dict(point_by_day_type or {}).items():
+        by_kind[kind] = dict(level) if isinstance(level, Mapping) else dict.fromkeys(TARGETS, level)
+    if (set(by_kind) - set(DAY_KINDS)
+            or any(set(levels) - set(TARGETS) for levels in by_kind.values())
+            or any(level not in QUANTILE_LEVELS for levels in by_kind.values() for level in levels.values())):
+        raise ValueError(f"point_by_day_type maps {DAY_KINDS} to quantiles among {QUANTILE_LEVELS}, "
+                         f"optionally per variable {TARGETS}")
+    return by_kind
 
 
 class TimestralForecaster:
-    """Forecast flow and occupancy, independently by default, with a pinned checkpoint.
+    """Forecast flow and occupancy with a pinned checkpoint.
 
+    The defaults are the configuration retained in #44: 209M, a 32,768-hour context,
+    both variables forecast jointly within each arc, calendar covariates, the median;
+    ``TimestralForecaster(calendar)`` is what a submission needs. Earlier runs keep
+    their meaning by stating ``model_size``, ``context_hours`` and ``multivariate``.
     ``calendar_covariates=()`` selects the history-only experiment; otherwise the
     selected calendar columns cover both context and the full forecast horizon.
-    ``multivariate=True`` forecasts both variables jointly within each arc.
+    ``multivariate=False`` forecasts each variable as its own series.
+    The point forecast is the median; ``point_by_day_type`` takes one native
+    quantile per day kind instead, for both variables (``{"weekend": 0.3}``) or
+    per variable (``{"ferie": {"debit_horaire": 0.4, "taux_occupation": 0.6}}``);
+    kinds left out keep the median.
     ``pipeline`` injects an upstream-compatible backend for offline tests.
-    ``sources_`` identifies model/fallback hours after every call.
+    ``sources_`` identifies model/fallback hours after every call, and
+    ``raw_forecast_`` the native quantiles of the Timestral arcs over the whole
+    horizon (``None`` when every arc takes the fallback).
     """
 
     def __init__(
-        self, calendar: pd.DataFrame | None = None, *, model_size: str = "5M",
+        self, calendar: pd.DataFrame | None = None, *, model_size: str = DEFAULT_MODEL_SIZE,
         calendar_covariates: Sequence[str] = CALENDAR_COVARIATES,
-        context_hours: int = DEFAULT_CONTEXT_HOURS, multivariate: bool = False,
-        pipeline: Any = None,
+        context_hours: int = DEFAULT_CONTEXT_HOURS, multivariate: bool = True,
+        point_by_day_type: Mapping[str, Any] | None = None, pipeline: Any = None,
     ) -> None:
         if model_size not in MODEL_REVISIONS:
             raise ValueError(f"model_size must be one of {tuple(MODEL_REVISIONS)}")
@@ -59,20 +86,24 @@ class TimestralForecaster:
         self.calendar, self.model_size = calendar, model_size
         self.calendar_covariates, self.context_hours = selected, context_hours
         self.multivariate, self.pipeline = multivariate, pipeline
+        self.point_by_day_type = _levels_by_kind(point_by_day_type)
         self.sources_: pd.Series | None = None
+        self.raw_forecast_: pd.DataFrame | None = None
 
     def describe(self) -> str:
         mode = "multivariate" if self.multivariate else "univariate"
+        by_kind = f", quantile by day type {self.point_by_day_type}" if self.point_by_day_type else ""
         return (
             f"Timestral-{self.model_size}@{MODEL_REVISIONS[self.model_size][:8]}, "
             f"source {SOURCE_REVISION[:8]}, context {self.context_hours} h, {mode}, "
-            f"calendar {list(self.calendar_covariates) or 'none'}, median, upstream clampsym defaults; "
+            f"calendar {list(self.calendar_covariates) or 'none'}, median{by_kind}, upstream clampsym defaults; "
             f"HolidayAwarePreviousWeekBaseline fallback if fewer than {MIN_RECENT_OK_HOURS} "
             "ok hours in the retained context's last 28 days"
         )
 
     def predict(self, history: pd.DataFrame, target_times: pd.DatetimeIndex) -> pd.DataFrame:
         self.sources_ = None
+        self.raw_forecast_ = None  # Stays None when every arc takes the fallback.
         _check_frame(history, [*KEYS, *TARGETS, "role", "qualite_mesure"], "history")
         if (not isinstance(target_times, pd.DatetimeIndex) or target_times.empty
                 or target_times.tz is not None or target_times.hasnans
@@ -127,13 +158,28 @@ class TimestralForecaster:
             context, prediction_length=len(horizon), known_covariates=known,
             symmetric_averaging=True, clip_nonnegative=True,
         )
-        median = forecast.median.detach().cpu().numpy()
-        expected = (len(context), 2 if self.multivariate else 1, len(horizon))
-        if median.shape != expected or not np.isfinite(median).all():
-            raise ValueError(f"Timestral returned invalid median forecasts; expected shape {expected}")
-        median = median.reshape(len(arcs), 2, len(horizon)).transpose(0, 2, 1)
+        levels = tuple(float(level) for level in forecast.quantile_levels)
+        quantiles = forecast.quantiles.detach().cpu().numpy()
+        expected = (len(context), 2 if self.multivariate else 1, len(horizon), len(levels))
+        if 0.5 not in levels or quantiles.shape != expected or not np.isfinite(quantiles).all():
+            raise ValueError(f"Timestral returned invalid median/quantile forecasts; expected shape {expected}")
+        # (arc, hour, variable, level), whatever the tensor layout.
+        quantiles = quantiles.reshape(len(arcs), 2, len(horizon), len(levels)).transpose(0, 2, 1, 3)
+        point = quantiles[..., levels.index(0.5)].copy()
+        if self.point_by_day_type:
+            kinds = day_kinds(horizon, self._calendar())
+            for kind, chosen in self.point_by_day_type.items():
+                for position, variable in enumerate(TARGETS):
+                    if chosen[variable] not in levels:
+                        raise ValueError(f"Quantile {chosen[variable]} is not a level of this checkpoint")
+                    point[:, kinds == kind, position] = quantiles[:, kinds == kind, position,
+                                                                  levels.index(chosen[variable])]
+        self.raw_forecast_ = pd.DataFrame(
+            quantiles.reshape(-1, len(levels)), columns=[str(level) for level in levels],
+            index=pd.MultiIndex.from_product([arcs, horizon, TARGETS], names=[*KEYS, "variable"]),
+        ).reset_index()
         index = pd.MultiIndex.from_product([arcs, horizon], names=KEYS)
-        return pd.DataFrame(median.reshape(-1, 2), index=index, columns=TARGETS)
+        return pd.DataFrame(point.reshape(-1, 2), index=index, columns=TARGETS)
 
     def _calendar(self) -> pd.DataFrame:
         if self.calendar is None:

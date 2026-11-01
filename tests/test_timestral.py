@@ -13,7 +13,7 @@ from traffic_prediction.data.calendar_events import calendar_table
 from traffic_prediction.evaluate import KEYS, TARGETS, backtest, target_window
 from traffic_prediction.models.baselines import HolidayAwarePreviousWeekBaseline
 from traffic_prediction.models.chronos import CALENDAR_COVARIATES, calendar_features
-from traffic_prediction.models.timestral import MODEL_REVISIONS, TimestralForecaster
+from traffic_prediction.models.timestral import MODEL_REVISIONS, QUANTILE_LEVELS, TimestralForecaster
 
 CUTOFF = pd.Timestamp("2025-11-06")
 LAST = CUTOFF + pd.Timedelta(hours=23)
@@ -36,8 +36,10 @@ class ArrayTensor:
 
 
 class FakePipeline:
-    def __init__(self, steps=False, invalid=None):
-        self.calls, self.steps, self.invalid = [], steps, invalid
+    """Median = context mean; each native level adds ``spread * (level - 0.5)``."""
+
+    def __init__(self, steps=False, invalid=None, spread=0.0):
+        self.calls, self.steps, self.invalid, self.spread = [], steps, invalid, spread
 
     def forecast(self, context, prediction_length, known_covariates=None, **options):
         self.calls.append((context.copy(), None if known_covariates is None else known_covariates.copy(),
@@ -49,7 +51,9 @@ class FakePipeline:
             median = median[..., :-1]
         elif self.invalid is not None:
             median[..., 0] = self.invalid
-        return SimpleNamespace(median=ArrayTensor(median))
+        offsets = self.spread * (np.array(QUANTILE_LEVELS) - 0.5)
+        return SimpleNamespace(quantiles=ArrayTensor(median[..., None] + offsets),
+                               quantile_levels=QUANTILE_LEVELS)
 
 
 @pytest.fixture(scope="module")
@@ -114,7 +118,8 @@ def test_missing_and_non_ok_values_stay_masked_on_a_bounded_grid(data, calendar)
     past.loc[past.arc.eq("A") & past.datetime.eq(partial), "qualite_mesure"] = "partielle"
     past = past.loc[~(past.arc.eq("A") & past.datetime.eq(absent))]
     pipeline = FakePipeline()
-    TimestralForecaster(calendar, pipeline=pipeline, context_hours=240).predict(past, target_window(CUTOFF))
+    TimestralForecaster(calendar, pipeline=pipeline, context_hours=240,
+                        multivariate=False).predict(past, target_window(CUTOFF))
     context, known, _, _ = pipeline.calls[0]
     assert context.shape == (4, 1, 240)
     assert np.isnan(context[:2, :, -7]).all() and np.isnan(context[:2, :, -11]).all()
@@ -141,7 +146,7 @@ def test_outage_fallback_is_explicit_and_matches_baseline(data, calendar):
     model = TimestralForecaster(calendar, pipeline=pipeline)
     actual = model.predict(past, target_window(CUTOFF)).set_index(KEYS)
     expected = HolidayAwarePreviousWeekBaseline(calendar).predict(past, target_window(CUTOFF)).set_index(KEYS)
-    assert pipeline.calls[0][0].shape[0] == 2  # Only A's two variables reach Timestral.
+    assert pipeline.calls[0][0].shape[:2] == (1, 2)  # Only A reaches Timestral, both variables jointly.
     assert model.sources_.loc["A"].eq("timestral").all()
     assert model.sources_.loc["B"].str.startswith("fallback_").all()
     pd.testing.assert_frame_equal(actual.loc["B"], expected.loc["B"])
@@ -191,16 +196,41 @@ def test_clips_finite_forecasts_to_submission_bounds(data, calendar):
     class Extreme(FakePipeline):
         def forecast(self, context, **options):
             result = super().forecast(context, **options)
-            result.median.array[:] = -50
-            result.median.array[1::2] = 150
+            result.quantiles.array[:] = -50
+            result.quantiles.array[:, 1] = 150  # Occupancy, second variable of each arc.
             return result
     actual = TimestralForecaster(calendar, pipeline=Extreme()).predict(history(data), target_window(CUTOFF))
     assert actual.debit_horaire.eq(0).all() and actual.taux_occupation.eq(100).all()
 
 
+def test_point_by_day_type_takes_one_quantile_per_day_kind_and_variable(data, calendar):
+    """Window: Sat 8 and Sun 9 (weekend), Mon 10 and Wed 12 (working days), Tue 11 November (holiday)."""
+    data.loc[data.arc.eq("B"), "qualite_mesure"] = "vide"  # B takes the fallback.
+    past, times = history(data), target_window(CUTOFF)
+    median = TimestralForecaster(calendar, pipeline=FakePipeline(spread=10.0)).predict(past, times)
+    model = TimestralForecaster(calendar, pipeline=FakePipeline(spread=10.0), point_by_day_type={
+        "weekend": 0.2, "ferie": {"debit_horaire": 0.1, "taux_occupation": 0.9}})
+    by_kind = model.predict(past, times)
+    shift = (by_kind[list(TARGETS)] - median[list(TARGETS)]).set_index(
+        median["arc"] + " " + median["datetime"].dt.strftime("%a"))
+    # The fake adds 10 * (level - 0.5): -3 at 0.2, -4 at 0.1, +4 at 0.9, nothing at the median.
+    expected = {"Sat": (-3, -3), "Sun": (-3, -3), "Mon": (0, 0), "Tue": (-4, 4), "Wed": (0, 0)}
+    for day, values in expected.items():
+        np.testing.assert_allclose(shift.loc[f"A {day}"], np.broadcast_to(values, (24, 2)))
+        np.testing.assert_allclose(shift.loc[f"B {day}"], 0.0)  # Fallback hours are untouched.
+    raw = model.raw_forecast_  # Native quantiles of A only, Friday gap included.
+    assert list(raw.columns) == [*KEYS, "variable", *map(str, QUANTILE_LEVELS)]
+    assert set(raw.arc) == {"A"} and len(raw) == 144 * 2
+    medians = raw.loc[raw.datetime.isin(times)].pivot(index="datetime", columns="variable", values="0.5")
+    np.testing.assert_allclose(medians[list(TARGETS)], median.loc[median.arc.eq("A"), list(TARGETS)])
+    assert "quantile by day type" in model.describe()
+
+
 @pytest.mark.parametrize("options", [{"context_hours": 0}, {"context_hours": 32769},
     {"context_hours": True}, {"context_hours": 168.5}, {"model_size": "unknown"},
-    {"calendar_covariates": ("debit_horaire",)}, {"calendar_covariates": ("day_type", "day_type")}])
+    {"calendar_covariates": ("debit_horaire",)}, {"calendar_covariates": ("day_type", "day_type")},
+    {"point_by_day_type": {"dimanche": 0.2}}, {"point_by_day_type": {"weekend": 0.33}},
+    {"point_by_day_type": {"ferie": {"vitesse": 0.2}}}])
 def test_invalid_settings(options):
     with pytest.raises(ValueError):
         TimestralForecaster(**options)
@@ -238,7 +268,14 @@ def test_native_loader_pins_weights_and_caches_backend(monkeypatch):
     args, options = calls[0]
     assert args == ("mistralai/Timestral-28M",)
     assert options["revision"] == MODEL_REVISIONS["28M"] and options["device"] == "cpu"
-    assert options["max_context"] == 8192
+    assert options["max_context"] == 32768
+
+
+def test_defaults_are_the_configuration_retained_in_issue_44():
+    model = TimestralForecaster()
+    assert (model.model_size, model.context_hours, model.multivariate) == ("209M", 32768, True)
+    assert model.calendar_covariates == CALENDAR_COVARIATES and model.point_by_day_type == {}
+    assert "Timestral-209M@9874d252" in model.describe() and "context 32768 h, multivariate" in model.describe()
 
 
 def test_model_integrates_with_the_official_submission_builder(data):

@@ -17,7 +17,7 @@ python -m pip install numpy==2.2.6 pandas==2.3.3 pyarrow==25.0.1 `
 python -m pip install stream-unzip==0.0.100 stream-inflate==0.0.43 pycryptodome==4.2.0
 ```
 
-Use Python 3.10–3.13; development is tested on 3.12. Select `.venv` in VS Code and your notebook kernel. These commands install the current data workflow; all project pins are in [requirements.txt](requirements.txt).
+Use Python 3.10–3.13; development is tested on 3.12. Select `.venv` in VS Code and your notebook kernel. These commands install the current data workflow; all project pins are in [requirements.txt](requirements.txt), which needs neither Git nor GitHub. Timestral is optional and not on PyPI: `python -m pip install -r requirements-timestral.txt` adds it from its pinned GitHub commit, which requires Git ([details](docs/methodology.md#installation-et-utilisation)).
 
 ## 2. Download data
 
@@ -169,11 +169,11 @@ To evaluate the same configuration directly in Python:
 ```python
 from traffic_prediction.models.timestral import TimestralForecaster
 
-model = TimestralForecaster(multivariate=True)  # 5M, calendar, joint targets.
+model = TimestralForecaster(multivariate=True)  # Defaults since #44: 209M, 32,768 h context, calendar, joint targets.
 result = backtest(model, data, description=model.describe())
 ```
 
-Use `calendar_covariates=()` for history only, `multivariate=True` for joint flow/occupancy, or `model_size="28M"` for the larger checkpoint. Install the pinned Timestral package and PyTorch first; [installation, results, and limitations](docs/methodology.md#timestral-issue-20). The final submission model remains a team decision in #32.
+Use `calendar_covariates=()` for history only, `multivariate=False` for separate flow/occupancy series, or `model_size="5M", context_hours=8192` for the #20 setting; `scripts/run_timestral_44.py` reruns the #44 comparisons. Install the pinned Timestral package and PyTorch first; [installation, results, and limitations](docs/methodology.md#timestral-issue-20). The final submission model remains a team decision in #32.
 
 The notebook's scores remain readable without local data or weights. Fresh runs save hourly predictions locally for ensemble work; plots are exported under `outputs/figures/`.
 
