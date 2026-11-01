@@ -93,17 +93,20 @@ def test_pipeline_roundtrip_reproducible_and_no_network(local_data, monkeypatch,
     assert list(path.parent.iterdir()) == [path]
 
 
-def test_refresh_precedes_read_and_uses_submission_cutoff(local_data, monkeypatch):
+@pytest.mark.parametrize("cutoff_day", ["2026-11-05", "2026-11-04"])
+def test_refresh_precedes_read_and_uses_submission_cutoff(local_data, monkeypatch, cutoff_day):
+    monkeypatch.setattr(predict, "CUTOFF", pd.Timestamp(f"{cutoff_day} 23:00"))
     calls = []
     original_query = predict.query.query_traffic
 
     def refresh(start, end, **kwargs):
         calls.append("refresh")
-        assert start == "2026-10-01" and end == "2026-11-05"
+        assert start == "2026-10-01" and end == cutoff_day
         assert kwargs["output_dir"] == local_data["data_dir"]
 
     def query(*args, **kwargs):
         assert calls == ["refresh"]
+        assert args[1] == [predict.CUTOFF]
         calls.append("query")
         return original_query(*args, **kwargs)
 
