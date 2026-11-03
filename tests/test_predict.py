@@ -17,7 +17,9 @@ SCHOOL_PATH = Path(__file__).parent / "fixtures/paris_school_holidays.json"
 
 @pytest.fixture
 def history():
-    times = pd.date_range("2026-10-01", "2026-11-11 23:00", freq="h")
+    # 11/11/2025 is the reference day of the Champs-Elysées ceremony closure (#47).
+    times = pd.date_range("2025-11-11", "2025-11-11 23:00", freq="h").append(
+        pd.date_range("2026-10-01", "2026-11-11 23:00", freq="h"))
     return pd.concat([
         pd.DataFrame(dict(arc=arc, datetime=times, role="evalue", qualite_mesure="ok",
                           debit_horaire=100.0 + times.hour, taux_occupation=10.0))
@@ -196,10 +198,9 @@ def test_export_failure_keeps_existing_file_and_cleans_temporary(local_data, mon
 
 def test_missing_arc_rejected(local_data):
     root = local_data["data_dir"]
-    partition = next(root.rglob("*.parquet"))
-    table = pd.read_parquet(partition)
-    table = table[table.arc.ne(SUBMISSION_ARCS[0])]
-    build.write_partitions(table, root)
+    for partition in list(root.rglob("*.parquet")):  # One partition per year.
+        table = pd.read_parquet(partition)
+        build.write_partitions(table[table.arc.ne(SUBMISSION_ARCS[0])], root)
     with pytest.raises(ValueError, match="all three"):
         predict.run_submission("team", skip_update=True, **local_data)
     assert not local_data["output_dir"].exists()

@@ -14,10 +14,11 @@ import numpy as np
 import pandas as pd
 
 from traffic_prediction.constants import CUTOFF, SUBMISSION_DECIMALS, TARGET_TIMES
-from traffic_prediction.data import calendar_events, query, traffic, update, weather
+from traffic_prediction.data import calendar_events, disruptions, query, traffic, update, weather
 from traffic_prediction.data.build import DEFAULT_DATASET_DIR
 from traffic_prediction.data.validate import SUBMISSION_ARCS, SUBMISSION_COLUMNS, validate_submission
 from traffic_prediction.models.base import ForecastModel
+from traffic_prediction.models.postprocess import copy_closures_from_previous_year
 from traffic_prediction.submission_format import test_format_and_export_output
 from traffic_prediction.models.baselines import (
     DayTypeProfileBaseline, FourWeekMeanBaseline, HolidayAwarePreviousWeekBaseline,
@@ -65,11 +66,14 @@ MODELS = {
 SEED = 42
 
 
-def build_submission(history: pd.DataFrame, model: ForecastModel) -> pd.DataFrame:
+def build_submission(history: pd.DataFrame, model: ForecastModel,
+                     events: pd.DataFrame | None = None) -> pd.DataFrame:
     """Fit the chosen model on cutoff-limited data and enforce the export contract.
 
     Model.predict fits the existing baselines and constructs their lag/profile
     features. Preserve local end-of-hour labels pending organizer clarification.
+    With `events` (data/raw/events_manual.csv), ceremony closures are copied from the
+    previous year before clipping and rounding (#47); `model.sources_` marks those hours.
     """
     random.seed(SEED)
     np.random.seed(SEED)
@@ -77,6 +81,13 @@ def build_submission(history: pd.DataFrame, model: ForecastModel) -> pd.DataFram
     if history.empty:
         raise ValueError("No traffic history at or before the submission cutoff.")
     table = model.predict(history, TARGET_TIMES.copy())[SUBMISSION_COLUMNS].copy()
+    if events is not None:
+        replaced = copy_closures_from_previous_year(table, history, events)
+        sources = getattr(model, "sources_", None)
+        if isinstance(sources, pd.Series) and len(replaced):
+            sources = sources.astype(object)
+            sources.loc[replaced] = [f"closure_copy_{time.year - 1}" for _, time in replaced]
+            model.sources_ = sources
     table["datetime"] = table["datetime"].dt.strftime("%Y-%m-%d %H:%M").astype(object)
     table["arc"] = table["arc"].astype(object)
     for column, upper in [("debit_horaire", None), ("taux_occupation", 100)]:
@@ -117,6 +128,7 @@ def run_submission(
     config_path: str | Path = traffic.DEFAULT_CONFIG,
     raw_dir: str | Path = traffic.REPO_ROOT / "data/raw/recent",
     school_holidays_path: str | Path = calendar_events.DEFAULT_SCHOOL_PATH,
+    events_path: str | Path = disruptions.DEFAULT_EVENTS_PATH,
     skip_update: bool = False, update_start: str | None = None,
     model_name: str = "holiday-aware",
 ) -> Path:
@@ -151,6 +163,7 @@ def run_submission(
     calendar = calendar_events.calendar_table(
         history["datetime"].min().normalize(), school_holidays_path=school_holidays_path,
     )
+    events = disruptions.read_events(events_path, list(SUBMISSION_ARCS))
     if model_name == "ensemble":
         # LightGBM learns from the holiday flag and weather of past hours, as in the backtest dataset.
         covariates = load_covariates()
@@ -161,7 +174,7 @@ def run_submission(
         model = e5_ensemble(calendar, covariates)
     else:
         model = MODELS[model_name](calendar)
-    table = build_submission(history, model)
+    table = build_submission(history, model, events)
     return export_submission(table, team_name, output_dir)
 
 
@@ -175,6 +188,8 @@ def main() -> None:
     parser.add_argument("--config", type=Path, default=traffic.DEFAULT_CONFIG)
     parser.add_argument("--raw-dir", type=Path, default=traffic.REPO_ROOT / "data/raw/recent")
     parser.add_argument("--school-holidays-file", type=Path, default=calendar_events.DEFAULT_SCHOOL_PATH)
+    parser.add_argument("--events-file", type=Path, default=disruptions.DEFAULT_EVENTS_PATH,
+                        help="Hand-checked events; ceremony closures are copied from the previous year (#47).")
     parser.add_argument("--skip-update", action="store_true", help="Use frozen local data without network access.")
     parser.add_argument("--update-start", help="First inclusive refresh date; required when bootstrapping recent data.")
     args = parser.parse_args()
@@ -184,7 +199,8 @@ def main() -> None:
         path = run_submission(
             args.team_name, data_dir=args.data_dir, output_dir=args.output_dir,
             config_path=args.config, raw_dir=args.raw_dir,
-            school_holidays_path=args.school_holidays_file, skip_update=args.skip_update,
+            school_holidays_path=args.school_holidays_file, events_path=args.events_file,
+            skip_update=args.skip_update,
             update_start=args.update_start, model_name=args.model,
         )
     except (OSError, ValueError, RuntimeError, HTTPException, duckdb.Error) as error:
