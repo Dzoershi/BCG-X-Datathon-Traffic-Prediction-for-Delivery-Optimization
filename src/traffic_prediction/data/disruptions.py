@@ -28,6 +28,7 @@ from urllib.request import Request, urlopen
 import numpy as np
 import pandas as pd
 
+from traffic_prediction.constants import TEST_START  
 from traffic_prediction.data.traffic import REPO_ROOT, Arc, period_bounds
 from traffic_prediction.data.weather import save_raw
 
@@ -46,7 +47,6 @@ PERTURBANTS = "chantiers-perturbants"
 PRIVATE_BUILDING_WORKS = "Tiers (travaux sur bâtiment)"
 ON_ARC_M = 50.0  # About half the width of the Champs-Elysées, facade to facade.
 NEAR_M = 200.0  # Neighbouring junctions.
-TEST_START = "2026-11-07"
 DEFAULT_RAW_DIR = REPO_ROOT / "data" / "raw" / "disruptions"
 DEFAULT_EVENTS_PATH = REPO_ROOT / "data" / "raw" / "events_manual.csv"
 USER_AGENT = "traffic-prediction/0.1"

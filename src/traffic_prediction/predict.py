@@ -13,6 +13,7 @@ import duckdb
 import numpy as np
 import pandas as pd
 
+from traffic_prediction.constants import CUTOFF, SUBMISSION_DECIMALS, TARGET_TIMES
 from traffic_prediction.data import calendar_events, query, traffic, update
 from traffic_prediction.data.validate import SUBMISSION_ARCS, SUBMISSION_COLUMNS, validate_submission
 from traffic_prediction.models.base import ForecastModel
@@ -22,8 +23,6 @@ from traffic_prediction.models.baselines import (
     PreviousWeekBaseline,
 )
 
-CUTOFF = pd.Timestamp("2026-11-05 23:00")
-TARGET_TIMES = pd.date_range("2026-11-07", "2026-11-11 23:00", freq="h")
 DEFAULT_OUTPUT_DIR = traffic.REPO_ROOT / "outputs/submissions"
 MODELS = {
     "holiday-aware": HolidayAwarePreviousWeekBaseline,
@@ -52,7 +51,8 @@ def build_submission(history: pd.DataFrame, model: ForecastModel) -> pd.DataFram
         values = table[column].astype(float)
         if not np.isfinite(values).all():
             raise ValueError(f"Non-finite predictions for {column}.")
-        table[column] = values.clip(lower=0, upper=upper)
+        # Round after clipping so that bounds stay exact; 15 decimals carry no information.
+        table[column] = values.clip(lower=0, upper=upper).round(SUBMISSION_DECIMALS)
     validate_submission(table)
     return table.sort_values(["arc", "datetime"], kind="stable").reset_index(drop=True)
 

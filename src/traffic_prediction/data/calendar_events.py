@@ -10,6 +10,7 @@ from urllib.request import urlopen
 import holidays
 import pandas as pd
 
+from traffic_prediction.constants import PREDICTION_END  # noqa: F401 (re-exported for build and weather)
 from traffic_prediction.data.traffic import PARIS_TZ, REPO_ROOT
 
 SCHOOL_RECORDS_URL = (
@@ -17,7 +18,6 @@ SCHOOL_RECORDS_URL = (
     "fr-en-calendrier-scolaire/records"
 )
 DEFAULT_SCHOOL_PATH = REPO_ROOT / "data/raw/calendar/paris_school_holidays.json"
-PREDICTION_END = "2026-11-11"
 CALENDAR_COLUMNS = [
     "datetime", "hour", "day_of_week", "is_weekend", "is_holiday",
     "is_day_before_holiday", "is_day_after_holiday", "is_bridge",
