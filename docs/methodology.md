@@ -1373,6 +1373,53 @@ L'audit indépendant recalcule **1 728 enregistrements de score à partir de 51 
 
 La suite locale complète passe : **644 tests et 27 sous-tests**, dont 29 tests #31. Ils couvrent les deux modèles globaux, les catégories, les labels et leur transformation, la séparation temporelle dans le backtest, les états remis à zéro, les entrées invalides, les débordements, les limites physiques, le repli et la reproductibilité LightGBM native. Un test intègre le modèle au constructeur de rendu officiel et vérifie les **360 lignes du 7 au 11 novembre 2026**. La CI installe les deux dépendances de modélisation déjà épinglées pour exécuter également le test natif sous Windows/Linux et Python 3.10/3.13. Le rendu opérationnel avec les dernières observations reste à effectuer avant la date du brief.
 
+## Ensemble et choix final (issue #32)
+
+**Modèle rendu : E5**, moyenne pondérée de trois modèles déjà mesurés, avec des poids par variable et par type de jour : `HolidayAwarePreviousWeekBaseline` (#17), Timestral-5M multivarié avec calendrier et contexte de 32 768 h (#44), LightGBM brut (#31). [`models/ensemble.py`](../src/traffic_prediction/models/ensemble.py) définit `WeightedEnsemble` et les poids figés `E5_WEIGHTS` ; `predict.e5_ensemble` assemble les membres avec leurs réglages retenus.
+
+| Variable | Ouvrés | Week-ends | Fériés |
+|---|---|---|---|
+| Débit | 0,9 Timestral-5M + 0,1 LightGBM | 0,5 baseline + 0,2 Timestral-5M + 0,3 LightGBM | 1,0 LightGBM |
+| Occupation | 0,1 baseline + 0,9 Timestral-5M | 0,6 baseline + 0,4 Timestral-5M | 0,8 baseline + 0,2 Timestral-5M |
+
+### Méthode et scores
+
+Les combinaisons sont évaluées sans réentraîner de modèle, à partir des prévisions horaires des huit fenêtres. [`scripts/run_local_backtests.py`](../scripts/run_local_backtests.py) rejoue chaque modèle et journalise ses réglages ; [`scripts/evaluate_combinations.py`](../scripts/evaluate_combinations.py) écrit **toutes les stratégies testées** dans [`ensemble_results.md`](ensemble_results.md) et [`ensemble_results.csv`](ensemble_results.csv) : modèles seuls, règles C1 à C5, ensembles E1 à E6, paires, choix par type de jour.
+
+Les poids sont choisis sur une grille de pas 0,1 summant à 1, séparément par variable et par type de jour, en *leave-one-window-out* : pour chaque fenêtre, les poids qui minimisent l'erreur des sept autres lui sont appliqués. Le score obtenu ne contient donc aucune heure ayant servi au choix. Les poids rendus sont ensuite choisis sur les huit fenêtres. RMSE poolée Convention + Saint-Pères, 994 heures notées.
+
+| Stratégie | Débit | Occupation | Lecture |
+|---|---:|---:|---|
+| Baseline holiday-aware (#17) | 97,46 | 2,04 | Référence |
+| Timestral-209M seul (#44) | 91,98 | 1,73 | Meilleur modèle seul en occupation |
+| LightGBM brut seul (#31) | 89,06 | 2,05 | Meilleur modèle seul en débit |
+| C3 choisie honnêtement (un modèle par type de jour) | 92,19 | 1,76 | Le 87,4 de C3 venait du choix sur ces mêmes fenêtres |
+| Paire baseline + LightGBM | **87,74** | 1,87 | Meilleure en débit, faible en occupation |
+| E1 : baseline + Timestral-5M + Timestral-209M | 88,45 | **1,70** | Meilleure en occupation, exige le 209M |
+| **E5 : baseline + Timestral-5M + LightGBM** | 88,02 | 1,71 | **Retenu** |
+| Ensemble choisi par type de jour parmi E1 à E6 (validation imbriquée) | 89,71 | 1,70 | Plus de choix, plus d'ajustement au hasard des fenêtres |
+
+E5 bat la baseline sur 7 fenêtres sur 8 en débit et 6 sur 8 en occupation ; un bootstrap des fenêtres donne un écart de [−12,9 ; −5,5] véh/h et [−0,47 ; −0,17] point, deux intervalles qui excluent zéro. Ses écarts avec la paire baseline + LightGBM ([−4,1 ; +4,9]) et avec E1 restent dans le bruit, tout comme son avance sur Timestral-209M seul ([−10,7 ; +3,8]). **Raisons du choix** : quasi optimal sur les deux variables à la fois ; il évite Timestral-209M (environ 4 à 8 min et 799 Mo de poids sur CPU) ; le backtest de la classe de production retrouve exactement la recombinaison des prévisions sauvegardées (84,20 / 1,64 avec les poids figés, score optimiste puisque mesuré sur les fenêtres du choix).
+
+### Stabilité et réserves
+
+- **Poids stables** sur les ouvrés et les week-ends (par exemple Timestral-5M entre 0,8 et 1 en débit ouvré), **instables sur les fériés** : 4 fériés, 120 heures ; le poids de LightGBM en débit férié varie de 0,3 à 1 selon la fenêtre écartée. Son avance sur les fériés vient surtout du 1er janvier (voir les [pistes chiffrées](#contexte-long-grandes-tailles-et-quantile-issue-44)), mais il bat aussi la baseline sur les deux 11/11 (58,9 et 61,0 contre 105,5 et 82,8).
+- Choisir l'ensemble lui-même par type de jour (validation imbriquée) fait moins bien que E5 en débit (89,7) : la sélection colle aux fenêtres disponibles.
+- Champs-Élysées : les trois membres prennent le même repli, le profil par type de jour de `HolidayAwarePreviousWeekBaseline` ; l'ensemble n'y change rien. La fermeture du 11/11 n'est pas corrigée ici.
+- Le choix et les poids reposent sur les huit fenêtres du backtest, sans jeu final indépendant.
+
+### Rendu
+
+```bash
+python -m traffic_prediction.data.build --dataset --end 2026-11-05   # covariables de LightGBM, après la météo
+python -m traffic_prediction.predict --team-name <équipe>             # --model ensemble par défaut
+python -m traffic_prediction.predict --team-name <équipe> --model holiday-aware   # plan B sans Timestral ni dataset
+```
+
+L'ensemble exige `requirements-timestral.txt` et le `covariates.parquet` du dataset #22 ; il échoue avec un message explicite sinon. L'historique de rendu reçoit l'indicateur férié du calendrier et la météo passée des covariables, comme dans le dataset du backtest. Une panne d'un membre arrête le rendu au lieu de changer de modèle en silence. Hors ligne, un rendu complet prend environ 12 s sur un Mac M1. **LightGBM tourne sur un seul fil** dans l'ensemble : sur macOS, une fois PyTorch chargé, LightGBM multifil se bloque dans OpenMP (plusieurs copies de `libomp`) ; ses prévisions sont identiques au bit près avec 1 et 4 fils.
+
+[`test_ensemble.py`](../tests/test_ensemble.py) vérifie les poids E5 (complets, positifs, de somme 1), les types de jour de la semaine du rendu, l'application des poids par variable et type de jour, qu'un membre de poids nul ne tourne pas, les poids invalides refusés, des membres incohérents ou en panne, les bornes et le contrat du CSV.
+
 ## Décisions ouvertes
 
 | Point | Comportement ou constat actuel | Prochain arbitrage |
@@ -1383,7 +1430,7 @@ La suite locale complète passe : **644 tests et 27 sous-tests**, dont 29 tests 
 | Période de travail historique | Huit fenêtres de backtest 2024–2026 configurées. | Vérifier la couverture locale ; maintenir la cible officielle de novembre 2026. |
 | Proxies 4272 et 4265 | Candidats configurés, avec fortes lacunes rapportées. | Mesurer leur utilité séparément pour `q` et `k` ; vérifier les autres candidats avant adoption. |
 | `etat_barre` et `etat_trafic` | Champs conservés dans le contrat ; réserves de l'exploration. | Décider des features selon qualité et disponibilité à l'instant de prévision. |
-| Modèles, enrichissements, scores | Backtest, quatre baselines, Chronos-2 et Timestral mesurés. Timestral fournit un compromis utile avec calendrier ; la baseline reste forte les jours atypiques. | #32 : comparer les combinaisons et contrôler leur stabilité ; voir [Timestral](#timestral-issue-20) et [Pistes pour la #32](#pistes-chiffrées-pour-la-32). |
+| Modèles, enrichissements, scores | Backtest, quatre baselines, Chronos-2 et Timestral mesurés. Timestral fournit un compromis utile avec calendrier ; la baseline reste forte les jours atypiques. | Choix fait en #32 : ensemble E5, voir [Ensemble et choix final](#ensemble-et-choix-final-issue-32). Reste : poids des fériés instables (4 fériés). |
 | Météo dans le backtest | Historique Historical Forecast : prévisions à très courte échéance, presque observées. Le gain mesuré grâce à la météo est un plafond. | Backtest strict avec l'API Previous Runs (`*_previous_dayN`) si le temps le permet. |
 | Reproductibilité finale | Bruts conservés et manifeste des fichiers traités disponible ; pas de provenance complète d'un modèle. | Figer le cutoff et toutes les entrées utilisées pour chaque score et pour le rendu. |
 | Validation réelle 2023 | Archive complète téléchargée et CRC vérifiés le 1er novembre ; frontière 2024 récupérée depuis les deux derniers membres. | Transformer l'année entière uniquement si un modèle a besoin de cet historique supplémentaire. |
