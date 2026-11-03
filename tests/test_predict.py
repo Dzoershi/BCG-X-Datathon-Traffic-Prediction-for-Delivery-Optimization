@@ -1,6 +1,8 @@
 """Offline submission tests using synthetic processed traffic only."""
 
 from pathlib import Path
+import hashlib
+import json
 import os
 import sys
 
@@ -102,6 +104,17 @@ def test_pipeline_roundtrip_reproducible_and_no_network(local_data, monkeypatch,
     monkeypatch.setattr(predict.calendar_events, "download_school_holidays", forbidden)
     path = predict.run_submission("test_team", skip_update=True, model_name=model_name, **local_data)
     original = path.read_bytes()
+    log_path = path.with_name(f"{path.stem}_run.json")
+    log = json.loads(log_path.read_text(encoding="utf-8"))
+    assert log["csv_sha256"] == hashlib.sha256(original).hexdigest()
+    assert log["model_choice"] == model_name
+    assert log["cutoff"] == predict.CUTOFF.isoformat()
+    assert log["closure_correction_applied"] is True
+    assert log["runtime_seconds"] >= 0
+    assert len(log["sources"]) == 360
+    assert all(row["source"] is not None for row in log["sources"])
+    assert any(row["source"] == "closure_copy_2025" for row in log["sources"])
+    assert set(log["last_observed_hour_per_arc"].values()) == {predict.CUTOFF.isoformat()}
     assert path.name == "output_test_team.csv"
     assert original.startswith(
         b";arc;datetime;debit_horaire;taux_occupation" + line_ending.encode("ascii")
@@ -110,7 +123,10 @@ def test_pipeline_roundtrip_reproducible_and_no_network(local_data, monkeypatch,
     validate_submission(table)
     predict.run_submission("test_team", skip_update=True, model_name=model_name, **local_data)
     assert path.read_bytes() == original
-    assert list(path.parent.iterdir()) == [path]
+    repeated = json.loads(log_path.read_text(encoding="utf-8"))
+    for field in ("csv_sha256", "traffic_fingerprint", "sources", "model_revisions"):
+        assert repeated[field] == log[field]
+    assert set(path.parent.iterdir()) == {path, path.with_name(f"{path.stem}_run.json")}
 
 
 @pytest.mark.parametrize("cutoff_day", ["2026-11-05", "2026-11-04"])
@@ -193,7 +209,7 @@ def test_export_failure_keeps_existing_file_and_cleans_temporary(local_data, mon
     with pytest.raises(OSError, match="write failed"):
         predict.export_submission(table, "team", path.parent)
     assert path.read_bytes() == original
-    assert list(path.parent.iterdir()) == [path]
+    assert set(path.parent.iterdir()) == {path, path.with_name(f"{path.stem}_run.json")}
 
 
 def test_missing_arc_rejected(local_data):
@@ -222,7 +238,7 @@ def test_organizer_function_checks_object_types_before_publication(local_data):
     with pytest.raises(AssertionError, match="Column arc does not have type"):
         predict.export_submission(table, "team", path.parent)
     assert path.read_bytes() == original
-    assert list(path.parent.iterdir()) == [path]
+    assert set(path.parent.iterdir()) == {path, path.with_name(f"{path.stem}_run.json")}
 
 
 def test_requires_pandas_2_before_refresh(monkeypatch):
@@ -230,3 +246,29 @@ def test_requires_pandas_2_before_refresh(monkeypatch):
     monkeypatch.setattr(predict.update, "update_traffic", lambda *a, **k: pytest.fail("updated"))
     with pytest.raises(ValueError, match="pandas 2.x"):
         predict.run_submission("team")
+
+
+@pytest.mark.parametrize("failure", ["metadata", "write", "replace"])
+def test_run_log_failure_warns_and_keeps_submission(local_data, monkeypatch, capsys, failure):
+    from traffic_prediction import submission_log
+
+    def fail(*args, **kwargs):
+        raise OSError("run log unavailable")
+
+    if failure == "metadata":
+        monkeypatch.setattr(submission_log, "timestral_package", fail)
+    elif failure == "write":
+        monkeypatch.setattr(Path, "write_text", fail)
+    else:
+        original = Path.replace
+
+        def replace(path, target):
+            if str(target).endswith("_run.json"):
+                fail()
+            return original(path, target)
+
+        monkeypatch.setattr(Path, "replace", replace)
+    path = predict.run_submission("team", skip_update=True, **local_data)
+    validate_submission(pd.read_csv(path, sep=";", index_col=0))
+    assert "Warning: submission run log" in capsys.readouterr().err
+    assert list(path.parent.iterdir()) == [path]

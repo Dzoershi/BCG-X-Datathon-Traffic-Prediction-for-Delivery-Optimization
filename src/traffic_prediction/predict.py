@@ -8,6 +8,7 @@ from pathlib import Path
 import random
 import re
 from tempfile import TemporaryDirectory
+import time
 
 import duckdb
 import numpy as np
@@ -20,6 +21,7 @@ from traffic_prediction.data.validate import SUBMISSION_ARCS, SUBMISSION_COLUMNS
 from traffic_prediction.models.base import ForecastModel
 from traffic_prediction.models.postprocess import copy_closures_from_previous_year
 from traffic_prediction.submission_format import test_format_and_export_output
+from traffic_prediction.submission_log import write_run_log
 from traffic_prediction.models.baselines import (
     DayTypeProfileBaseline, FourWeekMeanBaseline, HolidayAwarePreviousWeekBaseline,
     PreviousWeekBaseline,
@@ -137,6 +139,7 @@ def run_submission(
     No historical archives are downloaded. Frozen local inputs with skip_update
     produce identical bytes; a live refresh can incorporate source corrections.
     """
+    started = time.perf_counter()
     if pd.__version__.split(".")[0] != "2":
         raise ValueError("Submission requires pandas 2.x; install the pinned requirements.")
     if not re.fullmatch(r"[A-Za-z0-9_-]+", team_name):
@@ -175,7 +178,10 @@ def run_submission(
     else:
         model = MODELS[model_name](calendar)
     table = build_submission(history, model, events)
-    return export_submission(table, team_name, output_dir)
+    path = export_submission(table, team_name, output_dir)
+    write_run_log(path, history=history, table=table, model=model, model_name=model_name,
+                  cutoff=CUTOFF, seed=SEED, started=started)
+    return path
 
 
 def main() -> None:
