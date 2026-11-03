@@ -90,7 +90,8 @@ def test_nonfinite_predictions_rejected(history, bad):
         predict.build_submission(history, Model())
 
 
-@pytest.mark.parametrize("model_name", predict.MODELS)
+# The ensemble needs Timestral weights and the #22 dataset: tested on stubs in test_ensemble.py.
+@pytest.mark.parametrize("model_name", [name for name in predict.MODELS if name != "ensemble"])
 @pytest.mark.parametrize("line_ending", ["\n", "\r\n"], ids=["LF", "CRLF"])
 def test_pipeline_roundtrip_reproducible_and_no_network(local_data, monkeypatch, model_name, line_ending):
     # Exercise both organizer-export defaults, including Windows on Unix hosts.
@@ -156,7 +157,8 @@ def test_invalid_team_rejected_before_update(tmp_path, name, monkeypatch):
 
 
 def test_cli(local_data, monkeypatch, capsys):
-    monkeypatch.setattr(sys, "argv", ["predict", "--team-name", "cli", "--skip-update",
+    # The default ensemble needs Timestral weights and the #22 dataset (see test_ensemble.py).
+    monkeypatch.setattr(sys, "argv", ["predict", "--team-name", "cli", "--skip-update", "--model", "holiday-aware",
         "--data-dir", str(local_data["data_dir"]), "--output-dir", str(local_data["output_dir"]),
         "--school-holidays-file", str(SCHOOL_PATH)])
     predict.main()
