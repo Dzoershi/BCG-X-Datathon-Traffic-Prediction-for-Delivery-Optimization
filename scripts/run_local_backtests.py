@@ -91,7 +91,14 @@ def build_models(calendar: pd.DataFrame, covariates: pd.DataFrame | None) -> dic
             return TimestralForecaster(calendar, model_size=size, multivariate=True, context_hours=32768)
         return factory
 
+    def ensemble():
+        from traffic_prediction.predict import e5_ensemble
+        if covariates is None:
+            raise RuntimeError("the ensemble's LightGBM needs covariates.parquet: build the #22 dataset first")
+        return e5_ensemble(calendar, covariates)  # #32 submitted model, frozen E5 weights.
+
     return {
+        "ensemble_e5": ensemble,
         "baseline_holiday_aware": lambda: HolidayAwarePreviousWeekBaseline(calendar),
         "baseline_day_type": lambda: DayTypeProfileBaseline(calendar),
         "lightgbm_raw": lightgbm,
