@@ -13,7 +13,8 @@ import duckdb
 import numpy as np
 import pandas as pd
 
-from traffic_prediction.data import calendar_events, query, traffic, update
+from traffic_prediction.data import calendar_events, query, traffic, update, weather
+from traffic_prediction.data.build import DEFAULT_DATASET_DIR
 from traffic_prediction.data.validate import SUBMISSION_ARCS, SUBMISSION_COLUMNS, validate_submission
 from traffic_prediction.models.base import ForecastModel
 from traffic_prediction.submission_format import test_format_and_export_output
@@ -21,11 +22,42 @@ from traffic_prediction.models.baselines import (
     DayTypeProfileBaseline, FourWeekMeanBaseline, HolidayAwarePreviousWeekBaseline,
     PreviousWeekBaseline,
 )
+from traffic_prediction.models.ensemble import E5_WEIGHTS, WeightedEnsemble
+from traffic_prediction.models.timestral import TimestralForecaster
+from traffic_prediction.train import LightGBMForecaster
 
 CUTOFF = pd.Timestamp("2026-11-05 23:00")
 TARGET_TIMES = pd.date_range("2026-11-07", "2026-11-11 23:00", freq="h")
 DEFAULT_OUTPUT_DIR = traffic.REPO_ROOT / "outputs/submissions"
+
+
+def load_covariates() -> pd.DataFrame:
+    """Measurement-free covariates of the #22 dataset (calendar and weather through the target week)."""
+    path = DEFAULT_DATASET_DIR / "covariates.parquet"
+    if not path.exists():
+        raise FileNotFoundError(f"The ensemble needs {path}: run python -m traffic_prediction.data.build "
+                                f"--dataset --end {CUTOFF:%Y-%m-%d} first.")
+    return pd.read_parquet(path)
+
+
+def e5_ensemble(calendar: pd.DataFrame, covariates: pd.DataFrame | None = None) -> WeightedEnsemble:
+    """Submitted model (#32): baseline, Timestral-5M and LightGBM, weighted per variable and day kind.
+
+    Members use their retained backtest settings (#17, #44, #31). LightGBM needs the
+    measurement-free covariates of the #22 dataset, built through the cutoff day.
+    """
+    covariates = load_covariates() if covariates is None else covariates
+    return WeightedEnsemble({
+        "baseline_holiday_aware": HolidayAwarePreviousWeekBaseline(calendar),
+        "timestral_5m": TimestralForecaster(calendar, model_size="5M", multivariate=True, context_hours=32768),
+        # One thread: once torch is loaded (Timestral), multithreaded LightGBM deadlocks in OpenMP
+        # (macOS, several libomp copies). Deterministic forecasts are identical to n_jobs=4.
+        "lightgbm_raw": LightGBMForecaster(covariates, n_jobs=1),
+    }, E5_WEIGHTS, calendar)
+
+
 MODELS = {
+    "ensemble": e5_ensemble,
     "holiday-aware": HolidayAwarePreviousWeekBaseline,
     "previous-week": PreviousWeekBaseline,
     "four-week-mean": FourWeekMeanBaseline,
@@ -119,14 +151,25 @@ def run_submission(
     calendar = calendar_events.calendar_table(
         history["datetime"].min().normalize(), school_holidays_path=school_holidays_path,
     )
-    table = build_submission(history, MODELS[model_name](calendar))
+    if model_name == "ensemble":
+        # LightGBM learns from the holiday flag and weather of past hours, as in the backtest dataset.
+        covariates = load_covariates()
+        history = history.merge(calendar[["datetime", "is_holiday"]], on="datetime", how="left",
+                                validate="many_to_one")
+        history = history.merge(covariates[["arc", "datetime", *weather.VALUE_COLUMNS]],
+                                on=["arc", "datetime"], how="left", validate="one_to_one")
+        model = e5_ensemble(calendar, covariates)
+    else:
+        model = MODELS[model_name](calendar)
+    table = build_submission(history, model)
     return export_submission(table, team_name, output_dir)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--team-name", required=True)
-    parser.add_argument("--model", choices=MODELS, default="holiday-aware")
+    parser.add_argument("--model", choices=MODELS, default="ensemble",
+                        help="ensemble: retained model (#32); holiday-aware: plan B without Timestral or dataset")
     parser.add_argument("--data-dir", type=Path, default=query.DEFAULT_TRAFFIC_DIR)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--config", type=Path, default=traffic.DEFAULT_CONFIG)
