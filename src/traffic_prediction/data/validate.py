@@ -19,6 +19,7 @@ import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
 
+from traffic_prediction.constants import TARGET_END, TARGET_START, TARGET_TIMES
 from traffic_prediction.data import build, query, traffic
 
 MANIFEST_VERSION = 1
@@ -227,9 +228,9 @@ def validate_submission(table: pd.DataFrame) -> None:
     if not text.str.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}").all():
         raise ValueError("Submission datetime must match YYYY-MM-DD HH:MM exactly.")
     timestamps = pd.to_datetime(text, format="%Y-%m-%d %H:%M", errors="raise")
-    hours = pd.date_range("2026-11-07", "2026-11-11 23:00", freq="h")
-    if not timestamps.isin(hours).all():
-        raise ValueError("Submission timestamps must be hourly on November 7–11, 2026.")
+    if not timestamps.isin(TARGET_TIMES).all():
+        raise ValueError(f"Submission timestamps must be hourly from {TARGET_START:%Y-%m-%d %H:%M} "
+                         f"to {TARGET_END:%Y-%m-%d %H:%M}.")
     if table.duplicated(["arc", "datetime"]).any():
         raise ValueError("Submission contains duplicate arc/hour pairs.")
     for column in ["debit_horaire", "taux_occupation"]:

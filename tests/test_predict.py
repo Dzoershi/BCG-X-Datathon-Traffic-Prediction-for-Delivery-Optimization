@@ -61,6 +61,23 @@ def test_cutoff_clipping_types_and_order(history):
     assert table.equals(table.sort_values(["arc", "datetime"]).reset_index(drop=True))
 
 
+def test_exported_values_have_two_decimals(history, tmp_path):
+    class Model:
+        def predict(self, data, times):
+            index = pd.MultiIndex.from_product([SUBMISSION_ARCS, times], names=["arc", "datetime"])
+            table = index.to_frame(index=False)
+            table["debit_horaire"] = 123.456789123
+            table["taux_occupation"] = 7.0 / 3.0
+            return table
+
+    table = predict.build_submission(history, Model())
+    assert table.debit_horaire.eq(123.46).all() and table.taux_occupation.eq(2.33).all()
+    path = predict.export_submission(table, "rounded", tmp_path)
+    for line in path.read_text(encoding="utf-8").splitlines()[1:]:
+        for value in line.split(";")[-2:]:
+            assert len(value.partition(".")[2]) <= 2, line
+
+
 @pytest.mark.parametrize("bad", [np.nan, np.inf, -np.inf])
 def test_nonfinite_predictions_rejected(history, bad):
     class Model:

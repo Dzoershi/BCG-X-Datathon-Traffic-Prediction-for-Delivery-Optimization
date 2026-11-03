@@ -584,7 +584,7 @@ L'issue demandait l'API historique (ERA5). **Le choix retenu est l'historique Hi
 
 ### Construction, raccord et rafraîchissement
 
-- **Coupure.** Le jour de Paris de l'exécution sépare les deux sources : historique jusqu'à hier 23:00, prévision à partir d'aujourd'hui 00:00, jusqu'au 11 novembre 23:00 (`calendar_events.PREDICTION_END`). Exécuté le vendredi 6 novembre, l'historique s'arrête au jeudi 23:00, la coupure du modèle, et la prévision couvre du 6 novembre 00:00 au 11 novembre 23:00.
+- **Coupure.** Le jour de Paris de l'exécution sépare les deux sources : historique jusqu'à hier 23:00, prévision à partir d'aujourd'hui 00:00, jusqu'au 11 novembre 23:00 (`constants.PREDICTION_END`). Exécuté le vendredi 6 novembre, l'historique s'arrête au jeudi 23:00, la coupure du modèle, et la prévision couvre du 6 novembre 00:00 au 11 novembre 23:00.
 - **Raccord.** Chaque partie est déjà une grille complète. `join_consecutive` exige que chaque partie commence l'heure qui suit la fin de la précédente : un trou ou un chevauchement arrête la construction.
 - **Rafraîchissement.** `--refresh-forecast` relit `weather.parquet` et garde les lignes d'historique antérieures à aujourd'hui, sans les retélécharger. Il télécharge ensuite les jours passés manquants, puis la nouvelle prévision. L'historique stocké doit venir de la même source que celle demandée. Les anciennes lignes `forecast` sont remplacées.
 - **Fichier.** `data/processed/weather/weather.parquet`, une ligne par heure : `datetime` (timestamp ns sans fuseau), trois colonnes float64 et `source`. L'écriture passe par un fichier temporaire, contrôlé avant remplacement ; en cas d'échec, l'ancien fichier est conservé.
@@ -796,6 +796,8 @@ Les erreurs de `HolidayAwarePreviousWeekBaseline` ont été recalculées heure p
 4. Remplacer les horaires provisoires du 11/11/2026 dans `events_manual.csv` par ceux de l'arrêté de la préfecture de police, retirer « PROVISOIRES », relancer l'étape 1.
 5. Confirmer la grève du 05/11 avec les plans de transport SNCF publiés le 04/11.
 6. Comparer le samedi 31/10 et le dimanche 01/11 sur Saint-Pères et Convention à un samedi et un dimanche normaux. S'ils sont perturbés, la semaine recopiée par `HolidayAwarePreviousWeek` est biaisée pour le 07/11, le 08/11 et le 11/11.
+7. Vérifier les dates du rendu dans [`constants.py`](../src/traffic_prediction/constants.py), seul endroit où elles sont définies (#46) : coupure `CUTOFF` le jeudi 05/11 23:00, fenêtre `TARGET_TIMES` du samedi 07/11 00:00 au mercredi 11/11 23:00. `predict`, le validateur, le calendrier, la météo et les perturbations les importent. Seule la commande manuelle du dataset les recopie : `--end` doit être le jour de `CUTOFF`, soit `python -m traffic_prediction.data.build --dataset --end 2026-11-05`.
+8. Lancer le rendu puis `python -m traffic_prediction.data.validate --submission outputs/submissions/output_<équipe>.csv`. Les valeurs sont arrondies à 2 décimales après le bornage (débit ≥ 0, occupation entre 0 et 100).
 
 ## Chronos-2 (issue #19)
 
