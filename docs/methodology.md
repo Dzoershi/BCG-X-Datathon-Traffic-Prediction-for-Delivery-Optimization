@@ -788,12 +788,24 @@ Les erreurs de `HolidayAwarePreviousWeekBaseline` ont été recalculées heure p
 - Les sources ne décrivent que l'état du jour : la table doit être reconstruite juste avant le rendu.
 - La liste manuelle n'est pas exhaustive (8 mai, Saint-Sylvestre 2025, autres manifestations) et Paris Respire n'est pas toujours appliqué.
 
+### Fermeture du 11/11 dans le rendu (issue #47)
+
+Aucun modèle ne prévoit la fermeture des Champs-Élysées pour la cérémonie : sans mesure récente, tous y prennent le profil de repli, de 268 à 698 véh/h entre 7 h et 14 h, alors que le 11/11/2025 a mesuré de 12 à 119 véh/h. Sur la fenêtre de backtest du 06/11/2025, recopier l'année précédente faisait passer la RMSE du débit du 11/11 de 436 à 162 véh/h sur cet arc.
+
+[`models/postprocess.py`](../src/traffic_prediction/models/postprocess.py) remplace donc, dans `build_submission`, après le modèle et avant le bornage et l'arrondi, le débit et l'occupation des heures de cérémonie par les valeurs mesurées un an plus tôt, **à la même date** (le 11/11/2025 était un mardi, le 11/11/2026 est un mercredi).
+
+- **Heures** : lues dans [`events_manual.csv`](../data/raw/events_manual.csv), lignes de type `ceremonie` sur un arc précis et dans la fenêtre du rendu ; rien n'est codé en dur. Les étiquettes de début et de fin sont toutes deux remplacées (7:00 à 14:00, 8 heures), à la différence de `active_hours` (8:00 à 14:00) : recopier 7:00 et 14:00 garde les transitions mesurées (323 et 601 véh/h en 2025) au lieu de les deviner.
+- **Garde-fous** : une heure de référence absente ou non `ok` arrête le rendu avec la liste des heures manquantes. Les heures remplacées sont marquées `closure_copy_2025` dans `sources_` du modèle.
+- **Options** : `--events-file` choisit un autre fichier ; un fichier sans ligne de cérémonie désactive la correction.
+- **Vérifié** : un rendu hors ligne ne modifie que ces 8 lignes, et le validateur l'accepte. [`test_postprocess.py`](../tests/test_postprocess.py) couvre les heures retenues, la copie par date et non par jour de semaine, les autres heures et arcs inchangés, les valeurs manquantes ou invalides, les sources, l'arrondi et la ligne du fichier versionné.
+- **Limite** : les horaires 2026 sont provisoires (étape 4 de la check-list) ; il suffit de corriger la ligne du fichier, sans toucher au code.
+
 ### Check-list du vendredi 6 novembre
 
 1. Lancer `python -m traffic_prediction.data.build --disruptions` et lire le contrôle affiché.
 2. Contrôler à la main `circulation_evenement` et `fermetures-voirie` : à 500 m ou moins, les chantiers perturbants et fermetures qui commencent ou finissent entre le 31/10 et le 11/11.
 3. Quai Voltaire (`CP002700` dans `chantiers-perturbants`) : vérifier que le chantier est vraiment terminé (`date_fin`, `statut`), puis comparer le trafic de Saint-Pères du 03 au 05/11 à celui du 13 au 15/10.
-4. Remplacer les horaires provisoires du 11/11/2026 dans `events_manual.csv` par ceux de l'arrêté de la préfecture de police, retirer « PROVISOIRES », relancer l'étape 1.
+4. Remplacer les horaires provisoires du 11/11/2026 dans `events_manual.csv` par ceux de l'arrêté de la préfecture de police, retirer « PROVISOIRES », relancer l'étape 1. Le rendu lit cette ligne pour recopier le 11/11/2025 sur ces heures ([fermeture du 11/11](#fermeture-du-1111-dans-le-rendu-issue-47)).
 5. Confirmer la grève du 05/11 avec les plans de transport SNCF publiés le 04/11.
 6. Comparer le samedi 31/10 et le dimanche 01/11 sur Saint-Pères et Convention à un samedi et un dimanche normaux. S'ils sont perturbés, la semaine recopiée par `HolidayAwarePreviousWeek` est biaisée pour le 07/11, le 08/11 et le 11/11.
 7. Vérifier les dates du rendu dans [`constants.py`](../src/traffic_prediction/constants.py), seul endroit où elles sont définies (#46) : coupure `CUTOFF` le jeudi 05/11 23:00, fenêtre `TARGET_TIMES` du samedi 07/11 00:00 au mercredi 11/11 23:00. `predict`, le validateur, le calendrier, la météo et les perturbations les importent. Seule la commande manuelle du dataset les recopie : `--end` doit être le jour de `CUTOFF`, soit `python -m traffic_prediction.data.build --dataset --end 2026-11-05`.
