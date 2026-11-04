@@ -265,6 +265,19 @@ at zero, and occupancy to [0, 100]. Checks run before publication, and an existi
 submission is preserved if an update or export fails. Local end-of-hour labels
 are retained pending clarification from BCG X.
 
+Each successful run also writes `outputs/submissions/output_your_team_run.json`
+(issue #48). It records the Git commit and dirty status, selected model and settings,
+ensemble weights and member sources, pinned checkpoint revisions, required and
+installed Timestral package commits (null when unavailable), cutoff, last valid
+observed hour per arc, closure-copy markers, seed, runtime in seconds, and SHA-256
+of the published CSV. Traffic fingerprints hash the sorted, cutoff-limited evaluated
+history using the existing dataset content-hash convention; model history and
+calendar fingerprints cover additional inputs. The per-hour `sources` records align
+with the CSV's arc/hour rows. Model names reflect the implemented CLI choices
+(`ensemble` and the baselines). Logging runs offline
+after CSV publication, and a logging failure only prints a warning. The CSV remains
+usable; verify its hash before using any existing sidecar after such a warning.
+
 Prerequisite: processed local traffic containing the three evaluated arcs.
 The default refresh overlaps the latest source day by seven days. For a first
 recent-only collection, pass `--update-start 2026-10-01`; no historical archive
