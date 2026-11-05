@@ -7,6 +7,28 @@ from types import SimpleNamespace
 import numpy as np
 import pandas as pd
 import pytest
+from traffic_prediction.train import FEATURE_GROUPS, selected_features
+
+
+@pytest.mark.parametrize("omitted", FEATURE_GROUPS)
+def test_feature_ablation_preserves_rows_labels_and_matching_prediction_columns(tables, fake, omitted):
+    history = past(tables)
+    before = history.copy(deep=True)
+    model = LightGBMForecaster(tables[1], feature_groups=tuple(group for group in FEATURE_GROUPS if group != omitted))
+    model.predict(history, target_window(CUTOFF))
+    expected = selected_features(model.features_.feature_columns, model.feature_groups)
+    assert expected == model.feature_columns_ and expected[0] == "arc"
+    assert len(expected) < len(model.features_.feature_columns)
+    assert all(list(item.X.columns) == expected == list(item.future.columns) for item in fake)
+    assert all(len(item.y) == len(fake[0].y) for item in fake)
+    pd.testing.assert_frame_equal(history, before)
+    assert all(value >= 0 for value in model.timings_.values())
+
+
+@pytest.mark.parametrize("groups", [(), ("unknown",), ("lags", "lags")])
+def test_invalid_feature_groups_fail_before_fitting(groups):
+    with pytest.raises(ValueError, match="feature_groups"):
+        LightGBMForecaster(feature_groups=groups)
 
 from traffic_prediction.data.calendar_events import calendar_table
 from traffic_prediction.evaluate import KEYS, TARGETS, backtest, target_window
