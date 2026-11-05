@@ -193,6 +193,17 @@ pooled/macro RMSE, day-type and fallback breakdowns under `outputs/metrics/valid
 Uses two baselines and a calendar/traffic-only LightGBM diagnostic; evaluates proxy methods
 under historical outages. November 7–11 stays reserved. [Results, rules and reproduction](docs/validation/README.md).
 
+### Measure model complexity and feature value (#55)
+
+```powershell
+python -m traffic_prediction.comparison
+```
+
+Runs controlled LightGBM feature removals, Chronos-2 and pinned Timestral checkpoints
+on the frozen #53 inputs. Requires local pretrained weights; `--allow-download` permits
+fetching them. Saves accuracy, coverage, fallback attribution, runtime and resource
+metadata under `outputs/metrics/complexity_55/`. [Measured results and limitations](docs/complexity/README.md).
+
 ### Review saved model results
 
 Open [05_model_experiments.ipynb](notebooks/05_model_experiments.ipynb). It starts with LightGBM's raw-flow report: settings, evaluation dates, errors, coverage, feature importance, fallbacks, and an observed-versus-forecast plot when local data is available.

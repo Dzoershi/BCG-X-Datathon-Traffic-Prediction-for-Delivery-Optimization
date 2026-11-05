@@ -31,7 +31,8 @@ Le statut « implémenté » décrit l'arbre de travail ; le statut de publicati
 19. [LightGBM](#lightgbm-issue-31)
 20. [Audit qualité par cible](#audit-qualité-par-cible-issue-52)
 21. [Évaluation comparable](#évaluation-comparable-issue-53)
-22. [Décisions ouvertes](#décisions-ouvertes)
+22. [Complexité et valeur des variables](#complexité-et-valeur-des-variables-issue-55)
+23. [Décisions ouvertes](#décisions-ouvertes)
 
 ## Périmètre du brief
 
@@ -1466,6 +1467,25 @@ Les candidats exécutés sont les profils par type de jour, la baseline semaine 
 L'expérience de panne cache les mesures de Champs-Élysées pendant 28, 90, 180 ou 365 jours avant chaque cutoff admissible. Elle compare un profil de contrôle à copie, écart moyen et régression linéaire pour chacun des deux proxies. Chaque calibration utilise uniquement les paires observées strictement antérieures à la panne ; écart/régression exigent 20 paires et la régression une variance non nulle. La prévision utilise le proxy connu une semaine avant l'heure cible, toujours avant le cutoff, sinon le profil. Les observations originales restent la vérité et ne sont pas remplacées par les estimations. Aucune des variantes actives ne bat ici le contrôle en RMSE regroupée ; les effectifs et replis rendent explicites les égalités par absence de proxy.
 
 L'exécution sauvegarde **61 440 lignes horaires** et vérifie indépendamment **1 402 lignes agrégées**, par sommes d'erreurs dans des boucles Python distinctes du calcul Pandas. La suite locale passe **743 tests et 27 sous-tests** ; une seconde exécution complète reproduit les mêmes octets de prévisions horaires. Les résultats de développement et du contrôle récent sont séparés, avec couverture à chaque comparaison. Les anciens scores gardent leur propre snapshot, masque et définition d'agrégation ; ce protocole ne choisit ni ne remplace le modèle de rendu.
+
+## Complexité et valeur des variables (issue #55)
+
+```powershell
+python -m traffic_prediction.comparison
+```
+
+Le [rapport et les tables mesurées](complexity/README.md) comparent sur les mêmes entrées #53
+les références simples, LightGBM, Chronos-2 et Timestral 5M/28M/209M. Les retraits contrôlés
+de colonnes gardent les lignes d'entraînement et les hyperparamètres fixes. Le retrait du
+calendrier explicite conserve l'information temporelle indirecte des profils et décalages ;
+ce n'est pas une suppression totale du calendrier. Les prévisions météo sans dates d'émission
+vérifiées restent exclues, et aucun gain de tendance ou proxy non implémenté n'est inventé.
+
+Les scores sont accompagnés de couverture, replis, contrôles récents et pannes simulées.
+Les chronométrages distinguent chargement, fenêtres observées et préparation/entraînement/
+inférence de LightGBM ; la mémoire et les tailles sont décrites avec leurs limites de mesure.
+Le choix de référence de cette expérience est figé indépendamment de la PR #54, qui reste
+la responsabilité de son auteur. Aucun changement du modèle de rendu n'est automatique.
 
 ## Décisions ouvertes
 
