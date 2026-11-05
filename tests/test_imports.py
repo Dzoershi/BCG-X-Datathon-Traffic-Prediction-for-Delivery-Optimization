@@ -15,6 +15,7 @@ MODULE_NAMES = [
     "traffic_prediction.data.calendar_events",
     "traffic_prediction.data.weather",
     "traffic_prediction.data.disruptions",
+    "traffic_prediction.data.disruption_review",
     "traffic_prediction.data.dataset",
     "traffic_prediction.data.build",
     "traffic_prediction.data.query",

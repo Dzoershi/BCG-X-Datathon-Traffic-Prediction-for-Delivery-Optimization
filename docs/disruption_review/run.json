@@ -1,0 +1,91 @@
+{
+  "snapshot": "20261105T223608663128Z",
+  "sources": [
+    {
+      "file": "00_referentiel-comptages-routiers.json",
+      "dataset": "referentiel-comptages-routiers",
+      "arc": null,
+      "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/referentiel-comptages-routiers/exports/json?where=iu_ac+in+%28%274264%27%2C+%275671%27%2C+%27191%27%29",
+      "records": 3,
+      "retrieved_at": "2026-11-05T22:36:08.822507+00:00",
+      "sha256": "598ededc9adca6002efab2cea117e4f3a91ae843fe6eb6fc010eab45ec7e3457"
+    },
+    {
+      "file": "01_chantiers-a-paris.json",
+      "dataset": "chantiers-a-paris",
+      "arc": "Champs-Elysées",
+      "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/chantiers-a-paris/exports/json?where=within_distance%28geo_shape%2C+geom%27POINT%282.301723+48.871536%29%27%2C+310m%29",
+      "records": 62,
+      "retrieved_at": "2026-11-05T22:36:09.050111+00:00",
+      "sha256": "93bcfbe467664f2966df610eb78088bcca7cb44af45fd795dbc4c6c7c175af5b"
+    },
+    {
+      "file": "02_chantiers-perturbants.json",
+      "dataset": "chantiers-perturbants",
+      "arc": "Champs-Elysées",
+      "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/chantiers-perturbants/exports/json?where=within_distance%28geo_shape%2C+geom%27POINT%282.301723+48.871536%29%27%2C+310m%29",
+      "records": 0,
+      "retrieved_at": "2026-11-05T22:36:09.227714+00:00",
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    {
+      "file": "03_chantiers-a-paris.json",
+      "dataset": "chantiers-a-paris",
+      "arc": "Convention",
+      "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/chantiers-a-paris/exports/json?where=within_distance%28geo_shape%2C+geom%27POINT%282.293206+48.838634%29%27%2C+368m%29",
+      "records": 46,
+      "retrieved_at": "2026-11-05T22:36:09.437665+00:00",
+      "sha256": "e1a67cc9cfc174f725b54625f42d601279e939c320ecd88d4744504a9e3f0c35"
+    },
+    {
+      "file": "04_chantiers-perturbants.json",
+      "dataset": "chantiers-perturbants",
+      "arc": "Convention",
+      "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/chantiers-perturbants/exports/json?where=within_distance%28geo_shape%2C+geom%27POINT%282.293206+48.838634%29%27%2C+368m%29",
+      "records": 0,
+      "retrieved_at": "2026-11-05T22:36:09.550235+00:00",
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    {
+      "file": "05_chantiers-a-paris.json",
+      "dataset": "chantiers-a-paris",
+      "arc": "Saint-Pères",
+      "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/chantiers-a-paris/exports/json?where=within_distance%28geo_shape%2C+geom%27POINT%282.332454+48.857280%29%27%2C+374m%29",
+      "records": 39,
+      "retrieved_at": "2026-11-05T22:36:09.727988+00:00",
+      "sha256": "5a229ae79f68d562ed472cafd912cb09265d3a9c5ca4930fa1fc0396f3324426"
+    },
+    {
+      "file": "06_chantiers-perturbants.json",
+      "dataset": "chantiers-perturbants",
+      "arc": "Saint-Pères",
+      "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/chantiers-perturbants/exports/json?where=within_distance%28geo_shape%2C+geom%27POINT%282.332454+48.857280%29%27%2C+374m%29",
+      "records": 3,
+      "retrieved_at": "2026-11-05T22:36:09.927617+00:00",
+      "sha256": "21004fbe0c3a072cdc3226c93d0198fa79b6085553d51af625254d84aef14f53"
+    },
+    {
+      "file": "07_circulation_evenement.json",
+      "dataset": "circulation_evenement",
+      "arc": null,
+      "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/circulation_evenement/exports/json?",
+      "records": 146,
+      "retrieved_at": "2026-11-05T22:36:10.186225+00:00",
+      "sha256": "a3eace308b5184ef732808ac12e7f25e14fb5e82a6b59a04cff8d22beed39cf0"
+    },
+    {
+      "file": "08_fermetures-voirie.json",
+      "dataset": "fermetures-voirie",
+      "arc": null,
+      "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/fermetures-voirie/exports/json?",
+      "records": 136,
+      "retrieved_at": "2026-11-05T22:36:10.511558+00:00",
+      "sha256": "9e5e163210cd90c09da6851a27ee81e40fe73714ea4adb0258230ec562f7dd7b"
+    }
+  ],
+  "review_sha256": "e567ed43d8073c69366aa2181023c54617b5240e905758074d8b32d8026f988d",
+  "events_sha256": "30ccd0c19676428d74378f1abbae73d5e882644fbdf0c7a00db2fee642f6d942",
+  "code_sha256": "2956406431f0f8682b55ae89f46b78e7297d4331545a5b19c3500ffe41260bfc",
+  "candidate_hour_rows": 9878,
+  "interpretation": "Source-declared works and provisional events are not verified road closures. No numeric adjustment without explicit approved review."
+}

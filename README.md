@@ -291,9 +291,10 @@ python -m traffic_prediction.predict --team-name your_team
 ```
 
 This command refreshes recent traffic with the issue #8 updater, builds calendar
-features, fits the selected baseline on local history through **2026-11-05 23:00**,
+features, fits the selected model on local history through **2026-11-05 23:00**,
 predicts, and calls the unchanged organizer `test_format_and_export_output` function.
-The default `holiday-aware` model is the safety baseline selected by issue #17.
+The CLI defaults to the E5 `ensemble` selected in #32 (requires Timestral weights and dataset covariates).
+Use `--model holiday-aware` for the safety baseline without those dependencies.
 Use `--model previous-week`, `four-week-mean`, or `day-type-profile` to select
 another implemented baseline. Baselines fit their lag/profile features inside
 `predict`; no separate model artifact is needed.
@@ -311,7 +312,7 @@ Each successful run also writes `outputs/submissions/output_your_team_run.json`
 (issue #48). It records the Git commit and dirty status, selected model and settings,
 ensemble weights and member sources, pinned checkpoint revisions, required and
 installed Timestral package commits (null when unavailable), cutoff, last valid
-observed hour per arc, closure-copy markers, seed, runtime in seconds, and SHA-256
+observed hour per arc, closure-copy markers, reviewed decisions and changed values, seed, runtime in seconds, and SHA-256
 of the published CSV. Traffic fingerprints hash the sorted, cutoff-limited evaluated
 history using the existing dataset content-hash convention; model history and
 calendar fingerprints cover additional inputs. The per-hour `sources` records align
@@ -344,6 +345,22 @@ On **November 5 evening**, run the live command as a dry run, validate the file,
 then run twice with `--skip-update` and compare file hashes. Repeat the live
 command on November 6 for delivery, retaining the November 5 cutoff. That future
 operational dry run has not yet been performed.
+
+## 11. Check submission-period disruptions (#57)
+
+```powershell
+python -m traffic_prediction.data.disruption_review --refresh --assess-history
+# Offline replay: replace SNAPSHOT with the capture directory printed above.
+python -m traffic_prediction.data.disruption_review --snapshot data/raw/disruption_57/SNAPSHOT
+```
+
+[Review, evidence and delivery checklist](docs/disruption_review/README.md).
+Outputs go to `outputs/metrics/disruption_57/`; exact source snapshots stay outside Git.
+The provisional November 11 road closure **does not change the forecast**.
+A prior-year copy needs an approved traffic-order entry in
+`configs/disruptions_review.json` (`--closure-review` selects another file).
+A 07:00–14:00 clock restriction affects end-hour labels **08:00–14:00**.
+The submission sidecar records decisions and every changed value; no forced zeros.
 
 ## Project deliverables
 

@@ -5,22 +5,22 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from traffic_prediction.data.disruptions import ALL_ARCS
+from traffic_prediction.data.disruptions import ALL_ARCS, active_hours
 from traffic_prediction.evaluate import TARGETS
 
 CLOSURE_TYPE = "ceremonie"
 
 
 def closure_hours(events: pd.DataFrame, times: pd.DatetimeIndex) -> list[tuple[str, pd.DatetimeIndex]]:
-    """Target labels from start to end, both included, of each ceremony on a single arc.
+    """Candidate end-hour labels overlapping a single-arc ceremony's clock interval.
 
-    Unlike ``disruptions.active_hours`` (08:00-14:00 for a 07:00-14:00 event), the start label
-    is kept: copying it keeps the measured transition hours instead of guessing them.
+    A 07:00-14:00 restriction maps to 08:00-14:00; the 07:00 measurement precedes it.
+    This function finds candidates, not evidence that a restriction is confirmed.
     """
     closures = events.loc[events["type"].eq(CLOSURE_TYPE) & events["arc"].ne(ALL_ARCS)]
     found = []
     for row in closures.itertuples():
-        labels = times[(times >= row.date_debut) & (times <= row.date_fin)]
+        labels = times[active_hours(times, row.date_debut, row.date_fin)]
         if len(labels):
             found.append((row.arc, labels))
     return found
