@@ -1,0 +1,8 @@
+{
+  "audit_sha256": "3d47f3daf03ac4a9e66bbe8c2eed1431bc6f86731eb1ac14785df47d1ada668e",
+  "predictions_sha256": "3e5a4e8ff3177336edc69f7179d052500af358efa680ef1f4eacc78a3033f095",
+  "cutoff": "2025-11-06 23:00",
+  "reference_date": "2024-11-11",
+  "reference_labels": "08:00-14:00 Paris end-hours",
+  "interpretation": "Exploratory single annual transfer; already investigated in #47, not an independent test or a promise for 2026."
+}

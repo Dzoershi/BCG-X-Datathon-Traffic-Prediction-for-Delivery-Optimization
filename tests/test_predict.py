@@ -109,11 +109,14 @@ def test_pipeline_roundtrip_reproducible_and_no_network(local_data, monkeypatch,
     assert log["csv_sha256"] == hashlib.sha256(original).hexdigest()
     assert log["model_choice"] == model_name
     assert log["cutoff"] == predict.CUTOFF.isoformat()
-    assert log["closure_correction_applied"] is True
+    assert log["closure_correction_applied"] is False
+    assert log["closure_review"][0]["status"] == "provisional"
+    assert log["closure_review"][0]["action"] == "none"
+    assert log["closure_adjustments"] == []
     assert log["runtime_seconds"] >= 0
     assert len(log["sources"]) == 360
     assert all(row["source"] is not None for row in log["sources"])
-    assert any(row["source"] == "closure_copy_2025" for row in log["sources"])
+    assert not any(row["source"] == "closure_copy_2025" for row in log["sources"])
     assert set(log["last_observed_hour_per_arc"].values()) == {predict.CUTOFF.isoformat()}
     assert path.name == "output_test_team.csv"
     assert original.startswith(

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {"id": "monument", "url": "https://www.paris-arc-de-triomphe.fr/visiter/informations-pratiques", "assessment": "Annual monument morning closure; no road hours/direction verified"},
+    {"id": "flags_2026", "url": "https://bovp.apps.paris.fr/index.php?id=55395&lvl=notice_display", "assessment": "2026 flag-display notice, not a traffic order; published 2026-10-15"},
+    {"id": "order_2025", "url": "https://cdn.paris.fr/paris/2025/11/07/arrete_2025-01460_03112025-F8oV.pdf", "assessment": "2025-01460 article 3 and annex 1; historical motor-vehicle restriction 07:00-14:00, interior Champs segment, both directions; emergency exemption"},
+    {"id": "gazette_2025", "url": "https://www.prefectures-regions.gouv.fr/ile-de-france/irecontenu/telechargement/132389/971747/file/recueil-75-2025-678-recueil-des-actes-administratifs-special%20du%2004.11.2025.pdf", "assessment": "Official publication 2025-11-04 includes order 2025-01460 p44 onward; known before historical cutoff, unlike later City-hosting path"},
+    {"id": "peace_forum", "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000055023178", "assessment": "Decree 2026-1004 designates Paris Peace Forum November 10-11 as a major event; does not establish target-road restriction hours/direction"},
+    {"id": "public_transport", "url": "https://www.bonjour-ratp.fr/actualites/articles/bulletin-travaux-7-novembre/", "assessment": "Official operator bulletin for November 7-13; regional public-transport context, no quantified traffic effect on evaluated arcs"}
+  ],
+  "events": [
+    {
+      "arc": "Champs-Elysées",
+      "iu_ac": 4264,
+      "upstream_node": "Av_Champs_Elysees-Washington",
+      "downstream_node": "Av_Champs_Elysees-Berri",
+      "date_debut": "2026-11-11 07:00",
+      "date_fin": "2026-11-11 14:00",
+      "status": "provisional",
+      "evidence_kind": "monument_hours",
+      "source_url": "https://www.paris-arc-de-triomphe.fr/visiter/informations-pratiques",
+      "checked_at": "2026-11-05T22:30:00+00:00",
+      "reviewer": "issue-57 review",
+      "direction_verified": false,
+      "hours_verified": false,
+      "action": "none",
+      "rationale": "Monument closure is not a road traffic order. The 2025 order supports only a provisional 2026 scenario. Recheck the Police Prefecture order before delivery; do not force zeros or copy history automatically."
+    }
+  ]
+}

@@ -11,7 +11,7 @@ from traffic_prediction.data.validate import SUBMISSION_ARCS, validate_submissio
 from traffic_prediction.models.postprocess import closure_hours, copy_closures_from_previous_year
 
 CHAMPS = "Champs-Elysées"
-CLOSED = pd.date_range("2026-11-11 07:00", "2026-11-11 14:00", freq="h")
+CLOSED = pd.date_range("2026-11-11 08:00", "2026-11-11 14:00", freq="h")
 
 
 def events(*rows):
@@ -50,7 +50,7 @@ class Constant:
         return table
 
 
-def test_closure_hours_include_start_and_end_labels():
+def test_closure_hours_follow_positive_end_hour_overlap():
     found = closure_hours(events(CEREMONY), TARGET_TIMES)
     assert len(found) == 1 and found[0][0] == CHAMPS and found[0][1].equals(CLOSED)
 
@@ -92,16 +92,23 @@ def test_missing_reference_hours_stop_the_submission(history, damage):
 
 
 def test_submission_marks_sources_and_rounds_copied_values(history):
+    from traffic_prediction.data.disruption_review import read_review
+    review = read_review()
+    review["events"][0].update(status="confirmed", evidence_kind="traffic_order", direction_verified=True,
+                               hours_verified=True, action="copy_prior_year", source_url="https://example.org/order")
     model = Constant()
-    table = predict.build_submission(history, model, events(CEREMONY))
+    table = predict.build_submission(history, model, events(CEREMONY), closure_review=review)
     validate_submission(table)
     closed = table["arc"].eq(CHAMPS) & table["datetime"].isin(CLOSED.strftime("%Y-%m-%d %H:%M"))
     assert closed.sum() == len(CLOSED)
-    assert table.loc[closed & table["datetime"].eq("2026-11-11 07:00"), "taux_occupation"].item() == 0.86
+    assert table.loc[closed & table["datetime"].eq("2026-11-11 08:00"), "taux_occupation"].item() == 0.99
     assert table.loc[~closed, "debit_horaire"].eq(600.0).all()
     labels = model.sources_.loc[CHAMPS].loc[CLOSED]
     assert labels.eq("closure_copy_2025").all()
     assert model.sources_.drop(index=[(CHAMPS, time) for time in CLOSED]).eq("model").all()
+    assert len(model.closure_adjustments_) == 7
+    assert model.closure_adjustments_[0]["before"]["debit_horaire"] == 600
+    assert model.closure_adjustments_[0]["after_before_rounding"]["debit_horaire"] == 18
 
 
 def test_without_events_nothing_is_replaced(history):

@@ -1,0 +1,36 @@
+[
+  {
+    "arc": "Champs-Elysées",
+    "date_debut": "2026-11-11 07:00:00",
+    "date_fin": "2026-11-11 14:00:00",
+    "status": "provisional",
+    "action": "none",
+    "candidate_labels": [
+      "2026-11-11 08:00:00",
+      "2026-11-11 09:00:00",
+      "2026-11-11 10:00:00",
+      "2026-11-11 11:00:00",
+      "2026-11-11 12:00:00",
+      "2026-11-11 13:00:00",
+      "2026-11-11 14:00:00"
+    ],
+    "review": {
+      "arc": "Champs-Elysées",
+      "iu_ac": 4264,
+      "upstream_node": "Av_Champs_Elysees-Washington",
+      "downstream_node": "Av_Champs_Elysees-Berri",
+      "date_debut": "2026-11-11 07:00",
+      "date_fin": "2026-11-11 14:00",
+      "status": "provisional",
+      "evidence_kind": "monument_hours",
+      "source_url": "https://www.paris-arc-de-triomphe.fr/visiter/informations-pratiques",
+      "checked_at": "2026-11-05T22:30:00+00:00",
+      "reviewer": "issue-57 review",
+      "direction_verified": false,
+      "hours_verified": false,
+      "action": "none",
+      "rationale": "Monument closure is not a road traffic order. The 2025 order supports only a provisional 2026 scenario. Recheck the Police Prefecture order before delivery; do not force zeros or copy history automatically."
+    },
+    "reason": "Monument closure is not a road traffic order. The 2025 order supports only a provisional 2026 scenario. Recheck the Police Prefecture order before delivery; do not force zeros or copy history automatically."
+  }
+]
