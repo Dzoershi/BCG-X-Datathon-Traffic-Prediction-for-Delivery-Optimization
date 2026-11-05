@@ -6,6 +6,7 @@ The pooled aggregate of `run_local_backtests.py` covers Convention and Saint-Pè
 
 ## RMSE and coverage per arc/target
 
+
 | Model | Arc | Target | RMSE | Valid truth | Truth coverage | Forecast coverage |
 |---|---|---|---:|---:|---:|---:|
 | baseline_holiday_aware | Champs-Elysées | debit_horaire | 216.806 | 690/960 | 71.9% | 100.0% |
@@ -81,3 +82,31 @@ The pooled aggregate of `run_local_backtests.py` covers Convention and Saint-Pè
 Processed traffic content SHA-256: `9d8d2e9e29cd3fe400c8e40c7dce76483d6a3179f3958efe971fcc50b2334049`
 
 Further checks required before closure: the simulated Champs-Elysées outages and proxy evidence; the final frozen 2026-11-05 23:00 cutoff; repeat-run identical submission CSV SHA-256; and documented baseline selection/rationale. Do not use November 7–11 observations to select the model.
+
+
+
+## Submission reproducibility
+
+Selected candidate: `HolidayAwarePreviousWeekBaseline`
+
+Command:
+
+```powershell
+.\.venv\Scripts\python.exe -m traffic_prediction.predict --team-name baseline54 --model holiday-aware --skip-update
+```
+
+Validation command:
+
+```powershell
+.\.venv\Scripts\python.exe -m traffic_prediction.data.validate --submission outputs/submissions/output_baseline54.csv
+```
+
+Results:
+- 360 valid submission rows.
+- Three official arcs.
+- Seed: 42.
+- Two consecutive runs produced identical CSV bytes.
+- SHA-256: `A2DDF62F61B6B6BFB037CA102390D725B01B4B81A3BFBCAE54F4941A29A82284`
+- Baseline tests: 30 passed.
+
+The byte-level reproducibility check was performed on the locally available inputs. Final verification against the frozen official cutoff (2026-11-05 23:00) remains required.
