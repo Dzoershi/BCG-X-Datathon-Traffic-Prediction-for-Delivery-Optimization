@@ -5,6 +5,8 @@ import importlib
 import pytest
 
 MODULE_NAMES = [
+    "traffic_prediction.validation",
+    "traffic_prediction.models.proxy",
     "traffic_prediction",
     "traffic_prediction.data",
     "traffic_prediction.data.traffic",

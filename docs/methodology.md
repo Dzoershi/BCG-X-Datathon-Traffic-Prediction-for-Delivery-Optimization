@@ -1,6 +1,6 @@
 # Méthodologie
 
-Ce document consigne les choix présents dans le code au **1er novembre 2026**, leurs raisons, leurs limites et les questions encore ouvertes. Le [README](../README.md) reste le guide de commandes rapide.
+Ce document consigne les choix présents dans le code, leurs raisons, leurs limites et les questions encore ouvertes. Les expériences sont datées dans leurs sections et rapports. Le [README](../README.md) reste le guide de commandes rapide.
 
 - **Implémenté** : comportement observable dans les modules et couvert par les tests indiqués.
 - **Provisoire** : règle ou hypothèse en place qui doit encore être justifiée par les données ou le métier.
@@ -30,7 +30,8 @@ Le statut « implémenté » décrit l'arbre de travail ; le statut de publicati
 18. [Variables tabulaires](#variables-tabulaires-issue-30)
 19. [LightGBM](#lightgbm-issue-31)
 20. [Audit qualité par cible](#audit-qualité-par-cible-issue-52)
-21. [Décisions ouvertes](#décisions-ouvertes)
+21. [Évaluation comparable](#évaluation-comparable-issue-53)
+22. [Décisions ouvertes](#décisions-ouvertes)
 
 ## Périmètre du brief
 
@@ -499,9 +500,9 @@ Le framework ne transmet aucune ligne après le jeudi. Le modèle doit réinitia
 
 `BacktestResult.scores` contient une ligne par cutoff, arc évalué, variable et sous-ensemble (`all` ou `atypical`). `per_arc` moyenne les fenêtres par arc/variable/sous-ensemble ; `summary` moyenne les couples arc/fenêtre par variable/sous-ensemble. Seuls les arcs `role == "evalue"` sont évalués, y compris ceux présents dans l’entrée mais sans aucune vérité dans une fenêtre. Un arc totalement absent de l’entrée ne peut pas être découvert : conserver la grille produite par le pipeline.
 
-La vérité est réindexée sur tous les couples arc × 120 heures. Une heure est ignorée si la ligne manque, si `qualite_mesure != "ok"` ou si la valeur de la cible est absente, non finie ou hors limites physiques (débit ≥ 0, occupation entre 0 et 100). `n_expected`, `n_scored` et `n_ignored` sont rapportés pour chaque cible et sous-ensemble. Une prévision absente ou non finie **sur une vérité valide fait échouer le run**, afin de ne pas améliorer artificiellement le score. Des prévisions manquantes sur une vérité ignorée sont autorisées.
+La vérité est réindexée sur tous les couples arc × 120 heures. Depuis #53, chaque cible mesurée est évaluée indépendamment : une ligne `partielle`, ou la partenaire valide d'une mesure masquée sur une ligne `invalide`, reste utilisable pour sa valeur disponible. Les valeurs absentes, non finies, hors domaine et les zéros de débit suspects restent exclus ; une estimation proxy ne devient jamais une vérité observée. Une étiquette `invalide` avec deux valeurs pourtant dans le domaine reste exclue comme incohérente. `truth_policy="paired"` retrouve le masque historique. `n_expected`, `n_scored` et `n_ignored` accompagnent chaque cible et sous-ensemble. Une prévision absente ou non finie **sur une vérité valide fait échouer le run** ; elle reste autorisée sur une vérité ignorée.
 
-`rmse = sqrt(mean((prediction - vérité)**2))` est calculée séparément pour les deux variables. Les jours atypiques sont samedi, dimanche ou jour férié de France métropolitaine (`holidays.France`, sans jours régionaux). Une fenêtre sans vérité produit une RMSE `NaN`, avec 120 heures ignorées par cible. Les moyennes sont des **moyennes arithmétiques des RMSE disponibles**, sans pondération par nombre d’heures ; elles ne sont pas une RMSE des erreurs mises en commun. `n_groups`, `n_groups_scored` et `n_groups_normalized` rendent explicite le nombre de contributions. Comparer deux modèles demande les mêmes cutoffs et données.
+`rmse = sqrt(mean((prediction - vérité)**2))` est calculée séparément pour les deux variables. Les jours atypiques sont samedi, dimanche ou jour férié de France métropolitaine (`holidays.France`, sans jours régionaux). Une fenêtre sans vérité produit une RMSE `NaN`, avec 120 heures ignorées par cible. Dans `per_arc` et `summary`, la colonne historique `rmse`, aussi nommée `macro_rmse`, reste la moyenne arithmétique des RMSE arc/fenêtre disponibles. La nouvelle `pooled_rmse` vaut `sqrt(sum_squared_error / n_scored)` ; elle pondère donc les observations, et peut classer différemment les modèles. `n_groups`, `n_groups_scored` et `n_groups_normalized` indiquent les contributions. Le protocole #53 compare les modèles sur des vérités identiques et sauvegarde les erreurs horaires permettant de recalculer les deux agrégations.
 
 `PreviousWeekModel` fournit la référence minimale nécessaire à la normalisation : même arc, même heure locale sept jours avant, uniquement si la qualité source est `ok`. Aucun proxy, entraînement ou remplissage n’est appliqué. `baseline_n_scored` compte les vérités valides dont la référence est finie ; `baseline_rmse` est calculée sur ces seules heures. `normalized_score = rmse / baseline_rmse` est défini uniquement si la référence couvre **toutes** les vérités valides du groupe et si sa RMSE est strictement positive. Sinon le ratio reste `NaN` (y compris une référence parfaite) ; aucune division par zéro ni comparaison sur des heures différentes. Un ratio inférieur à 1 indique une amélioration sur la référence.
 
@@ -1448,6 +1449,23 @@ L'audit du 5 novembre porte sur les étiquettes horaires du **1er janvier 2024 a
 **Identité des arcs.** Un inventaire indépendant interroge les paires de nœuds orientées, sans filtre d'identifiant, avec contrôle du sens inverse. Il confirme les trois IDs officiels et les deux proxies à la date du snapshot. Le téléchargement récent filtré par ID pourrait néanmoins manquer un futur changement d'identifiant ; un nouvel inventaire daté est nécessaire avant une actualisation finale. La date de fin du référentiel ne remplace pas les dates des mesures observées.
 
 La vérification indépendante retrouve les comptes sur 124 680 lignes d'audit et ne détecte aucune différence sur les 124 080 lignes de production existantes. La suite locale passe **705 tests et 27 sous-tests**, dont 25 tests d'audit et son contrôle d'import. Les scores antérieurs restent attachés à leurs propres snapshots ; cet audit ne constitue pas une actualisation de ces scores.
+
+## Évaluation comparable (issue #53)
+
+```powershell
+python -m traffic_prediction.validation
+python -m traffic_prediction.validation --verify-only
+```
+
+Le [rapport du 5 novembre](validation/README.md) fournit les paramètres, empreintes, commandes et CSV complets. Le brief confirme la RMSE pour deux variables et trois arcs, mais ne précise ni leur agrégation ni le traitement des capteurs sans vérité : ces points restent explicitement non confirmés. Aucun score mélangeant véhicules/heure et points d'occupation n'est inventé.
+
+Le protocole reprend les huit cutoffs de développement et ajoute un contrôle récent à paramètres fixes : cutoff du **29 octobre 2026**, prévision du **31 octobre au 4 novembre**. La vérité et l'historique viennent du snapshot borné #52. Le contrôle récent n'est pas présenté comme indépendant de toutes les explorations de l'équipe. Les bornes, grilles complètes, vérités et masques doivent être identiques entre candidats ; une prévision manquante ne réduit pas l'échantillon. Le 7–11 novembre est interdit dans ce protocole.
+
+Les candidats exécutés sont les profils par type de jour, la baseline semaine précédente adaptée aux fériés, et LightGBM avec paramètres fixes et météo explicitement manquante. Ce dernier est un diagnostic calendrier/trafic, distinct du LightGBM et de l'ensemble E5 de production. Les entraînements gardent leurs conventions existantes ; le changement de masque concerne la vérité évaluée, pas une nouvelle politique d'entraînement. Les sorties distinguent jours ouvrés, week-ends et fériés (férié prioritaire), prévision principale, repli et attribution inconnue. Pour un ensemble, le repli total exige que tous les membres de poids positif de la variable concernée utilisent leur repli.
+
+L'expérience de panne cache les mesures de Champs-Élysées pendant 28, 90, 180 ou 365 jours avant chaque cutoff admissible. Elle compare un profil de contrôle à copie, écart moyen et régression linéaire pour chacun des deux proxies. Chaque calibration utilise uniquement les paires observées strictement antérieures à la panne ; écart/régression exigent 20 paires et la régression une variance non nulle. La prévision utilise le proxy connu une semaine avant l'heure cible, toujours avant le cutoff, sinon le profil. Les observations originales restent la vérité et ne sont pas remplacées par les estimations. Aucune des variantes actives ne bat ici le contrôle en RMSE regroupée ; les effectifs et replis rendent explicites les égalités par absence de proxy.
+
+L'exécution sauvegarde **61 440 lignes horaires** et vérifie indépendamment **1 402 lignes agrégées**, par sommes d'erreurs dans des boucles Python distinctes du calcul Pandas. La suite locale passe **743 tests et 27 sous-tests** ; une seconde exécution complète reproduit les mêmes octets de prévisions horaires. Les résultats de développement et du contrôle récent sont séparés, avec couverture à chaque comparaison. Les anciens scores gardent leur propre snapshot, masque et définition d'agrégation ; ce protocole ne choisit ni ne remplace le modèle de rendu.
 
 ## Décisions ouvertes
 

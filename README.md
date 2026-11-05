@@ -167,18 +167,31 @@ from traffic_prediction.models.baselines import HolidayAwarePreviousWeekBaseline
 
 data = query_traffic("SELECT * FROM traffic")
 result = backtest(HolidayAwarePreviousWeekBaseline(), data, author="your-name", description="Holiday-aware baseline")
-print(result.summary)
+print(result.summary[["variable", "subset", "pooled_rmse", "macro_rmse", "n_scored", "n_expected"]])
 ```
 
 Replace `HolidayAwarePreviousWeekBaseline()` with any model implementing `predict(history, target_times)`.
 `PreviousWeekModel` is only the internal reference for `normalized_score`, not a model to score: it has no fallback for sensor outages.
 Chronos-2 (#19) is `Chronos2Forecaster()` in `models/chronos.py`; it needs `torch`, `chronos-forecasting` and the pretrained weights (478 MB, download once): [installation, offline use and results](docs/methodology.md#chronos-2-issue-19).
 The eight configured Thursday cutoffs produce Saturday–Wednesday forecasts after a Friday gap.
-Results contain per-window/arc scores (`scores`), means by arc (`per_arc`), and overall means
-(`summary`), including atypical days, coverage counts, and ratios to the previous-week baseline.
+Results contain per-window/arc scores (`scores`), pooled RMSE and macro means (`per_arc`,
+`summary`), and hourly truth/predictions with source labels (`hourly`). Targets are scored
+independently; `truth_policy="paired"` reproduces the earlier complete-pair mask.
 Each successful call appends a run to `docs/experiments.csv`; use `experiments_path=None` to
 skip logging. Data is read only from existing local Parquet files; no download is triggered.
 [Model contract, metric definitions, and limitations](docs/methodology.md#backtest-issue-15).
+
+### Compare models and simulate sensor outages (#53)
+
+```powershell
+python -m traffic_prediction.validation
+python -m traffic_prediction.validation --verify-only
+```
+
+Requires the #52 audit snapshots and local calendar. Saves hourly predictions, coverage,
+pooled/macro RMSE, day-type and fallback breakdowns under `outputs/metrics/validation_53/`.
+Uses two baselines and a calendar/traffic-only LightGBM diagnostic; evaluates proxy methods
+under historical outages. November 7–11 stays reserved. [Results, rules and reproduction](docs/validation/README.md).
 
 ### Review saved model results
 
