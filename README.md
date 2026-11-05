@@ -204,6 +204,16 @@ on the frozen #53 inputs. Requires local pretrained weights; `--allow-download` 
 fetching them. Saves accuracy, coverage, fallback attribution, runtime and resource
 metadata under `outputs/metrics/complexity_55/`. [Measured results and limitations](docs/complexity/README.md).
 
+### Explore traffic patterns and forecast errors (#56)
+
+```powershell
+python -m traffic_prediction.analysis
+```
+
+Uses the frozen #52 observations and #55 predictions. Exports six figures as PNG/SVG/PDF
+under `outputs/figures/traffic_56/`, with counts and error tables under `outputs/metrics/traffic_56/`.
+[Figures, measured observations and interpretation](docs/traffic_analysis/README.md).
+
 ### Review saved model results
 
 Open [05_model_experiments.ipynb](notebooks/05_model_experiments.ipynb). It starts with LightGBM's raw-flow report: settings, evaluation dates, errors, coverage, feature importance, fallbacks, and an observed-versus-forecast plot when local data is available.

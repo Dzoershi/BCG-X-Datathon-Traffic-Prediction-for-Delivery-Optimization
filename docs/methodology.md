@@ -32,7 +32,8 @@ Le statut « implémenté » décrit l'arbre de travail ; le statut de publicati
 20. [Audit qualité par cible](#audit-qualité-par-cible-issue-52)
 21. [Évaluation comparable](#évaluation-comparable-issue-53)
 22. [Complexité et valeur des variables](#complexité-et-valeur-des-variables-issue-55)
-23. [Décisions ouvertes](#décisions-ouvertes)
+23. [Profils et erreurs](#profils-et-erreurs-issue-56)
+24. [Décisions ouvertes](#décisions-ouvertes)
 
 ## Périmètre du brief
 
@@ -1486,6 +1487,22 @@ Les chronométrages distinguent chargement, fenêtres observées et préparation
 inférence de LightGBM ; la mémoire et les tailles sont décrites avec leurs limites de mesure.
 Le choix de référence de cette expérience est figé indépendamment de la PR #54, qui reste
 la responsabilité de son auteur. Aucun changement du modèle de rendu n'est automatique.
+
+## Profils et erreurs (issue #56)
+
+```powershell
+python -m traffic_prediction.analysis
+```
+
+Le [rapport et ses six figures](traffic_analysis/README.md) croisent la qualité #52, le
+calendrier et les prévisions #55 sur leurs empreintes vérifiées. Chaque figure conserve
+unités, période, effectifs et trous d'observation ; les comparaisons vacances scolaires
+restent descriptives. Les erreurs sont ventilées par arc, cible, heure et fenêtre sans
+mélanger les unités. L'exemple historique est choisi par une règle explicite sur le seul
+développement, avec observations, prévisions et replis distingués. Les événements manuels
+servent de contexte incertain, pas de preuve causale. Aucune vérité du 7–11 novembre n'est
+utilisée. Les 350 cellules mensuelles sont vérifiées indépendamment ; la suite locale
+passe 762 tests et 27 sous-tests. Les exports SVG/PDF/PNG alimentent la présentation #35.
 
 ## Décisions ouvertes
 

@@ -40,7 +40,7 @@ jobs:
           required = {
               "numpy", "pandas", "pyarrow", "pyyaml", "duckdb", "pytest",
               "stream-unzip", "stream-inflate", "pycryptodome", "holidays",
-              "lightgbm", "scikit-learn",
+              "lightgbm", "scikit-learn", "matplotlib",
           }
           specifications = []
           found = set()

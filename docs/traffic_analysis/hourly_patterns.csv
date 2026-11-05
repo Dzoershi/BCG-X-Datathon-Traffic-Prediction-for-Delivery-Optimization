@@ -1,0 +1,721 @@
+arc,role,variable,day_kind,hour,n_expected,n_valid,source_rows,mean,median,latest_valid,coverage_percent
+Champs-Elysées,evalue,debit_horaire,holiday,0,31,19,30,678.2105263157895,773.0,2025-11-11 00:00:00,61.29032258064516
+Champs-Elysées,evalue,debit_horaire,holiday,1,31,19,31,703.7894736842105,813.0,2025-11-11 01:00:00,61.29032258064516
+Champs-Elysées,evalue,debit_horaire,holiday,2,31,19,31,637.2105263157895,734.0,2025-11-11 02:00:00,61.29032258064516
+Champs-Elysées,evalue,debit_horaire,holiday,3,31,18,31,592.9444444444445,611.5,2025-11-11 03:00:00,58.064516129032256
+Champs-Elysées,evalue,debit_horaire,holiday,4,31,18,31,467.5,425.5,2025-11-11 04:00:00,58.064516129032256
+Champs-Elysées,evalue,debit_horaire,holiday,5,31,19,31,338.57894736842104,287.0,2025-11-11 05:00:00,61.29032258064516
+Champs-Elysées,evalue,debit_horaire,holiday,6,31,19,31,339.7894736842105,316.0,2025-11-11 06:00:00,61.29032258064516
+Champs-Elysées,evalue,debit_horaire,holiday,7,31,19,31,343.6842105263158,324.0,2025-11-11 07:00:00,61.29032258064516
+Champs-Elysées,evalue,debit_horaire,holiday,8,31,18,31,283.8333333333333,275.5,2025-11-11 08:00:00,58.064516129032256
+Champs-Elysées,evalue,debit_horaire,holiday,9,31,18,31,290.8333333333333,317.5,2025-11-11 09:00:00,58.064516129032256
+Champs-Elysées,evalue,debit_horaire,holiday,10,31,19,31,378.6842105263158,452.0,2025-11-11 10:00:00,61.29032258064516
+Champs-Elysées,evalue,debit_horaire,holiday,11,31,19,31,478.5263157894737,563.0,2025-11-11 11:00:00,61.29032258064516
+Champs-Elysées,evalue,debit_horaire,holiday,12,31,19,31,579.4736842105264,669.0,2025-11-11 12:00:00,61.29032258064516
+Champs-Elysées,evalue,debit_horaire,holiday,13,31,20,31,686.25,745.5,2025-11-11 13:00:00,64.51612903225806
+Champs-Elysées,evalue,debit_horaire,holiday,14,31,20,31,732.2,764.0,2025-11-11 14:00:00,64.51612903225806
+Champs-Elysées,evalue,debit_horaire,holiday,15,31,19,31,815.578947368421,854.0,2025-11-11 15:00:00,61.29032258064516
+Champs-Elysées,evalue,debit_horaire,holiday,16,31,19,31,886.6842105263158,949.0,2025-11-11 16:00:00,61.29032258064516
+Champs-Elysées,evalue,debit_horaire,holiday,17,31,20,31,876.8,913.0,2025-11-11 17:00:00,64.51612903225806
+Champs-Elysées,evalue,debit_horaire,holiday,18,31,20,31,868.65,882.0,2025-11-11 18:00:00,64.51612903225806
+Champs-Elysées,evalue,debit_horaire,holiday,19,31,20,31,864.45,877.5,2025-11-11 19:00:00,64.51612903225806
+Champs-Elysées,evalue,debit_horaire,holiday,20,31,19,31,861.3684210526316,902.0,2025-11-11 20:00:00,61.29032258064516
+Champs-Elysées,evalue,debit_horaire,holiday,21,31,18,31,840.0,858.5,2025-11-11 21:00:00,58.064516129032256
+Champs-Elysées,evalue,debit_horaire,holiday,22,31,19,31,792.8421052631579,801.0,2025-11-11 22:00:00,61.29032258064516
+Champs-Elysées,evalue,debit_horaire,holiday,23,31,19,31,738.421052631579,761.0,2025-11-11 23:00:00,61.29032258064516
+Champs-Elysées,evalue,debit_horaire,weekend,0,292,177,285,898.5310734463277,914.0,2025-11-16 00:00:00,60.61643835616438
+Champs-Elysées,evalue,debit_horaire,weekend,1,292,175,284,924.4,926.0,2025-11-16 01:00:00,59.93150684931507
+Champs-Elysées,evalue,debit_horaire,weekend,2,292,175,283,867.8628571428571,864.0,2025-11-16 02:00:00,59.93150684931507
+Champs-Elysées,evalue,debit_horaire,weekend,3,292,179,286,765.2569832402235,784.0,2025-11-16 03:00:00,61.3013698630137
+Champs-Elysées,evalue,debit_horaire,weekend,4,292,178,285,682.056179775281,703.0,2025-11-16 04:00:00,60.95890410958904
+Champs-Elysées,evalue,debit_horaire,weekend,5,292,178,285,514.185393258427,518.5,2025-11-16 05:00:00,60.95890410958904
+Champs-Elysées,evalue,debit_horaire,weekend,6,292,179,285,405.21787709497204,420.0,2025-11-16 06:00:00,61.3013698630137
+Champs-Elysées,evalue,debit_horaire,weekend,7,292,179,285,362.4972067039106,381.0,2025-11-16 07:00:00,61.3013698630137
+Champs-Elysées,evalue,debit_horaire,weekend,8,292,178,285,326.2303370786517,334.0,2025-11-16 08:00:00,60.95890410958904
+Champs-Elysées,evalue,debit_horaire,weekend,9,292,174,285,380.8333333333333,375.0,2025-11-16 09:00:00,59.58904109589041
+Champs-Elysées,evalue,debit_horaire,weekend,10,292,178,285,508.3707865168539,514.5,2025-11-16 10:00:00,60.95890410958904
+Champs-Elysées,evalue,debit_horaire,weekend,11,292,176,285,648.5284090909091,652.0,2025-11-16 11:00:00,60.273972602739725
+Champs-Elysées,evalue,debit_horaire,weekend,12,292,175,285,736.9942857142858,758.0,2025-11-16 12:00:00,59.93150684931507
+Champs-Elysées,evalue,debit_horaire,weekend,13,292,175,285,766.6914285714286,806.0,2025-11-16 13:00:00,59.93150684931507
+Champs-Elysées,evalue,debit_horaire,weekend,14,292,174,285,765.735632183908,803.5,2025-11-16 14:00:00,59.58904109589041
+Champs-Elysées,evalue,debit_horaire,weekend,15,292,174,284,790.6321839080459,840.5,2025-11-16 15:00:00,59.58904109589041
+Champs-Elysées,evalue,debit_horaire,weekend,16,292,174,285,863.2701149425287,905.0,2025-11-16 16:00:00,59.58904109589041
+Champs-Elysées,evalue,debit_horaire,weekend,17,292,178,285,884.4887640449438,929.0,2025-11-16 17:00:00,60.95890410958904
+Champs-Elysées,evalue,debit_horaire,weekend,18,292,177,285,871.8418079096045,903.0,2025-11-16 18:00:00,60.61643835616438
+Champs-Elysées,evalue,debit_horaire,weekend,19,292,181,285,880.7513812154696,882.0,2025-11-16 19:00:00,61.986301369863014
+Champs-Elysées,evalue,debit_horaire,weekend,20,292,177,285,871.9604519774011,889.0,2025-11-16 20:00:00,60.61643835616438
+Champs-Elysées,evalue,debit_horaire,weekend,21,292,176,285,827.7840909090909,833.0,2025-11-16 21:00:00,60.273972602739725
+Champs-Elysées,evalue,debit_horaire,weekend,22,292,178,285,801.5056179775281,809.5,2025-11-16 22:00:00,60.95890410958904
+Champs-Elysées,evalue,debit_horaire,weekend,23,292,176,285,789.6363636363636,780.0,2025-11-16 23:00:00,60.273972602739725
+Champs-Elysées,evalue,debit_horaire,working,0,716,441,698,650.4625850340136,641.0,2025-11-19 00:00:00,61.59217877094972
+Champs-Elysées,evalue,debit_horaire,working,1,716,436,697,611.4288990825688,601.0,2025-11-19 01:00:00,60.89385474860335
+Champs-Elysées,evalue,debit_horaire,working,2,716,443,696,482.9435665914221,475.0,2025-11-19 02:00:00,61.87150837988827
+Champs-Elysées,evalue,debit_horaire,working,3,716,438,698,378.76940639269407,359.0,2025-11-19 03:00:00,61.1731843575419
+Champs-Elysées,evalue,debit_horaire,working,4,716,435,697,258.4735632183908,235.0,2025-11-19 04:00:00,60.754189944134076
+Champs-Elysées,evalue,debit_horaire,working,5,716,438,697,205.52511415525115,193.5,2025-11-19 05:00:00,61.1731843575419
+Champs-Elysées,evalue,debit_horaire,working,6,716,436,698,289.4357798165138,288.0,2025-11-19 06:00:00,60.89385474860335
+Champs-Elysées,evalue,debit_horaire,working,7,716,439,698,549.123006833713,546.0,2025-11-19 07:00:00,61.312849162011176
+Champs-Elysées,evalue,debit_horaire,working,8,716,437,696,839.7231121281465,857.0,2025-11-19 08:00:00,61.03351955307262
+Champs-Elysées,evalue,debit_horaire,working,9,716,428,696,1032.4485981308412,1052.0,2025-11-19 09:00:00,59.77653631284916
+Champs-Elysées,evalue,debit_horaire,working,10,716,427,696,1039.9718969555036,1051.0,2025-11-19 10:00:00,59.63687150837989
+Champs-Elysées,evalue,debit_horaire,working,11,716,420,697,985.5166666666667,993.5,2025-11-19 11:00:00,58.659217877094974
+Champs-Elysées,evalue,debit_horaire,working,12,716,409,696,984.283618581907,999.0,2025-11-18 12:00:00,57.12290502793296
+Champs-Elysées,evalue,debit_horaire,working,13,716,415,696,995.6746987951807,998.0,2025-11-18 13:00:00,57.960893854748605
+Champs-Elysées,evalue,debit_horaire,working,14,716,421,698,944.980997624703,945.0,2025-11-18 14:00:00,58.798882681564244
+Champs-Elysées,evalue,debit_horaire,working,15,716,432,698,955.6828703703703,956.5,2025-11-18 15:00:00,60.33519553072626
+Champs-Elysées,evalue,debit_horaire,working,16,716,438,697,949.066210045662,941.5,2025-11-18 16:00:00,61.1731843575419
+Champs-Elysées,evalue,debit_horaire,working,17,716,433,696,933.7182448036951,926.0,2025-11-18 17:00:00,60.47486033519553
+Champs-Elysées,evalue,debit_horaire,working,18,716,438,695,959.5753424657535,944.5,2025-11-18 18:00:00,61.1731843575419
+Champs-Elysées,evalue,debit_horaire,working,19,716,436,695,982.9724770642201,977.0,2025-11-18 19:00:00,60.89385474860335
+Champs-Elysées,evalue,debit_horaire,working,20,716,436,695,979.75,966.5,2025-11-18 20:00:00,60.89385474860335
+Champs-Elysées,evalue,debit_horaire,working,21,716,439,695,874.9248291571754,861.0,2025-11-18 21:00:00,61.312849162011176
+Champs-Elysées,evalue,debit_horaire,working,22,716,438,695,782.7648401826484,780.0,2025-11-18 22:00:00,61.1731843575419
+Champs-Elysées,evalue,debit_horaire,working,23,716,438,696,722.4132420091324,716.0,2025-11-18 23:00:00,61.1731843575419
+Champs-Elysées,evalue,taux_occupation,holiday,0,31,17,30,16.089380588235294,15.43945,2025-11-11 00:00:00,54.83870967741935
+Champs-Elysées,evalue,taux_occupation,holiday,1,31,17,31,16.800459411764706,14.15667,2025-11-11 01:00:00,54.83870967741935
+Champs-Elysées,evalue,taux_occupation,holiday,2,31,17,31,12.69091588235294,11.23833,2025-11-11 02:00:00,54.83870967741935
+Champs-Elysées,evalue,taux_occupation,holiday,3,31,18,31,11.571388888888889,8.87806,2025-11-11 03:00:00,58.064516129032256
+Champs-Elysées,evalue,taux_occupation,holiday,4,31,18,31,8.53768611111111,6.52167,2025-11-11 04:00:00,58.064516129032256
+Champs-Elysées,evalue,taux_occupation,holiday,5,31,19,31,8.058773157894738,3.69334,2025-11-11 05:00:00,61.29032258064516
+Champs-Elysées,evalue,taux_occupation,holiday,6,31,19,31,4.85152,3.70555,2025-11-11 06:00:00,61.29032258064516
+Champs-Elysées,evalue,taux_occupation,holiday,7,31,19,31,4.824883684210526,3.52111,2025-11-11 07:00:00,61.29032258064516
+Champs-Elysées,evalue,taux_occupation,holiday,8,31,18,31,3.579876666666667,3.1794450000000003,2025-11-11 08:00:00,58.064516129032256
+Champs-Elysées,evalue,taux_occupation,holiday,9,31,18,31,4.051020555555556,4.25278,2025-11-11 09:00:00,58.064516129032256
+Champs-Elysées,evalue,taux_occupation,holiday,10,31,19,31,6.042223684210526,6.22,2025-11-11 10:00:00,61.29032258064516
+Champs-Elysées,evalue,taux_occupation,holiday,11,31,19,31,10.146813684210526,10.11222,2025-11-11 11:00:00,61.29032258064516
+Champs-Elysées,evalue,taux_occupation,holiday,12,31,19,31,12.372018421052632,14.00111,2025-11-11 12:00:00,61.29032258064516
+Champs-Elysées,evalue,taux_occupation,holiday,13,31,20,31,17.251196,18.41556,2025-11-11 13:00:00,64.51612903225806
+Champs-Elysées,evalue,taux_occupation,holiday,14,31,20,31,17.942084,18.004445,2025-11-11 14:00:00,64.51612903225806
+Champs-Elysées,evalue,taux_occupation,holiday,15,31,19,31,21.249533157894735,21.76778,2025-11-11 15:00:00,61.29032258064516
+Champs-Elysées,evalue,taux_occupation,holiday,16,31,19,31,24.20049947368421,25.46445,2025-11-11 16:00:00,61.29032258064516
+Champs-Elysées,evalue,taux_occupation,holiday,17,31,20,31,25.5431405,25.58278,2025-11-11 17:00:00,64.51612903225806
+Champs-Elysées,evalue,taux_occupation,holiday,18,31,20,31,26.397028,26.327225,2025-11-11 18:00:00,64.51612903225806
+Champs-Elysées,evalue,taux_occupation,holiday,19,31,20,31,26.4124455,25.19778,2025-11-11 19:00:00,64.51612903225806
+Champs-Elysées,evalue,taux_occupation,holiday,20,31,19,31,23.218948421052634,23.19111,2025-11-11 20:00:00,61.29032258064516
+Champs-Elysées,evalue,taux_occupation,holiday,21,31,18,31,22.417347222222222,23.275275,2025-11-11 21:00:00,58.064516129032256
+Champs-Elysées,evalue,taux_occupation,holiday,22,31,19,31,20.125498421052633,19.57611,2025-11-11 22:00:00,61.29032258064516
+Champs-Elysées,evalue,taux_occupation,holiday,23,31,19,31,16.032369473684213,14.06,2025-11-11 23:00:00,61.29032258064516
+Champs-Elysées,evalue,taux_occupation,weekend,0,292,174,285,18.080253333333335,17.418055000000003,2025-11-16 00:00:00,59.58904109589041
+Champs-Elysées,evalue,taux_occupation,weekend,1,292,173,284,18.055759306358382,16.95278,2025-11-16 01:00:00,59.24657534246575
+Champs-Elysées,evalue,taux_occupation,weekend,2,292,173,283,16.42811,15.98945,2025-11-16 02:00:00,59.24657534246575
+Champs-Elysées,evalue,taux_occupation,weekend,3,292,177,286,14.700572372881357,13.94167,2025-11-16 03:00:00,60.61643835616438
+Champs-Elysées,evalue,taux_occupation,weekend,4,292,176,285,12.227419147727273,11.079725,2025-11-16 04:00:00,60.273972602739725
+Champs-Elysées,evalue,taux_occupation,weekend,5,292,176,285,7.950926420454545,6.8866700000000005,2025-11-16 05:00:00,60.273972602739725
+Champs-Elysées,evalue,taux_occupation,weekend,6,292,177,285,5.589317175141242,5.03334,2025-11-16 06:00:00,60.61643835616438
+Champs-Elysées,evalue,taux_occupation,weekend,7,292,178,285,5.444720337078651,4.468055,2025-11-16 07:00:00,60.95890410958904
+Champs-Elysées,evalue,taux_occupation,weekend,8,292,177,285,5.107625254237288,4.12556,2025-11-16 08:00:00,60.61643835616438
+Champs-Elysées,evalue,taux_occupation,weekend,9,292,172,285,6.246406046511628,5.218055,2025-11-16 09:00:00,58.9041095890411
+Champs-Elysées,evalue,taux_occupation,weekend,10,292,175,285,8.700794742857143,7.81889,2025-11-16 10:00:00,59.93150684931507
+Champs-Elysées,evalue,taux_occupation,weekend,11,292,174,285,12.193855229885058,11.12139,2025-11-16 11:00:00,59.58904109589041
+Champs-Elysées,evalue,taux_occupation,weekend,12,292,174,285,15.906789482758622,14.76389,2025-11-16 12:00:00,59.58904109589041
+Champs-Elysées,evalue,taux_occupation,weekend,13,292,174,285,18.317686379310345,17.372225,2025-11-16 13:00:00,59.58904109589041
+Champs-Elysées,evalue,taux_occupation,weekend,14,292,173,285,18.53041248554913,17.39278,2025-11-16 14:00:00,59.24657534246575
+Champs-Elysées,evalue,taux_occupation,weekend,15,292,172,284,20.13576,19.23556,2025-11-16 15:00:00,58.9041095890411
+Champs-Elysées,evalue,taux_occupation,weekend,16,292,172,285,23.114061162790698,23.148055,2025-11-16 16:00:00,58.9041095890411
+Champs-Elysées,evalue,taux_occupation,weekend,17,292,176,285,24.794912215909093,24.560275,2025-11-16 17:00:00,60.273972602739725
+Champs-Elysées,evalue,taux_occupation,weekend,18,292,175,285,25.704029942857144,24.97167,2025-11-16 18:00:00,59.93150684931507
+Champs-Elysées,evalue,taux_occupation,weekend,19,292,178,285,24.30635286516854,24.048055,2025-11-15 19:00:00,60.95890410958904
+Champs-Elysées,evalue,taux_occupation,weekend,20,292,175,285,22.579092971428572,21.67444,2025-11-15 20:00:00,59.93150684931507
+Champs-Elysées,evalue,taux_occupation,weekend,21,292,175,285,20.198049085714285,19.385,2025-11-16 21:00:00,59.93150684931507
+Champs-Elysées,evalue,taux_occupation,weekend,22,292,177,285,18.186375649717515,17.22333,2025-11-16 22:00:00,60.61643835616438
+Champs-Elysées,evalue,taux_occupation,weekend,23,292,175,285,16.672506057142858,15.08945,2025-11-16 23:00:00,59.93150684931507
+Champs-Elysées,evalue,taux_occupation,working,0,716,441,698,10.281208185941043,9.76722,2025-11-19 00:00:00,61.59217877094972
+Champs-Elysées,evalue,taux_occupation,working,1,716,436,697,9.028702844036697,8.490555,2025-11-19 01:00:00,60.89385474860335
+Champs-Elysées,evalue,taux_occupation,working,2,716,443,696,6.693431173814898,6.17889,2025-11-19 02:00:00,61.87150837988827
+Champs-Elysées,evalue,taux_occupation,working,3,716,438,698,5.085059566210045,4.46028,2025-11-19 03:00:00,61.1731843575419
+Champs-Elysées,evalue,taux_occupation,working,4,716,435,697,3.3964429885057474,2.88611,2025-11-19 04:00:00,60.754189944134076
+Champs-Elysées,evalue,taux_occupation,working,5,716,438,697,2.536615799086758,2.229445,2025-11-19 05:00:00,61.1731843575419
+Champs-Elysées,evalue,taux_occupation,working,6,716,436,698,3.8045716513761465,3.333335,2025-11-19 06:00:00,60.89385474860335
+Champs-Elysées,evalue,taux_occupation,working,7,716,439,698,6.475067198177677,6.02889,2025-11-19 07:00:00,61.312849162011176
+Champs-Elysées,evalue,taux_occupation,working,8,716,437,696,10.354696201372997,10.18722,2025-11-19 08:00:00,61.03351955307262
+Champs-Elysées,evalue,taux_occupation,working,9,716,428,696,14.128524042056075,13.76389,2025-11-19 09:00:00,59.77653631284916
+Champs-Elysées,evalue,taux_occupation,working,10,716,426,696,16.626594812206573,15.3925,2025-11-19 10:00:00,59.497206703910614
+Champs-Elysées,evalue,taux_occupation,working,11,716,419,697,18.955097899761338,17.59667,2025-11-19 11:00:00,58.5195530726257
+Champs-Elysées,evalue,taux_occupation,working,12,716,409,696,21.264058655256726,19.76334,2025-11-19 12:00:00,57.12290502793296
+Champs-Elysées,evalue,taux_occupation,working,13,716,415,696,24.714546265060243,23.71,2025-11-18 13:00:00,57.960893854748605
+Champs-Elysées,evalue,taux_occupation,working,14,716,420,698,23.47052238095238,23.271665,2025-11-18 14:00:00,58.659217877094974
+Champs-Elysées,evalue,taux_occupation,working,15,716,431,698,21.651568584686775,21.43833,2025-11-18 15:00:00,60.19553072625698
+Champs-Elysées,evalue,taux_occupation,working,16,716,437,697,22.576281281464528,22.005,2025-11-18 16:00:00,61.03351955307262
+Champs-Elysées,evalue,taux_occupation,working,17,716,432,696,22.374673564814817,21.91167,2025-11-18 17:00:00,60.33519553072626
+Champs-Elysées,evalue,taux_occupation,working,18,716,437,695,23.084363135011444,22.53778,2025-11-18 18:00:00,61.03351955307262
+Champs-Elysées,evalue,taux_occupation,working,19,716,435,695,22.81836512643678,22.56222,2025-11-18 19:00:00,60.754189944134076
+Champs-Elysées,evalue,taux_occupation,working,20,716,434,695,21.91336771889401,21.64333,2025-11-18 20:00:00,60.614525139664806
+Champs-Elysées,evalue,taux_occupation,working,21,716,437,695,18.684772562929062,18.20611,2025-11-18 21:00:00,61.03351955307262
+Champs-Elysées,evalue,taux_occupation,working,22,716,436,695,15.841272889908256,15.330835,2025-11-18 22:00:00,60.89385474860335
+Champs-Elysées,evalue,taux_occupation,working,23,716,436,696,13.455467614678899,12.80611,2025-11-18 23:00:00,60.89385474860335
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,0,31,1,30,339.0,339.0,2024-01-01 00:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,1,31,1,31,319.0,319.0,2024-01-01 01:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,2,31,1,31,249.0,249.0,2024-01-01 02:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,3,31,1,31,193.0,193.0,2024-01-01 03:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,4,31,1,31,211.0,211.0,2024-01-01 04:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,5,31,1,31,108.0,108.0,2024-01-01 05:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,6,31,1,31,151.0,151.0,2024-01-01 06:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,7,31,1,31,158.0,158.0,2024-01-01 07:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,8,31,1,31,169.0,169.0,2024-01-01 08:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,9,31,1,31,161.0,161.0,2024-01-01 09:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,10,31,1,31,54.0,54.0,2024-01-01 10:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,11,31,1,31,81.0,81.0,2024-01-01 11:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,12,31,1,31,127.0,127.0,2024-01-01 12:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,13,31,1,31,239.0,239.0,2024-01-01 13:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,14,31,1,31,366.0,366.0,2024-01-01 14:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,15,31,1,31,217.0,217.0,2024-01-01 15:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,16,31,1,31,273.0,273.0,2024-01-01 16:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,17,31,1,31,257.0,257.0,2024-01-01 17:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,18,31,1,31,284.0,284.0,2024-01-01 18:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,19,31,1,31,226.0,226.0,2024-01-01 19:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,20,31,1,31,133.0,133.0,2024-01-01 20:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,21,31,1,31,80.0,80.0,2024-01-01 21:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,22,31,1,31,3.0,3.0,2024-01-01 22:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,holiday,23,31,1,31,3.0,3.0,2024-01-01 23:00:00,3.225806451612903
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,0,292,6,285,11.333333333333334,7.0,2024-01-28 00:00:00,2.0547945205479454
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,1,292,6,284,9.5,3.5,2024-01-28 01:00:00,2.0547945205479454
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,2,292,5,283,5.6,3.0,2024-01-28 02:00:00,1.7123287671232876
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,3,292,6,286,2.8333333333333335,2.0,2024-01-28 03:00:00,2.0547945205479454
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,4,292,3,285,1.3333333333333333,1.0,2024-01-27 04:00:00,1.0273972602739727
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,5,292,1,285,3.0,3.0,2024-01-06 05:00:00,0.3424657534246575
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,6,292,2,285,6.5,6.5,2024-01-28 06:00:00,0.684931506849315
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,7,292,4,285,1.0,1.0,2024-01-28 07:00:00,1.36986301369863
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,8,292,5,285,4.0,3.0,2024-01-28 08:00:00,1.7123287671232876
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,9,292,3,285,4.0,2.0,2024-01-27 09:00:00,1.0273972602739727
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,10,292,6,285,9.833333333333334,8.0,2024-01-28 10:00:00,2.0547945205479454
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,11,292,7,285,16.0,12.0,2024-01-28 11:00:00,2.3972602739726026
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,12,292,7,285,51.285714285714285,44.0,2024-01-28 12:00:00,2.3972602739726026
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,13,292,7,285,77.28571428571429,73.0,2024-01-28 13:00:00,2.3972602739726026
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,14,292,7,285,117.71428571428571,90.0,2024-01-28 14:00:00,2.3972602739726026
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,15,292,7,284,130.85714285714286,114.0,2024-01-28 15:00:00,2.3972602739726026
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,16,292,7,285,198.57142857142858,134.0,2024-01-28 16:00:00,2.3972602739726026
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,17,292,7,285,172.42857142857142,139.0,2024-01-28 17:00:00,2.3972602739726026
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,18,292,8,285,154.5,143.0,2024-01-28 18:00:00,2.73972602739726
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,19,292,8,285,105.0,84.0,2024-01-28 19:00:00,2.73972602739726
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,20,292,8,285,68.5,62.0,2024-01-28 20:00:00,2.73972602739726
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,21,292,8,285,24.375,18.0,2024-01-28 21:00:00,2.73972602739726
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,22,292,8,285,17.625,14.0,2024-01-28 22:00:00,2.73972602739726
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,weekend,23,292,7,285,12.428571428571429,5.0,2024-01-28 23:00:00,2.3972602739726026
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,0,716,13,698,58.30769230769231,9.0,2024-01-26 00:00:00,1.8156424581005586
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,1,716,12,697,62.666666666666664,17.0,2024-01-26 01:00:00,1.675977653631285
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,2,716,9,696,75.33333333333333,49.0,2024-01-26 02:00:00,1.2569832402234637
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,3,716,11,698,44.36363636363637,13.0,2024-01-29 03:00:00,1.5363128491620113
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,4,716,10,697,49.4,18.5,2024-01-26 04:00:00,1.3966480446927374
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,5,716,7,697,103.85714285714286,25.0,2024-01-26 05:00:00,0.9776536312849162
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,6,716,9,698,75.66666666666667,5.0,2024-01-29 06:00:00,1.2569832402234637
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,7,716,12,698,38.916666666666664,3.0,2024-01-29 07:00:00,1.675977653631285
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,8,716,17,696,30.11764705882353,7.0,2024-01-29 08:00:00,2.374301675977654
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,9,716,17,696,36.23529411764706,6.0,2024-01-29 09:00:00,2.374301675977654
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,10,716,17,696,31.058823529411764,17.0,2024-01-29 10:00:00,2.374301675977654
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,11,716,17,697,47.94117647058823,34.0,2024-01-29 11:00:00,2.374301675977654
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,12,716,16,696,63.75,44.5,2024-01-29 12:00:00,2.2346368715083798
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,13,716,16,696,92.0,62.5,2024-01-26 13:00:00,2.2346368715083798
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,14,716,16,698,79.875,47.0,2024-01-26 14:00:00,2.2346368715083798
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,15,716,16,698,125.3125,53.5,2024-01-26 15:00:00,2.2346368715083798
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,16,716,16,697,108.1875,49.0,2024-01-26 16:00:00,2.2346368715083798
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,17,716,16,696,133.9375,98.5,2024-01-26 17:00:00,2.2346368715083798
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,18,716,16,695,134.5625,87.5,2024-01-26 18:00:00,2.2346368715083798
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,19,716,16,695,110.5625,84.0,2024-01-26 19:00:00,2.2346368715083798
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,20,716,16,695,83.0625,70.0,2024-01-26 20:00:00,2.2346368715083798
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,21,716,16,695,60.6875,39.0,2024-01-26 21:00:00,2.2346368715083798
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,22,716,14,695,59.5,23.5,2024-01-26 22:00:00,1.9553072625698324
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,working,23,716,15,696,62.333333333333336,11.0,2024-01-26 23:00:00,2.094972067039106
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,0,31,25,30,8.8924904,6.23,2026-11-01 00:00:00,80.64516129032258
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,1,31,25,31,10.671669199999998,6.46945,2026-11-01 01:00:00,80.64516129032258
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,2,31,25,31,7.0085568,4.89,2026-11-01 02:00:00,80.64516129032258
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,3,31,24,31,5.85176125,3.75556,2026-11-01 03:00:00,77.41935483870968
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,4,31,26,31,8.333740384615385,2.5549999999999997,2026-11-01 04:00:00,83.87096774193549
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,5,31,28,31,4.714188571428571,1.3900000000000001,2026-11-01 05:00:00,90.3225806451613
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,6,31,28,31,2.8229975,1.462225,2026-11-01 06:00:00,90.3225806451613
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,7,31,27,31,1.9174703703703702,1.42056,2026-11-01 07:00:00,87.09677419354838
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,8,31,26,31,1.5292957692307694,1.129725,2026-11-01 08:00:00,83.87096774193549
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,9,31,26,31,1.0583773076923078,0.827225,2026-11-01 09:00:00,83.87096774193549
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,10,31,27,31,1.4296933333333333,1.32445,2026-11-01 10:00:00,87.09677419354838
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,11,31,26,31,2.577415769230769,2.42389,2026-11-01 11:00:00,83.87096774193549
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,12,31,27,31,3.70175,3.88112,2026-11-01 12:00:00,87.09677419354838
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,13,31,28,31,4.0459128571428575,4.4350000000000005,2026-11-01 13:00:00,90.3225806451613
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,14,31,28,31,4.792083571428571,4.778335,2026-11-01 14:00:00,90.3225806451613
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,15,31,27,31,6.7659488888888895,6.24,2026-11-01 15:00:00,87.09677419354838
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,16,31,27,31,8.78991962962963,7.91556,2026-11-01 16:00:00,87.09677419354838
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,17,31,29,31,10.739139655172414,9.53056,2026-11-01 17:00:00,93.54838709677419
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,18,31,29,31,13.90322,11.575,2026-11-01 18:00:00,93.54838709677419
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,19,31,30,31,15.942186,14.493055,2026-11-01 19:00:00,96.7741935483871
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,20,31,28,31,13.524683928571429,11.720275,2026-11-01 20:00:00,90.3225806451613
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,21,31,28,31,12.844186785714285,11.310835,2026-11-01 21:00:00,90.3225806451613
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,22,31,29,31,10.27149551724138,8.88833,2026-11-01 22:00:00,93.54838709677419
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,holiday,23,31,29,31,7.283141724137931,5.95556,2026-11-01 23:00:00,93.54838709677419
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,0,292,270,285,11.212933481481482,8.45778,2026-10-31 00:00:00,92.46575342465754
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,1,292,268,284,14.166912574626867,8.287225,2026-10-31 01:00:00,91.78082191780823
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,2,292,267,283,16.389826329588015,7.44333,2026-10-31 02:00:00,91.43835616438356
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,3,292,271,286,14.534757084870849,5.75722,2026-10-31 03:00:00,92.8082191780822
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,4,292,273,285,7.6153308424908435,3.85389,2026-10-31 04:00:00,93.4931506849315
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,5,292,271,285,3.6129326937269375,2.64111,2026-10-31 05:00:00,92.8082191780822
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,6,292,275,285,2.3976820363636366,2.16278,2026-10-31 06:00:00,94.17808219178082
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,7,292,275,285,1.9300299636363636,1.82111,2026-10-31 07:00:00,94.17808219178082
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,8,292,273,285,1.4647978754578754,1.42111,2026-10-31 08:00:00,93.4931506849315
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,9,292,269,285,1.4069547211895912,1.32833,2026-10-31 09:00:00,92.12328767123287
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,10,292,272,285,1.9163534558823532,1.82361,2026-10-31 10:00:00,93.15068493150685
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,11,292,269,285,2.977923531598513,2.82334,2026-10-31 11:00:00,92.12328767123287
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,12,292,270,285,4.1179003703703705,4.247225,2026-10-31 12:00:00,92.46575342465754
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,13,292,268,285,4.6630776865671635,4.734445,2026-10-31 13:00:00,91.78082191780823
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,14,292,263,285,5.003822357414449,5.13834,2026-10-31 14:00:00,90.06849315068493
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,15,292,265,284,5.719978339622641,6.0,2026-10-31 15:00:00,90.75342465753425
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,16,292,267,285,6.930157265917603,6.94056,2026-10-31 16:00:00,91.43835616438356
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,17,292,272,285,8.35749518382353,8.243335,2026-10-31 17:00:00,93.15068493150685
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,18,292,269,285,10.057927918215613,9.45445,2026-10-31 18:00:00,92.12328767123287
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,19,292,273,285,10.573389377289377,8.96945,2026-10-31 19:00:00,93.4931506849315
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,20,292,271,285,9.832020774907749,9.21167,2026-10-31 20:00:00,92.8082191780822
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,21,292,270,285,9.446299925925926,8.26,2026-10-31 21:00:00,92.46575342465754
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,22,292,271,285,8.855073062730627,7.02611,2026-10-31 22:00:00,92.8082191780822
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,weekend,23,292,271,285,8.631272250922509,6.16611,2026-10-31 23:00:00,92.8082191780822
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,0,716,665,698,4.817951052631579,4.22667,2026-11-04 00:00:00,92.87709497206704
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,1,716,661,697,3.8315551437216335,3.18667,2026-11-04 01:00:00,92.31843575418995
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,2,716,667,696,2.5856841379310342,2.07111,2026-11-04 02:00:00,93.15642458100558
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,3,716,660,698,2.0023429545454547,1.49389,2026-11-04 03:00:00,92.17877094972067
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,4,716,659,697,1.292559119878604,0.94389,2026-11-04 04:00:00,92.0391061452514
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,5,716,663,697,0.8001528657616893,0.66222,2026-11-04 05:00:00,92.59776536312849
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,6,716,660,698,0.9373260454545455,0.8255600000000001,2026-11-04 06:00:00,92.17877094972067
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,7,716,655,698,1.7167475114503818,1.62722,2026-11-04 07:00:00,91.4804469273743
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,8,716,651,696,2.6268071582181256,2.46944,2026-11-04 08:00:00,90.92178770949721
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,9,716,647,696,4.660518918083462,4.11222,2026-11-04 09:00:00,90.36312849162012
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,10,716,641,696,5.455130358814352,4.94444,2026-11-04 10:00:00,89.52513966480447
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,11,716,629,697,7.979822877583465,6.92056,2026-11-04 11:00:00,87.84916201117318
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,12,716,624,696,10.426919166666668,8.796389999999999,2026-11-04 12:00:00,87.15083798882682
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,13,716,631,696,11.133973169572108,9.23278,2026-11-04 13:00:00,88.12849162011173
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,14,716,638,698,10.432207993730408,8.976945,2026-11-04 14:00:00,89.10614525139665
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,15,716,650,698,10.756312446153846,9.169170000000001,2026-11-04 15:00:00,90.78212290502793
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,16,716,656,697,12.432698292682927,10.12695,2026-11-04 16:00:00,91.62011173184358
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,17,716,649,696,12.09706748844376,10.50167,2026-11-04 17:00:00,90.64245810055866
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,18,716,657,695,11.92021182648402,10.19389,2026-11-04 18:00:00,91.75977653631286
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,19,716,659,695,9.877784264036418,8.51667,2026-11-04 19:00:00,92.0391061452514
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,20,716,655,695,9.32070251908397,8.04611,2026-11-04 20:00:00,91.4804469273743
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,21,716,659,695,9.045997951441578,7.81778,2026-11-04 21:00:00,92.0391061452514
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,22,716,656,695,7.2220719207317075,6.31917,2026-11-04 22:00:00,91.62011173184358
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,working,23,716,655,696,6.407049496183205,5.35611,2026-11-04 23:00:00,91.4804469273743
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,0,31,14,30,886.5714285714286,1002.0,2026-11-01 00:00:00,45.16129032258065
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,1,31,15,31,909.4,1053.0,2026-11-01 01:00:00,48.38709677419355
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,2,31,15,31,817.4666666666667,901.0,2026-11-01 02:00:00,48.38709677419355
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,3,31,15,31,722.4,703.0,2026-11-01 03:00:00,48.38709677419355
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,4,31,15,31,565.2666666666667,593.0,2026-11-01 04:00:00,48.38709677419355
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,5,31,15,31,470.4,382.0,2026-11-01 05:00:00,48.38709677419355
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,6,31,16,31,411.4375,380.5,2026-11-01 06:00:00,51.61290322580645
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,7,31,16,31,420.75,458.5,2026-11-01 07:00:00,51.61290322580645
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,8,31,16,31,348.8125,350.5,2026-11-01 08:00:00,51.61290322580645
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,9,31,16,31,325.0625,350.0,2026-11-01 09:00:00,51.61290322580645
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,10,31,16,31,380.75,403.0,2026-11-01 10:00:00,51.61290322580645
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,11,31,16,31,494.875,492.0,2026-11-01 11:00:00,51.61290322580645
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,12,31,16,31,548.3125,573.0,2026-11-01 12:00:00,51.61290322580645
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,13,31,16,31,643.1875,705.0,2026-11-01 13:00:00,51.61290322580645
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,14,31,17,31,635.7058823529412,715.0,2026-11-01 14:00:00,54.83870967741935
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,15,31,17,31,705.7647058823529,757.0,2026-11-01 15:00:00,54.83870967741935
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,16,31,17,31,796.8823529411765,837.0,2026-11-01 16:00:00,54.83870967741935
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,17,31,17,31,826.2941176470588,870.0,2026-11-01 17:00:00,54.83870967741935
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,18,31,17,31,834.2941176470588,929.0,2026-11-01 18:00:00,54.83870967741935
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,19,31,17,31,804.0588235294117,897.0,2026-11-01 19:00:00,54.83870967741935
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,20,31,17,31,859.1764705882352,921.0,2026-11-01 20:00:00,54.83870967741935
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,21,31,17,31,816.8235294117648,926.0,2026-11-01 21:00:00,54.83870967741935
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,22,31,17,31,779.7647058823529,849.0,2026-11-01 22:00:00,54.83870967741935
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,holiday,23,31,17,31,787.5882352941177,900.0,2026-11-01 23:00:00,54.83870967741935
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,0,292,161,285,1012.0310559006211,1123.0,2026-10-31 00:00:00,55.136986301369866
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,1,292,161,284,1027.9068322981366,1124.0,2026-10-31 01:00:00,55.136986301369866
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,2,292,160,283,940.9875,1011.5,2026-10-31 02:00:00,54.794520547945204
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,3,292,163,286,820.8282208588957,869.0,2026-10-31 03:00:00,55.821917808219176
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,4,292,162,285,699.9691358024692,756.5,2026-10-31 04:00:00,55.47945205479452
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,5,292,160,285,575.79375,580.5,2026-10-31 05:00:00,54.794520547945204
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,6,292,162,285,484.9074074074074,505.5,2026-10-31 06:00:00,55.47945205479452
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,7,292,162,285,436.75308641975306,483.0,2026-10-31 07:00:00,55.47945205479452
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,8,292,161,285,383.4099378881988,408.0,2026-10-31 08:00:00,55.136986301369866
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,9,292,160,285,391.875,400.0,2026-10-31 09:00:00,54.794520547945204
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,10,292,160,285,478.43125,484.5,2026-10-31 10:00:00,54.794520547945204
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,11,292,158,285,584.1012658227849,582.5,2026-10-31 11:00:00,54.10958904109589
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,12,292,159,285,682.3333333333334,686.0,2026-10-31 12:00:00,54.45205479452055
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,13,292,163,285,714.4539877300614,741.0,2026-10-31 13:00:00,55.821917808219176
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,14,292,163,285,679.5766871165645,722.0,2026-10-31 14:00:00,55.821917808219176
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,15,292,160,284,724.71875,755.0,2026-10-31 15:00:00,54.794520547945204
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,16,292,162,285,780.1728395061729,836.5,2026-10-31 16:00:00,55.47945205479452
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,17,292,162,285,831.9629629629629,879.0,2026-10-31 17:00:00,55.47945205479452
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,18,292,164,285,848.4878048780488,910.0,2026-10-31 18:00:00,56.16438356164384
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,19,292,164,285,860.7682926829268,915.0,2026-10-31 19:00:00,56.16438356164384
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,20,292,163,285,868.8466257668712,927.0,2026-10-31 20:00:00,55.821917808219176
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,21,292,163,285,828.4539877300614,899.0,2026-10-31 21:00:00,55.821917808219176
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,22,292,163,285,832.638036809816,904.0,2026-10-31 22:00:00,55.821917808219176
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,weekend,23,292,161,285,875.0124223602485,940.0,2026-10-31 23:00:00,55.136986301369866
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,0,716,388,698,893.3530927835052,941.0,2026-11-04 00:00:00,54.18994413407821
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,1,716,385,697,786.5454545454545,833.0,2026-11-04 01:00:00,53.770949720670394
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,2,716,387,696,592.1033591731266,606.0,2026-11-04 02:00:00,54.05027932960894
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,3,716,388,698,452.0128865979381,443.0,2026-11-04 03:00:00,54.18994413407821
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,4,716,386,697,318.0025906735751,301.5,2026-11-04 04:00:00,53.910614525139664
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,5,716,385,697,245.39220779220778,236.0,2026-11-04 05:00:00,53.770949720670394
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,6,716,386,698,275.25129533678756,281.5,2026-11-04 06:00:00,53.910614525139664
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,7,716,384,698,421.2630208333333,461.0,2026-11-04 07:00:00,53.63128491620112
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,8,716,380,696,646.1078947368421,681.5,2026-11-04 08:00:00,53.072625698324025
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,9,716,380,696,875.3263157894737,899.5,2026-11-04 09:00:00,53.072625698324025
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,10,716,371,696,903.3261455525607,879.0,2026-11-04 10:00:00,51.815642458100555
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,11,716,371,697,906.2452830188679,896.0,2026-11-04 11:00:00,51.815642458100555
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,12,716,372,696,957.25,959.5,2026-11-04 12:00:00,51.95530726256983
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,13,716,368,696,991.7907608695652,988.0,2026-11-04 13:00:00,51.39664804469274
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,14,716,378,698,964.1031746031746,996.5,2026-11-04 14:00:00,52.79329608938548
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,15,716,381,698,1014.3385826771654,1039.0,2026-11-04 15:00:00,53.212290502793294
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,16,716,378,697,1036.8227513227514,1052.0,2026-11-04 16:00:00,52.79329608938548
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,17,716,383,696,1040.0130548302873,1054.0,2026-11-04 17:00:00,53.49162011173184
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,18,716,387,695,1026.7209302325582,1034.0,2026-11-04 18:00:00,54.05027932960894
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,19,716,385,695,997.0207792207792,1012.0,2026-11-04 19:00:00,53.770949720670394
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,20,716,387,695,985.9302325581396,1016.0,2026-11-04 20:00:00,54.05027932960894
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,21,716,385,695,904.9896103896103,931.0,2026-11-04 21:00:00,53.770949720670394
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,22,716,383,695,863.1932114882507,924.0,2026-11-04 22:00:00,53.49162011173184
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,working,23,716,384,696,912.2734375,966.0,2026-11-04 23:00:00,53.63128491620112
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,0,31,21,30,20.100661904761903,17.64778,2026-07-14 00:00:00,67.74193548387096
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,1,31,23,31,16.934035217391305,16.22389,2026-07-14 01:00:00,74.19354838709677
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,2,31,24,31,12.390833333333333,11.737775,2026-07-14 02:00:00,77.41935483870968
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,3,31,24,31,9.4091,7.136115,2026-07-14 03:00:00,77.41935483870968
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,4,31,24,31,5.561111666666666,4.000285,2026-07-14 04:00:00,77.41935483870968
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,5,31,23,31,4.162876086956522,2.27167,2026-07-14 05:00:00,74.19354838709677
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,6,31,24,31,3.2384733333333333,2.064165,2026-07-14 06:00:00,77.41935483870968
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,7,31,24,31,3.08801,2.1138899999999996,2026-07-14 07:00:00,77.41935483870968
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,8,31,24,31,2.5342141666666667,2.314725,2026-07-14 08:00:00,77.41935483870968
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,9,31,24,31,2.9693758333333338,2.208335,2026-07-14 09:00:00,77.41935483870968
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,10,31,23,31,4.870460434782609,4.06834,2026-07-14 10:00:00,74.19354838709677
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,11,31,23,31,7.860580869565218,5.53778,2026-07-14 11:00:00,74.19354838709677
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,12,31,23,31,12.459083043478262,12.07389,2026-07-14 12:00:00,74.19354838709677
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,13,31,23,31,10.721980869565217,11.61111,2026-07-14 13:00:00,74.19354838709677
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,14,31,23,31,10.94464043478261,10.31556,2026-07-14 14:00:00,74.19354838709677
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,15,31,23,31,12.034250869565218,12.05222,2026-07-14 15:00:00,74.19354838709677
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,16,31,23,31,14.490943478260869,15.14334,2026-07-14 16:00:00,74.19354838709677
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,17,31,23,31,17.827006521739133,17.63778,2026-07-14 17:00:00,74.19354838709677
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,18,31,23,31,16.73741652173913,16.78333,2026-07-14 18:00:00,74.19354838709677
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,19,31,23,31,18.379010869565217,18.26667,2026-07-14 19:00:00,74.19354838709677
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,20,31,23,31,16.753648695652174,17.87167,2026-07-14 20:00:00,74.19354838709677
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,21,31,23,31,15.911909130434783,14.17056,2026-07-14 21:00:00,74.19354838709677
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,22,31,23,31,13.031425652173912,11.12833,2026-07-14 22:00:00,74.19354838709677
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,holiday,23,31,23,31,12.111861304347826,11.31389,2026-07-14 23:00:00,74.19354838709677
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,0,292,197,285,18.862711015228427,19.46444,2026-07-26 00:00:00,67.46575342465754
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,1,292,197,284,21.359428680203045,21.995,2026-07-26 01:00:00,67.46575342465754
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,2,292,195,283,21.58488984615385,21.17667,2026-07-26 02:00:00,66.78082191780823
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,3,292,197,286,14.88861654822335,11.81222,2026-07-26 03:00:00,67.46575342465754
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,4,292,197,285,12.651112385786801,8.68611,2026-07-26 04:00:00,67.46575342465754
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,5,292,197,285,6.945819035532995,4.57056,2026-07-26 05:00:00,67.46575342465754
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,6,292,198,285,3.5175630303030303,3.109445,2026-07-26 06:00:00,67.8082191780822
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,7,292,199,285,2.947404974874372,2.82,2026-07-26 07:00:00,68.15068493150685
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,8,292,197,285,3.1133853807106595,2.95167,2026-07-26 08:00:00,67.46575342465754
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,9,292,196,285,3.213349132653061,2.87861,2026-07-26 09:00:00,67.12328767123287
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,10,292,196,285,5.024371734693878,4.26028,2026-07-26 10:00:00,67.12328767123287
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,11,292,194,285,8.279016391752577,7.13917,2026-07-26 11:00:00,66.43835616438356
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,12,292,194,285,10.581095412371132,9.580555,2026-07-26 12:00:00,66.43835616438356
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,13,292,197,285,11.267071015228426,11.31778,2026-07-26 13:00:00,67.46575342465754
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,14,292,197,285,11.066744060913706,10.25556,2026-07-26 14:00:00,67.46575342465754
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,15,292,195,284,12.175989999999999,11.875,2026-07-26 15:00:00,66.78082191780823
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,16,292,197,285,13.148554568527919,12.99056,2026-07-26 16:00:00,67.46575342465754
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,17,292,199,285,15.006598190954774,14.33,2026-07-26 17:00:00,68.15068493150685
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,18,292,199,285,15.43428623115578,15.01611,2026-07-26 18:00:00,68.15068493150685
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,19,292,199,285,15.996743216080402,14.18222,2026-07-26 19:00:00,68.15068493150685
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,20,292,199,285,13.167482763819095,12.44944,2026-07-26 20:00:00,68.15068493150685
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,21,292,199,285,13.4056991959799,12.02278,2026-07-26 21:00:00,68.15068493150685
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,22,292,199,285,12.869336834170856,12.01722,2026-07-26 22:00:00,68.15068493150685
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,weekend,23,292,198,285,13.888985606060606,12.039445,2026-07-26 23:00:00,67.8082191780822
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,0,716,471,698,11.14242872611465,9.92333,2026-07-29 00:00:00,65.78212290502793
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,1,716,467,697,8.317755203426124,7.15111,2026-07-29 01:00:00,65.22346368715084
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,2,716,472,696,4.964179639830509,4.389445,2026-07-29 02:00:00,65.92178770949721
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,3,716,471,698,3.2922234607218686,2.80889,2026-07-29 03:00:00,65.78212290502793
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,4,716,469,697,2.022466119402985,1.67945,2026-07-29 04:00:00,65.50279329608938
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,5,716,470,697,1.5607799574468086,1.230555,2026-07-29 05:00:00,65.64245810055866
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,6,716,468,698,1.9274229914529915,1.55639,2026-07-29 06:00:00,65.36312849162012
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,7,716,468,698,3.3405031623931625,3.115275,2026-07-29 07:00:00,65.36312849162012
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,8,716,461,696,6.072713752711497,6.02611,2026-07-29 08:00:00,64.3854748603352
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,9,716,457,696,10.565332056892778,10.99722,2026-07-29 09:00:00,63.8268156424581
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,10,716,446,696,12.837902331838565,12.767505,2026-07-29 10:00:00,62.29050279329609
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,11,716,452,697,15.566803230088496,15.751115,2026-07-29 11:00:00,63.12849162011173
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,12,716,455,696,19.238164835164834,19.45334,2026-07-29 12:00:00,63.547486033519554
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,13,716,451,696,19.521983414634146,19.75611,2026-07-29 13:00:00,62.98882681564246
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,14,716,462,698,18.62884935064935,18.924725000000002,2026-07-29 14:00:00,64.52513966480447
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,15,716,460,698,19.813361108695652,19.755835,2026-07-28 15:00:00,64.24581005586592
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,16,716,459,697,20.871936579520696,21.04334,2026-07-28 16:00:00,64.10614525139665
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,17,716,465,696,20.53145389247312,20.51945,2026-07-28 17:00:00,64.94413407821229
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,18,716,469,695,18.88165486140725,18.78222,2026-07-28 18:00:00,65.50279329608938
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,19,716,464,695,19.53226896551724,17.192500000000003,2026-07-28 19:00:00,64.80446927374301
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,20,716,464,695,15.674571314655172,13.852775,2026-07-28 20:00:00,64.80446927374301
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,21,716,463,695,13.26517870410367,12.20778,2026-07-28 21:00:00,64.66480446927375
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,22,716,467,695,11.292234111349035,10.43389,2026-07-28 22:00:00,65.22346368715084
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,working,23,716,468,696,12.607001581196583,11.854995,2026-07-28 23:00:00,65.36312849162012
+Convention,evalue,debit_horaire,holiday,0,31,18,30,322.72222222222223,339.0,2026-11-01 00:00:00,58.064516129032256
+Convention,evalue,debit_horaire,holiday,1,31,18,31,333.22222222222223,310.5,2026-11-01 01:00:00,58.064516129032256
+Convention,evalue,debit_horaire,holiday,2,31,18,31,291.72222222222223,221.5,2026-11-01 02:00:00,58.064516129032256
+Convention,evalue,debit_horaire,holiday,3,31,18,31,252.88888888888889,168.0,2026-11-01 03:00:00,58.064516129032256
+Convention,evalue,debit_horaire,holiday,4,31,18,31,191.16666666666666,135.0,2026-11-01 04:00:00,58.064516129032256
+Convention,evalue,debit_horaire,holiday,5,31,18,31,143.11111111111111,87.5,2026-11-01 05:00:00,58.064516129032256
+Convention,evalue,debit_horaire,holiday,6,31,18,31,144.55555555555554,121.0,2026-11-01 06:00:00,58.064516129032256
+Convention,evalue,debit_horaire,holiday,7,31,17,31,154.11764705882354,149.0,2026-11-01 07:00:00,54.83870967741935
+Convention,evalue,debit_horaire,holiday,8,31,17,31,166.1764705882353,171.0,2026-11-01 08:00:00,54.83870967741935
+Convention,evalue,debit_horaire,holiday,9,31,17,31,187.58823529411765,187.0,2026-11-01 09:00:00,54.83870967741935
+Convention,evalue,debit_horaire,holiday,10,31,16,31,233.25,250.5,2026-11-01 10:00:00,51.61290322580645
+Convention,evalue,debit_horaire,holiday,11,31,17,31,295.3529411764706,289.0,2026-11-01 11:00:00,54.83870967741935
+Convention,evalue,debit_horaire,holiday,12,31,16,31,396.3125,404.0,2026-11-01 12:00:00,51.61290322580645
+Convention,evalue,debit_horaire,holiday,13,31,17,31,431.7647058823529,449.0,2026-11-01 13:00:00,54.83870967741935
+Convention,evalue,debit_horaire,holiday,14,31,17,31,424.1764705882353,419.0,2026-11-01 14:00:00,54.83870967741935
+Convention,evalue,debit_horaire,holiday,15,31,17,31,432.2352941176471,453.0,2026-11-01 15:00:00,54.83870967741935
+Convention,evalue,debit_horaire,holiday,16,31,17,31,460.1764705882353,478.0,2026-11-01 16:00:00,54.83870967741935
+Convention,evalue,debit_horaire,holiday,17,31,17,31,472.94117647058823,453.0,2026-11-01 17:00:00,54.83870967741935
+Convention,evalue,debit_horaire,holiday,18,31,18,31,487.1111111111111,518.0,2026-11-01 18:00:00,58.064516129032256
+Convention,evalue,debit_horaire,holiday,19,31,18,31,510.27777777777777,513.0,2026-11-01 19:00:00,58.064516129032256
+Convention,evalue,debit_horaire,holiday,20,31,18,31,492.1666666666667,498.5,2026-11-01 20:00:00,58.064516129032256
+Convention,evalue,debit_horaire,holiday,21,31,18,31,432.72222222222223,423.5,2026-11-01 21:00:00,58.064516129032256
+Convention,evalue,debit_horaire,holiday,22,31,18,31,361.55555555555554,341.5,2026-11-01 22:00:00,58.064516129032256
+Convention,evalue,debit_horaire,holiday,23,31,18,31,333.05555555555554,316.0,2026-11-01 23:00:00,58.064516129032256
+Convention,evalue,debit_horaire,weekend,0,292,185,285,368.9891891891892,363.0,2026-10-31 00:00:00,63.35616438356164
+Convention,evalue,debit_horaire,weekend,1,292,185,284,325.41621621621624,318.0,2026-10-31 01:00:00,63.35616438356164
+Convention,evalue,debit_horaire,weekend,2,292,183,283,246.7486338797814,246.0,2026-10-31 02:00:00,62.67123287671233
+Convention,evalue,debit_horaire,weekend,3,292,183,286,201.4153005464481,198.0,2026-10-31 03:00:00,62.67123287671233
+Convention,evalue,debit_horaire,weekend,4,292,185,285,159.7891891891892,158.0,2026-10-31 04:00:00,63.35616438356164
+Convention,evalue,debit_horaire,weekend,5,292,185,285,137.25945945945946,134.0,2026-10-31 05:00:00,63.35616438356164
+Convention,evalue,debit_horaire,weekend,6,292,183,285,133.39344262295083,135.0,2026-10-31 06:00:00,62.67123287671233
+Convention,evalue,debit_horaire,weekend,7,292,183,285,153.33333333333334,151.0,2026-10-31 07:00:00,62.67123287671233
+Convention,evalue,debit_horaire,weekend,8,292,184,285,179.5108695652174,172.0,2026-10-31 08:00:00,63.013698630136986
+Convention,evalue,debit_horaire,weekend,9,292,183,285,238.63387978142077,221.0,2026-10-31 09:00:00,62.67123287671233
+Convention,evalue,debit_horaire,weekend,10,292,184,285,322.2282608695652,299.5,2026-10-31 10:00:00,63.013698630136986
+Convention,evalue,debit_horaire,weekend,11,292,185,285,402.97297297297297,388.0,2026-10-31 11:00:00,63.35616438356164
+Convention,evalue,debit_horaire,weekend,12,292,185,285,482.4054054054054,472.0,2026-10-31 12:00:00,63.35616438356164
+Convention,evalue,debit_horaire,weekend,13,292,183,285,536.3224043715848,527.0,2026-10-31 13:00:00,62.67123287671233
+Convention,evalue,debit_horaire,weekend,14,292,184,285,508.5271739130435,501.5,2026-10-31 14:00:00,63.013698630136986
+Convention,evalue,debit_horaire,weekend,15,292,181,284,540.7734806629834,534.0,2026-10-31 15:00:00,61.986301369863014
+Convention,evalue,debit_horaire,weekend,16,292,184,285,566.554347826087,570.5,2026-10-31 16:00:00,63.013698630136986
+Convention,evalue,debit_horaire,weekend,17,292,183,285,566.7158469945355,562.0,2026-10-31 17:00:00,62.67123287671233
+Convention,evalue,debit_horaire,weekend,18,292,183,285,568.2185792349727,561.0,2026-10-31 18:00:00,62.67123287671233
+Convention,evalue,debit_horaire,weekend,19,292,185,285,578.2216216216216,569.0,2026-10-31 19:00:00,63.35616438356164
+Convention,evalue,debit_horaire,weekend,20,292,185,285,559.2594594594594,549.0,2026-10-31 20:00:00,63.35616438356164
+Convention,evalue,debit_horaire,weekend,21,292,184,285,459.6902173913044,454.5,2026-10-31 21:00:00,63.013698630136986
+Convention,evalue,debit_horaire,weekend,22,292,184,285,387.375,387.5,2026-10-31 22:00:00,63.013698630136986
+Convention,evalue,debit_horaire,weekend,23,292,183,285,341.2021857923497,335.0,2026-10-31 23:00:00,62.67123287671233
+Convention,evalue,debit_horaire,working,0,716,437,698,319.08924485125857,299.0,2026-11-04 00:00:00,61.03351955307262
+Convention,evalue,debit_horaire,working,1,716,438,697,238.31278538812785,220.5,2026-11-04 01:00:00,61.1731843575419
+Convention,evalue,debit_horaire,working,2,716,438,696,146.9931506849315,138.0,2026-11-04 02:00:00,61.1731843575419
+Convention,evalue,debit_horaire,working,3,716,439,698,101.80182232346242,95.0,2026-11-04 03:00:00,61.312849162011176
+Convention,evalue,debit_horaire,working,4,716,439,697,76.6127562642369,72.0,2026-11-04 04:00:00,61.312849162011176
+Convention,evalue,debit_horaire,working,5,716,438,697,80.08675799086758,78.0,2026-11-04 05:00:00,61.1731843575419
+Convention,evalue,debit_horaire,working,6,716,438,698,119.71689497716895,116.0,2026-11-04 06:00:00,61.1731843575419
+Convention,evalue,debit_horaire,working,7,716,438,698,229.08675799086757,228.0,2026-11-04 07:00:00,61.1731843575419
+Convention,evalue,debit_horaire,working,8,716,429,696,405.13986013986016,406.0,2026-11-04 08:00:00,59.91620111731844
+Convention,evalue,debit_horaire,working,9,716,424,696,562.0566037735849,574.0,2026-11-04 09:00:00,59.21787709497207
+Convention,evalue,debit_horaire,working,10,716,420,696,560.9047619047619,561.0,2026-11-04 10:00:00,58.659217877094974
+Convention,evalue,debit_horaire,working,11,716,422,697,528.4691943127962,526.0,2026-11-04 11:00:00,58.93854748603352
+Convention,evalue,debit_horaire,working,12,716,429,696,566.3613053613053,562.0,2026-11-04 12:00:00,59.91620111731844
+Convention,evalue,debit_horaire,working,13,716,433,696,589.8983833718245,583.0,2026-11-04 13:00:00,60.47486033519553
+Convention,evalue,debit_horaire,working,14,716,440,698,608.9704545454546,608.0,2026-11-04 14:00:00,61.452513966480446
+Convention,evalue,debit_horaire,working,15,716,441,698,620.5759637188208,619.0,2026-11-04 15:00:00,61.59217877094972
+Convention,evalue,debit_horaire,working,16,716,443,697,644.7720090293453,656.0,2026-11-04 16:00:00,61.87150837988827
+Convention,evalue,debit_horaire,working,17,716,438,696,673.6712328767123,680.0,2026-11-04 17:00:00,61.1731843575419
+Convention,evalue,debit_horaire,working,18,716,436,695,692.0779816513761,702.5,2026-11-04 18:00:00,60.89385474860335
+Convention,evalue,debit_horaire,working,19,716,436,695,715.2637614678899,731.0,2026-11-04 19:00:00,60.89385474860335
+Convention,evalue,debit_horaire,working,20,716,440,695,654.8,660.0,2026-11-04 20:00:00,61.452513966480446
+Convention,evalue,debit_horaire,working,21,716,439,695,510.3530751708428,508.0,2026-11-04 21:00:00,61.312849162011176
+Convention,evalue,debit_horaire,working,22,716,435,695,369.00689655172414,359.0,2026-11-04 22:00:00,60.754189944134076
+Convention,evalue,debit_horaire,working,23,716,438,696,353.1849315068493,337.5,2026-11-04 23:00:00,61.1731843575419
+Convention,evalue,taux_occupation,holiday,0,31,19,30,2.1806457894736844,2.28056,2026-11-01 00:00:00,61.29032258064516
+Convention,evalue,taux_occupation,holiday,1,31,19,31,2.871988947368421,2.21111,2026-11-01 01:00:00,61.29032258064516
+Convention,evalue,taux_occupation,holiday,2,31,19,31,3.814006842105263,1.28056,2026-11-01 02:00:00,61.29032258064516
+Convention,evalue,taux_occupation,holiday,3,31,19,31,1.9544447368421054,1.13167,2026-11-01 03:00:00,61.29032258064516
+Convention,evalue,taux_occupation,holiday,4,31,19,31,1.2860257894736842,0.89723,2026-11-01 04:00:00,61.29032258064516
+Convention,evalue,taux_occupation,holiday,5,31,19,31,0.8524278947368421,0.58,2026-11-01 05:00:00,61.29032258064516
+Convention,evalue,taux_occupation,holiday,6,31,19,31,0.9762584210526315,0.66944,2026-11-01 06:00:00,61.29032258064516
+Convention,evalue,taux_occupation,holiday,7,31,18,31,0.9006505555555555,0.85834,2026-11-01 07:00:00,58.064516129032256
+Convention,evalue,taux_occupation,holiday,8,31,18,31,1.1723161111111111,1.178055,2026-11-01 08:00:00,58.064516129032256
+Convention,evalue,taux_occupation,holiday,9,31,18,31,1.4132416666666667,1.364445,2026-11-01 09:00:00,58.064516129032256
+Convention,evalue,taux_occupation,holiday,10,31,17,31,1.6191517647058822,1.71056,2026-11-01 10:00:00,54.83870967741935
+Convention,evalue,taux_occupation,holiday,11,31,18,31,2.164476666666667,2.1399999999999997,2026-11-01 11:00:00,58.064516129032256
+Convention,evalue,taux_occupation,holiday,12,31,17,31,2.706439411764706,2.58667,2026-11-01 12:00:00,54.83870967741935
+Convention,evalue,taux_occupation,holiday,13,31,18,31,2.9635183333333335,3.00528,2026-11-01 13:00:00,58.064516129032256
+Convention,evalue,taux_occupation,holiday,14,31,18,31,2.8323777777777774,2.698335,2026-11-01 14:00:00,58.064516129032256
+Convention,evalue,taux_occupation,holiday,15,31,18,31,2.8650627777777777,2.7316700000000003,2026-11-01 15:00:00,58.064516129032256
+Convention,evalue,taux_occupation,holiday,16,31,18,31,3.2796005555555556,2.9311100000000003,2026-11-01 16:00:00,58.064516129032256
+Convention,evalue,taux_occupation,holiday,17,31,18,31,3.3471305555555557,3.055,2026-11-01 17:00:00,58.064516129032256
+Convention,evalue,taux_occupation,holiday,18,31,19,31,3.6607031578947367,3.58278,2026-11-01 18:00:00,61.29032258064516
+Convention,evalue,taux_occupation,holiday,19,31,19,31,3.6316389473684207,3.60834,2026-11-01 19:00:00,61.29032258064516
+Convention,evalue,taux_occupation,holiday,20,31,19,31,3.8744742105263157,3.50723,2026-11-01 20:00:00,61.29032258064516
+Convention,evalue,taux_occupation,holiday,21,31,19,31,2.8960536842105262,2.89278,2026-11-01 21:00:00,61.29032258064516
+Convention,evalue,taux_occupation,holiday,22,31,19,31,2.4235384210526316,2.27722,2026-11-01 22:00:00,61.29032258064516
+Convention,evalue,taux_occupation,holiday,23,31,19,31,2.1482473684210524,1.97445,2026-11-01 23:00:00,61.29032258064516
+Convention,evalue,taux_occupation,weekend,0,292,187,285,2.4743002139037436,2.43222,2026-10-31 00:00:00,64.04109589041096
+Convention,evalue,taux_occupation,weekend,1,292,187,284,2.214933155080214,2.14333,2026-10-31 01:00:00,64.04109589041096
+Convention,evalue,taux_occupation,weekend,2,292,185,283,1.4965809729729729,1.5,2026-10-31 02:00:00,63.35616438356164
+Convention,evalue,taux_occupation,weekend,3,292,185,286,1.2622053513513514,1.22111,2026-10-31 03:00:00,63.35616438356164
+Convention,evalue,taux_occupation,weekend,4,292,187,285,1.0283081818181818,0.95667,2026-10-31 04:00:00,64.04109589041096
+Convention,evalue,taux_occupation,weekend,5,292,187,285,0.8428829946524065,0.81556,2026-10-31 05:00:00,64.04109589041096
+Convention,evalue,taux_occupation,weekend,6,292,185,285,0.7813917837837838,0.77833,2026-10-31 06:00:00,63.35616438356164
+Convention,evalue,taux_occupation,weekend,7,292,185,285,1.018150972972973,0.96167,2026-10-31 07:00:00,63.35616438356164
+Convention,evalue,taux_occupation,weekend,8,292,186,285,1.3092633870967743,1.259725,2026-10-31 08:00:00,63.6986301369863
+Convention,evalue,taux_occupation,weekend,9,292,185,285,1.7794068648648649,1.59167,2026-10-31 09:00:00,63.35616438356164
+Convention,evalue,taux_occupation,weekend,10,292,186,285,2.358137688172043,2.055555,2026-10-31 10:00:00,63.6986301369863
+Convention,evalue,taux_occupation,weekend,11,292,187,285,3.1067332620320856,2.74556,2026-10-31 11:00:00,64.04109589041096
+Convention,evalue,taux_occupation,weekend,12,292,187,285,3.749475454545455,3.21945,2026-10-31 12:00:00,64.04109589041096
+Convention,evalue,taux_occupation,weekend,13,292,185,285,4.064244108108109,3.58,2026-10-31 13:00:00,63.35616438356164
+Convention,evalue,taux_occupation,weekend,14,292,186,285,3.729762311827957,3.4230549999999997,2026-10-31 14:00:00,63.6986301369863
+Convention,evalue,taux_occupation,weekend,15,292,184,284,3.964928586956522,3.686115,2026-10-31 15:00:00,63.013698630136986
+Convention,evalue,taux_occupation,weekend,16,292,187,285,4.690913368983957,3.96222,2026-10-31 16:00:00,64.04109589041096
+Convention,evalue,taux_occupation,weekend,17,292,186,285,4.600765860215054,4.0788899999999995,2026-10-31 17:00:00,63.6986301369863
+Convention,evalue,taux_occupation,weekend,18,292,186,285,5.007161129032258,4.172499999999999,2026-10-31 18:00:00,63.6986301369863
+Convention,evalue,taux_occupation,weekend,19,292,188,285,5.177406436170212,4.239445,2026-10-31 19:00:00,64.38356164383562
+Convention,evalue,taux_occupation,weekend,20,292,187,285,4.793087914438503,4.16723,2026-10-31 20:00:00,64.04109589041096
+Convention,evalue,taux_occupation,weekend,21,292,186,285,3.498110860215054,3.220555,2026-10-31 21:00:00,63.6986301369863
+Convention,evalue,taux_occupation,weekend,22,292,186,285,2.7060943548387097,2.6261099999999997,2026-10-31 22:00:00,63.6986301369863
+Convention,evalue,taux_occupation,weekend,23,292,185,285,2.3190674054054052,2.22445,2026-10-31 23:00:00,63.35616438356164
+Convention,evalue,taux_occupation,working,0,716,444,698,2.140069009009009,2.003335,2026-11-04 00:00:00,62.01117318435754
+Convention,evalue,taux_occupation,working,1,716,445,697,1.608173797752809,1.47667,2026-11-04 01:00:00,62.150837988826815
+Convention,evalue,taux_occupation,working,2,716,445,696,0.8774208988764044,0.80556,2026-11-04 02:00:00,62.150837988826815
+Convention,evalue,taux_occupation,working,3,716,446,698,0.6179931390134529,0.55917,2026-11-04 03:00:00,62.29050279329609
+Convention,evalue,taux_occupation,working,4,716,446,697,0.47464643497757847,0.44472500000000004,2026-11-04 04:00:00,62.29050279329609
+Convention,evalue,taux_occupation,working,5,716,445,697,0.47573880898876403,0.445,2026-11-04 05:00:00,62.150837988826815
+Convention,evalue,taux_occupation,working,6,716,445,698,0.7390263370786516,0.72222,2026-11-04 06:00:00,62.150837988826815
+Convention,evalue,taux_occupation,working,7,716,445,698,1.8363656853932584,1.84,2026-11-04 07:00:00,62.150837988826815
+Convention,evalue,taux_occupation,working,8,716,438,696,3.4661920776255704,3.540835,2026-11-04 08:00:00,61.1731843575419
+Convention,evalue,taux_occupation,working,9,716,433,696,6.417879030023095,5.48611,2026-11-04 09:00:00,60.47486033519553
+Convention,evalue,taux_occupation,working,10,716,430,696,5.910211534883722,5.19639,2026-11-04 10:00:00,60.055865921787706
+Convention,evalue,taux_occupation,working,11,716,433,697,5.125488729792148,4.59056,2026-11-04 11:00:00,60.47486033519553
+Convention,evalue,taux_occupation,working,12,716,437,696,5.649927574370709,4.88556,2026-11-04 12:00:00,61.03351955307262
+Convention,evalue,taux_occupation,working,13,716,441,696,5.7797657142857135,4.84889,2026-11-04 13:00:00,61.59217877094972
+Convention,evalue,taux_occupation,working,14,716,444,698,5.708278310810811,4.935555,2026-11-04 14:00:00,62.01117318435754
+Convention,evalue,taux_occupation,working,15,716,446,698,6.316711479820627,5.059725,2026-11-04 15:00:00,62.29050279329609
+Convention,evalue,taux_occupation,working,16,716,449,697,7.542841046770602,5.84389,2026-11-04 16:00:00,62.70949720670391
+Convention,evalue,taux_occupation,working,17,716,445,696,9.609857595505618,7.27,2026-11-04 17:00:00,62.150837988826815
+Convention,evalue,taux_occupation,working,18,716,444,695,12.260808243243243,10.369724999999999,2026-11-04 18:00:00,62.01117318435754
+Convention,evalue,taux_occupation,working,19,716,443,695,10.328175304740407,8.13445,2026-11-04 19:00:00,61.87150837988827
+Convention,evalue,taux_occupation,working,20,716,447,695,7.7712140492170025,5.63444,2026-11-04 20:00:00,62.43016759776536
+Convention,evalue,taux_occupation,working,21,716,446,695,4.153044125560538,3.698055,2026-11-04 21:00:00,62.29050279329609
+Convention,evalue,taux_occupation,working,22,716,442,695,2.6742583710407235,2.5447249999999997,2026-11-04 22:00:00,61.73184357541899
+Convention,evalue,taux_occupation,working,23,716,445,696,2.4456118426966293,2.35722,2026-11-04 23:00:00,62.150837988826815
+Saint-Pères,evalue,debit_horaire,holiday,0,31,17,30,463.7647058823529,466.0,2026-11-01 00:00:00,54.83870967741935
+Saint-Pères,evalue,debit_horaire,holiday,1,31,18,31,376.8333333333333,356.5,2026-11-01 01:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,2,31,18,31,315.8333333333333,277.0,2026-11-01 02:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,3,31,18,31,268.05555555555554,204.5,2026-11-01 03:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,4,31,18,31,206.33333333333334,148.0,2026-11-01 04:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,5,31,18,31,165.88888888888889,106.5,2026-11-01 05:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,6,31,18,31,143.94444444444446,120.0,2026-11-01 06:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,7,31,18,31,148.27777777777777,139.0,2026-11-01 07:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,8,31,18,31,158.27777777777777,136.0,2026-11-01 08:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,9,31,18,31,193.22222222222223,183.0,2026-11-01 09:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,10,31,18,31,261.55555555555554,231.5,2026-11-01 10:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,11,31,18,31,310.8333333333333,282.5,2026-11-01 11:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,12,31,18,31,388.0,372.5,2026-11-01 12:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,13,31,18,31,435.44444444444446,437.0,2026-11-01 13:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,14,31,18,31,433.27777777777777,406.0,2026-11-01 14:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,15,31,18,31,448.27777777777777,467.0,2026-11-01 15:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,16,31,18,31,504.77777777777777,517.5,2026-11-01 16:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,17,31,18,31,542.7777777777778,551.5,2026-11-01 17:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,18,31,18,31,539.5,574.5,2026-11-01 18:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,19,31,18,31,557.0,569.5,2026-11-01 19:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,20,31,18,31,554.4444444444445,536.5,2026-11-01 20:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,21,31,18,31,464.8888888888889,471.0,2026-11-01 21:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,22,31,18,31,405.0,393.5,2026-11-01 22:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,holiday,23,31,18,31,369.3333333333333,349.5,2026-11-01 23:00:00,58.064516129032256
+Saint-Pères,evalue,debit_horaire,weekend,0,292,161,285,527.9813664596273,545.0,2026-10-31 00:00:00,55.136986301369866
+Saint-Pères,evalue,debit_horaire,weekend,1,292,161,284,486.944099378882,503.0,2026-10-31 01:00:00,55.136986301369866
+Saint-Pères,evalue,debit_horaire,weekend,2,292,159,283,387.4842767295597,391.0,2026-10-31 02:00:00,54.45205479452055
+Saint-Pères,evalue,debit_horaire,weekend,3,292,160,286,348.9,356.5,2026-10-31 03:00:00,54.794520547945204
+Saint-Pères,evalue,debit_horaire,weekend,4,292,161,285,245.87577639751552,255.0,2026-10-31 04:00:00,55.136986301369866
+Saint-Pères,evalue,debit_horaire,weekend,5,292,161,285,186.8695652173913,192.0,2026-10-31 05:00:00,55.136986301369866
+Saint-Pères,evalue,debit_horaire,weekend,6,292,160,285,154.525,154.5,2026-10-31 06:00:00,54.794520547945204
+Saint-Pères,evalue,debit_horaire,weekend,7,292,161,285,142.1055900621118,137.0,2026-10-31 07:00:00,55.136986301369866
+Saint-Pères,evalue,debit_horaire,weekend,8,292,160,285,163.10625,160.0,2026-10-31 08:00:00,54.794520547945204
+Saint-Pères,evalue,debit_horaire,weekend,9,292,160,285,224.175,213.5,2026-10-31 09:00:00,54.794520547945204
+Saint-Pères,evalue,debit_horaire,weekend,10,292,160,285,317.53125,310.0,2026-10-31 10:00:00,54.794520547945204
+Saint-Pères,evalue,debit_horaire,weekend,11,292,160,285,391.96875,381.5,2026-10-31 11:00:00,54.794520547945204
+Saint-Pères,evalue,debit_horaire,weekend,12,292,160,285,457.7625,456.5,2026-10-31 12:00:00,54.794520547945204
+Saint-Pères,evalue,debit_horaire,weekend,13,292,159,285,520.5157232704403,525.0,2026-10-31 13:00:00,54.45205479452055
+Saint-Pères,evalue,debit_horaire,weekend,14,292,158,285,516.9873417721519,514.0,2026-10-31 14:00:00,54.10958904109589
+Saint-Pères,evalue,debit_horaire,weekend,15,292,160,284,534.825,552.5,2026-10-31 15:00:00,54.794520547945204
+Saint-Pères,evalue,debit_horaire,weekend,16,292,161,285,577.0124223602485,600.0,2026-10-31 16:00:00,55.136986301369866
+Saint-Pères,evalue,debit_horaire,weekend,17,292,161,285,619.9503105590062,640.0,2026-10-31 17:00:00,55.136986301369866
+Saint-Pères,evalue,debit_horaire,weekend,18,292,161,285,611.583850931677,636.0,2026-10-31 18:00:00,55.136986301369866
+Saint-Pères,evalue,debit_horaire,weekend,19,292,161,285,631.4347826086956,663.0,2026-10-31 19:00:00,55.136986301369866
+Saint-Pères,evalue,debit_horaire,weekend,20,292,161,285,636.1863354037267,657.0,2026-10-31 20:00:00,55.136986301369866
+Saint-Pères,evalue,debit_horaire,weekend,21,292,161,285,560.1677018633541,561.0,2026-10-31 21:00:00,55.136986301369866
+Saint-Pères,evalue,debit_horaire,weekend,22,292,160,285,477.5875,462.0,2026-10-31 22:00:00,54.794520547945204
+Saint-Pères,evalue,debit_horaire,weekend,23,292,161,285,434.37888198757764,418.0,2026-10-31 23:00:00,55.136986301369866
+Saint-Pères,evalue,debit_horaire,working,0,716,394,698,418.6802030456853,405.0,2026-11-04 00:00:00,55.02793296089386
+Saint-Pères,evalue,debit_horaire,working,1,716,394,697,294.83248730964465,284.5,2026-11-04 01:00:00,55.02793296089386
+Saint-Pères,evalue,debit_horaire,working,2,716,394,696,174.9746192893401,162.0,2026-11-04 02:00:00,55.02793296089386
+Saint-Pères,evalue,debit_horaire,working,3,716,392,698,116.61224489795919,101.5,2026-11-04 03:00:00,54.74860335195531
+Saint-Pères,evalue,debit_horaire,working,4,716,393,697,71.25190839694656,61.0,2026-11-04 04:00:00,54.88826815642458
+Saint-Pères,evalue,debit_horaire,working,5,716,391,697,64.61636828644501,59.0,2026-11-04 05:00:00,54.608938547486034
+Saint-Pères,evalue,debit_horaire,working,6,716,393,698,112.50381679389314,110.0,2026-11-04 06:00:00,54.88826815642458
+Saint-Pères,evalue,debit_horaire,working,7,716,391,698,206.04092071611254,207.0,2026-11-04 07:00:00,54.608938547486034
+Saint-Pères,evalue,debit_horaire,working,8,716,389,696,347.74293059125966,350.0,2026-11-04 08:00:00,54.32960893854749
+Saint-Pères,evalue,debit_horaire,working,9,716,389,696,504.5552699228792,515.0,2026-11-04 09:00:00,54.32960893854749
+Saint-Pères,evalue,debit_horaire,working,10,716,383,696,591.5953002610966,598.0,2026-11-04 10:00:00,53.49162011173184
+Saint-Pères,evalue,debit_horaire,working,11,716,390,697,591.1282051282051,605.0,2026-11-04 11:00:00,54.46927374301676
+Saint-Pères,evalue,debit_horaire,working,12,716,386,696,603.9430051813472,620.5,2026-11-04 12:00:00,53.910614525139664
+Saint-Pères,evalue,debit_horaire,working,13,716,389,696,634.0771208226221,646.0,2026-11-04 13:00:00,54.32960893854749
+Saint-Pères,evalue,debit_horaire,working,14,716,392,698,617.0484693877551,632.0,2026-11-04 14:00:00,54.74860335195531
+Saint-Pères,evalue,debit_horaire,working,15,716,393,698,638.3893129770993,653.0,2026-11-04 15:00:00,54.88826815642458
+Saint-Pères,evalue,debit_horaire,working,16,716,389,697,654.2030848329049,673.0,2026-11-04 16:00:00,54.32960893854749
+Saint-Pères,evalue,debit_horaire,working,17,716,390,696,667.5692307692308,692.5,2026-11-04 17:00:00,54.46927374301676
+Saint-Pères,evalue,debit_horaire,working,18,716,391,695,673.5549872122762,694.0,2026-11-04 18:00:00,54.608938547486034
+Saint-Pères,evalue,debit_horaire,working,19,716,393,695,722.4503816793894,737.0,2026-11-04 19:00:00,54.88826815642458
+Saint-Pères,evalue,debit_horaire,working,20,716,395,695,711.7848101265823,723.0,2026-11-04 20:00:00,55.167597765363126
+Saint-Pères,evalue,debit_horaire,working,21,716,391,695,596.2225063938619,605.0,2026-11-04 21:00:00,54.608938547486034
+Saint-Pères,evalue,debit_horaire,working,22,716,391,695,474.3938618925831,477.0,2026-11-04 22:00:00,54.608938547486034
+Saint-Pères,evalue,debit_horaire,working,23,716,393,696,457.1272264631043,456.0,2026-11-04 23:00:00,54.88826815642458
+Saint-Pères,evalue,taux_occupation,holiday,0,31,17,30,5.729903529411764,5.40611,2026-11-01 00:00:00,54.83870967741935
+Saint-Pères,evalue,taux_occupation,holiday,1,31,18,31,4.852007777777778,4.521115,2026-11-01 01:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,2,31,18,31,3.834414444444444,2.916115,2026-11-01 02:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,3,31,18,31,3.2465733333333335,2.31083,2026-11-01 03:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,4,31,18,31,2.4759577777777775,1.64445,2026-11-01 04:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,5,31,18,31,2.0032111111111113,1.4108299999999998,2026-11-01 05:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,6,31,18,31,1.7742605555555555,1.38889,2026-11-01 06:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,7,31,18,31,1.8103711111111112,1.706115,2026-11-01 07:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,8,31,18,31,2.016081111111111,1.79,2026-11-01 08:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,9,31,18,31,2.3694755555555553,2.47778,2026-11-01 09:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,10,31,18,31,3.3230866666666667,2.870275,2026-11-01 10:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,11,31,18,31,3.8147227777777775,3.3919449999999998,2026-11-01 11:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,12,31,18,31,5.143982222222222,4.969445,2026-11-01 12:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,13,31,18,31,5.7753716666666675,5.530005,2026-11-01 13:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,14,31,18,31,5.785526666666666,5.141665,2026-11-01 14:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,15,31,18,31,5.849725,5.763615,2026-11-01 15:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,16,31,18,31,7.022625000000001,7.74111,2026-11-01 16:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,17,31,18,31,7.753613333333334,7.89917,2026-11-01 17:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,18,31,18,31,8.185711666666666,9.06417,2026-11-01 18:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,19,31,18,31,7.643427222222223,8.370004999999999,2026-11-01 19:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,20,31,18,31,7.784538888888889,8.129445,2026-11-01 20:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,21,31,18,31,6.132038888888889,6.31861,2026-11-01 21:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,22,31,18,31,5.385154444444444,5.30389,2026-11-01 22:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,holiday,23,31,18,31,4.680401666666667,4.6655549999999995,2026-11-01 23:00:00,58.064516129032256
+Saint-Pères,evalue,taux_occupation,weekend,0,292,161,285,6.807634409937889,7.05334,2026-10-31 00:00:00,55.136986301369866
+Saint-Pères,evalue,taux_occupation,weekend,1,292,161,284,6.213848819875777,6.55222,2026-10-31 01:00:00,55.136986301369866
+Saint-Pères,evalue,taux_occupation,weekend,2,292,159,283,4.766873773584906,4.92167,2026-10-31 02:00:00,54.45205479452055
+Saint-Pères,evalue,taux_occupation,weekend,3,292,160,286,4.0976260625,4.296665,2026-10-31 03:00:00,54.794520547945204
+Saint-Pères,evalue,taux_occupation,weekend,4,292,161,285,2.9539040372670806,3.10167,2026-10-31 04:00:00,55.136986301369866
+Saint-Pères,evalue,taux_occupation,weekend,5,292,161,285,2.303924782608696,2.38556,2026-10-31 05:00:00,55.136986301369866
+Saint-Pères,evalue,taux_occupation,weekend,6,292,160,285,1.908192375,1.9363899999999998,2026-10-31 06:00:00,54.794520547945204
+Saint-Pères,evalue,taux_occupation,weekend,7,292,161,285,1.8116675776397515,1.74,2026-10-31 07:00:00,55.136986301369866
+Saint-Pères,evalue,taux_occupation,weekend,8,292,160,285,2.1802722500000002,2.131665,2026-10-31 08:00:00,54.794520547945204
+Saint-Pères,evalue,taux_occupation,weekend,9,292,160,285,2.9804839375,2.6025,2026-10-31 09:00:00,54.794520547945204
+Saint-Pères,evalue,taux_occupation,weekend,10,292,160,285,4.2532031875000005,3.816115,2026-10-31 10:00:00,54.794520547945204
+Saint-Pères,evalue,taux_occupation,weekend,11,292,160,285,5.3653064375,5.001390000000001,2026-10-31 11:00:00,54.794520547945204
+Saint-Pères,evalue,taux_occupation,weekend,12,292,160,285,6.612091625,6.4805600000000005,2026-10-31 12:00:00,54.794520547945204
+Saint-Pères,evalue,taux_occupation,weekend,13,292,159,285,7.545402767295597,7.53222,2026-10-31 13:00:00,54.45205479452055
+Saint-Pères,evalue,taux_occupation,weekend,14,292,158,285,7.473661962025317,7.45139,2026-10-31 14:00:00,54.10958904109589
+Saint-Pères,evalue,taux_occupation,weekend,15,292,160,284,7.783508500000001,8.212779999999999,2026-10-31 15:00:00,54.794520547945204
+Saint-Pères,evalue,taux_occupation,weekend,16,292,161,285,8.61395149068323,8.84833,2026-10-31 16:00:00,55.136986301369866
+Saint-Pères,evalue,taux_occupation,weekend,17,292,161,285,9.482941366459627,9.69889,2026-10-31 17:00:00,55.136986301369866
+Saint-Pères,evalue,taux_occupation,weekend,18,292,161,285,9.46685801242236,9.55833,2026-10-31 18:00:00,55.136986301369866
+Saint-Pères,evalue,taux_occupation,weekend,19,292,161,285,9.386674782608697,9.62667,2026-10-31 19:00:00,55.136986301369866
+Saint-Pères,evalue,taux_occupation,weekend,20,292,161,285,9.101184844720498,9.235,2026-10-31 20:00:00,55.136986301369866
+Saint-Pères,evalue,taux_occupation,weekend,21,292,161,285,7.611826273291926,7.41,2026-10-31 21:00:00,55.136986301369866
+Saint-Pères,evalue,taux_occupation,weekend,22,292,160,285,6.3658419375,6.045,2026-10-31 22:00:00,54.794520547945204
+Saint-Pères,evalue,taux_occupation,weekend,23,292,161,285,5.699452795031056,5.51278,2026-10-31 23:00:00,55.136986301369866
+Saint-Pères,evalue,taux_occupation,working,0,716,394,698,5.000752588832488,4.93278,2026-11-04 00:00:00,55.02793296089386
+Saint-Pères,evalue,taux_occupation,working,1,716,394,697,3.5942325126903554,3.480835,2026-11-04 01:00:00,55.02793296089386
+Saint-Pères,evalue,taux_occupation,working,2,716,394,696,2.077517994923858,1.94278,2026-11-04 02:00:00,55.02793296089386
+Saint-Pères,evalue,taux_occupation,working,3,716,392,698,1.4203145153061225,1.2419449999999999,2026-11-04 03:00:00,54.74860335195531
+Saint-Pères,evalue,taux_occupation,working,4,716,393,697,0.9127548854961832,0.79722,2026-11-04 04:00:00,54.88826815642458
+Saint-Pères,evalue,taux_occupation,working,5,716,391,697,0.8327592327365728,0.785,2026-11-04 05:00:00,54.608938547486034
+Saint-Pères,evalue,taux_occupation,working,6,716,393,698,1.4715123155216285,1.41778,2026-11-04 06:00:00,54.88826815642458
+Saint-Pères,evalue,taux_occupation,working,7,716,391,698,2.6351674680306907,2.62056,2026-11-04 07:00:00,54.608938547486034
+Saint-Pères,evalue,taux_occupation,working,8,716,389,696,4.746399331619537,4.73833,2026-11-04 08:00:00,54.32960893854749
+Saint-Pères,evalue,taux_occupation,working,9,716,389,696,6.61298025706941,6.39945,2026-11-04 09:00:00,54.32960893854749
+Saint-Pères,evalue,taux_occupation,working,10,716,383,696,8.088227049608355,7.58667,2026-11-04 10:00:00,53.49162011173184
+Saint-Pères,evalue,taux_occupation,working,11,716,390,697,8.932831666666667,8.39861,2026-11-04 11:00:00,54.46927374301676
+Saint-Pères,evalue,taux_occupation,working,12,716,386,696,9.746034455958549,9.375,2026-11-04 12:00:00,53.910614525139664
+Saint-Pères,evalue,taux_occupation,working,13,716,389,696,10.218735835475579,9.71833,2026-11-04 13:00:00,54.32960893854749
+Saint-Pères,evalue,taux_occupation,working,14,716,392,698,9.947496862244899,9.61139,2026-11-04 14:00:00,54.74860335195531
+Saint-Pères,evalue,taux_occupation,working,15,716,393,698,10.033378575063614,9.705,2026-11-04 15:00:00,54.88826815642458
+Saint-Pères,evalue,taux_occupation,working,16,716,389,697,10.258848663239075,9.88889,2026-11-04 16:00:00,54.32960893854749
+Saint-Pères,evalue,taux_occupation,working,17,716,390,696,10.71127912820513,10.64111,2026-11-04 17:00:00,54.46927374301676
+Saint-Pères,evalue,taux_occupation,working,18,716,391,695,10.304096112531969,10.16,2026-11-04 18:00:00,54.608938547486034
+Saint-Pères,evalue,taux_occupation,working,19,716,393,695,10.138491628498727,9.96389,2026-11-04 19:00:00,54.88826815642458
+Saint-Pères,evalue,taux_occupation,working,20,716,395,695,9.314670810126582,9.16889,2026-11-04 20:00:00,55.167597765363126
+Saint-Pères,evalue,taux_occupation,working,21,716,391,695,7.869441636828645,7.96223,2026-11-04 21:00:00,54.608938547486034
+Saint-Pères,evalue,taux_occupation,working,22,716,391,695,6.111668030690538,6.085,2026-11-04 22:00:00,54.608938547486034
+Saint-Pères,evalue,taux_occupation,working,23,716,393,696,5.663771424936386,5.72611,2026-11-04 23:00:00,54.88826815642458
