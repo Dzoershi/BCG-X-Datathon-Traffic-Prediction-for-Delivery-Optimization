@@ -1,0 +1,205 @@
+phase,scenario,model,variable,day_kind,n_expected,n_scored,n_ignored,n_estimated_truth,n_fallback,n_native,n_source_unknown,n_forecast_fallback,n_forecast_native,n_forecast_unknown,sum_squared_error,rmse
+development,observed,baseline_day_type,debit_horaire,weekend,1152,727,425,0,0,727,0,0,1152,0,9737106.01220769,115.73047716803103
+development,observed,baseline_day_type,debit_horaire,holiday,432,248,184,0,0,248,0,0,432,0,9395325.09776575,194.63909009810112
+development,observed,baseline_day_type,debit_horaire,working,1296,716,580,0,0,716,0,0,1296,0,16486241.455004679,151.7414804608965
+development,observed,baseline_day_type,taux_occupation,weekend,1152,727,425,0,0,727,0,0,1152,0,8072.0879621930635,3.332159161830415
+development,observed,baseline_day_type,taux_occupation,holiday,432,245,187,0,0,245,0,0,432,0,9370.770120872616,6.18450008567258
+development,observed,baseline_day_type,taux_occupation,working,1296,712,584,0,0,712,0,0,1296,0,12836.611617872715,4.246050977261887
+development,observed,baseline_holiday_aware,debit_horaire,weekend,1152,727,425,0,1,726,0,385,767,0,13519665.946583046,136.36903742947015
+development,observed,baseline_holiday_aware,debit_horaire,holiday,432,248,184,0,0,248,0,144,288,0,16002939.0,254.0235812650268
+development,observed,baseline_holiday_aware,debit_horaire,working,1296,716,580,0,33,683,0,433,863,0,17449816.80925352,156.11294797962913
+development,observed,baseline_holiday_aware,taux_occupation,weekend,1152,727,425,0,1,726,0,385,767,0,22442.057812924075,5.556024254792319
+development,observed,baseline_holiday_aware,taux_occupation,holiday,432,245,187,0,0,245,0,144,288,0,15674.2731535656,7.998538936367959
+development,observed,baseline_holiday_aware,taux_occupation,working,1296,712,584,0,33,679,0,433,863,0,18710.652685369678,5.126305353817249
+development,observed,lightgbm_no_weather,debit_horaire,weekend,1152,727,425,0,0,727,0,384,768,0,9950094.84902141,116.98937071258584
+development,observed,lightgbm_no_weather,debit_horaire,holiday,432,248,184,0,0,248,0,144,288,0,8890604.80965513,189.33888386213167
+development,observed,lightgbm_no_weather,debit_horaire,working,1296,716,580,0,32,684,0,432,864,0,14366343.568443185,141.6500111339574
+development,observed,lightgbm_no_weather,taux_occupation,weekend,1152,727,425,0,0,727,0,384,768,0,9800.40884237613,3.671596027586416
+development,observed,lightgbm_no_weather,taux_occupation,holiday,432,245,187,0,0,245,0,144,288,0,6853.559332756505,5.289018014931642
+development,observed,lightgbm_no_weather,taux_occupation,working,1296,712,584,0,32,680,0,432,864,0,9278.947513271178,3.610017957499762
+recent_check,observed,baseline_day_type,debit_horaire,weekend,72,48,24,0,0,48,0,0,72,0,478190.7796273121,99.81136162232401
+recent_check,observed,baseline_day_type,debit_horaire,holiday,72,48,24,0,0,48,0,0,72,0,272008.5849724463,75.27845322706425
+recent_check,observed,baseline_day_type,debit_horaire,working,216,143,73,0,0,143,0,0,216,0,431559.871829581,54.935427563690276
+recent_check,observed,baseline_day_type,taux_occupation,weekend,72,48,24,0,0,48,0,0,72,0,191.0278490227886,1.9949302881658368
+recent_check,observed,baseline_day_type,taux_occupation,holiday,72,48,24,0,0,48,0,0,72,0,67.72545991112271,1.187832935004634
+recent_check,observed,baseline_day_type,taux_occupation,working,216,143,73,0,0,143,0,0,216,0,563.0286451568045,1.984253827725875
+recent_check,observed,baseline_holiday_aware,debit_horaire,weekend,72,48,24,0,0,48,0,24,48,0,261907.0,73.86742064897985
+recent_check,observed,baseline_holiday_aware,debit_horaire,holiday,72,48,24,0,0,48,0,24,48,0,455270.0,97.38989509526472
+recent_check,observed,baseline_holiday_aware,debit_horaire,working,216,143,73,0,0,143,0,72,144,0,713928.0,70.6576499503309
+recent_check,observed,baseline_holiday_aware,taux_occupation,weekend,72,48,24,0,0,48,0,24,48,0,30.725234441700003,0.8000681538898733
+recent_check,observed,baseline_holiday_aware,taux_occupation,holiday,72,48,24,0,0,48,0,24,48,0,56.447680640499996,1.0844322692898267
+recent_check,observed,baseline_holiday_aware,taux_occupation,working,216,143,73,0,0,143,0,72,144,0,1192.896323957,2.8882403527690763
+recent_check,observed,lightgbm_no_weather,debit_horaire,weekend,72,48,24,0,0,48,0,24,48,0,110800.76171041845,48.04528283089178
+recent_check,observed,lightgbm_no_weather,debit_horaire,holiday,72,48,24,0,0,48,0,24,48,0,320710.57717406016,81.74026154712817
+recent_check,observed,lightgbm_no_weather,debit_horaire,working,216,143,73,0,0,143,0,72,144,0,502786.5522940583,59.29578295445829
+recent_check,observed,lightgbm_no_weather,taux_occupation,weekend,72,48,24,0,0,48,0,24,48,0,15.895352660006187,0.5754591040350266
+recent_check,observed,lightgbm_no_weather,taux_occupation,holiday,72,48,24,0,0,48,0,24,48,0,41.85585758873773,0.9338078137918437
+recent_check,observed,lightgbm_no_weather,taux_occupation,working,216,143,73,0,0,143,0,72,144,0,674.549365608118,2.171895124269586
+development,outage_28d,profile,debit_horaire,weekend,336,295,41,0,295,0,0,336,0,0,4946991.4500299925,129.49695958776232
+development,outage_28d,profile,debit_horaire,holiday,144,128,16,0,128,0,0,144,0,0,7155194.092082158,236.43171074200654
+development,outage_28d,profile,debit_horaire,working,360,274,86,0,274,0,0,360,0,0,13027433.907662764,218.04902940633923
+development,outage_28d,profile,taux_occupation,weekend,336,295,41,0,295,0,0,336,0,0,7044.1003059455115,4.8865433715305535
+development,outage_28d,profile,taux_occupation,holiday,144,125,19,0,125,0,0,144,0,0,9512.675328237036,8.723611787894752
+development,outage_28d,profile,taux_occupation,working,360,270,90,0,270,0,0,360,0,0,9830.109434317106,6.033888689700282
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,weekend,336,295,41,0,295,0,0,336,0,0,4946991.4500299925,129.49695958776232
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,holiday,144,128,16,0,128,0,0,144,0,0,7155194.092082158,236.43171074200654
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,working,360,274,86,0,274,0,0,360,0,0,13027433.907662764,218.04902940633923
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,weekend,336,295,41,0,52,243,0,73,263,0,47112.41932381216,12.637369835211187
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,holiday,144,125,19,0,30,95,0,43,101,0,19566.88275622399,12.51139728606649
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,working,360,270,90,0,33,237,0,72,288,0,34520.88500675563,11.307304261168992
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,weekend,336,295,41,0,295,0,0,336,0,0,4946991.4500299925,129.49695958776232
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,holiday,144,128,16,0,128,0,0,144,0,0,7155194.092082158,236.43171074200654
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,working,360,274,86,0,274,0,0,360,0,0,13027433.907662764,218.04902940633923
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,weekend,336,295,41,0,52,243,0,73,263,0,35936.92394685686,11.037213469702666
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,holiday,144,125,19,0,30,95,0,43,101,0,11346.468002708712,9.527420638434608
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,working,360,270,90,0,33,237,0,72,288,0,19888.176912285806,8.582535434820379
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,weekend,336,295,41,0,295,0,0,336,0,0,4946991.4500299925,129.49695958776232
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,holiday,144,128,16,0,128,0,0,144,0,0,7155194.092082158,236.43171074200654
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,working,360,274,86,0,274,0,0,360,0,0,13027433.907662764,218.04902940633923
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,weekend,336,295,41,0,52,243,0,73,263,0,30311.807004480885,10.13666060153849
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,holiday,144,125,19,0,30,95,0,43,101,0,11122.18134400201,9.432785948595255
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,working,360,270,90,0,33,237,0,72,288,0,18882.747676810806,8.36278078791419
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,weekend,336,295,41,0,103,192,0,144,192,0,36997926.33872874,354.1422023048337
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,holiday,144,128,16,0,56,72,0,72,72,0,12180209.104014738,308.47671488317417
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,working,360,274,86,0,152,122,0,207,153,0,11570317.18718162,205.49315071241168
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,weekend,336,295,41,0,104,191,0,144,192,0,26752.046706007637,9.522862179416517
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,holiday,144,125,19,0,32,93,0,48,96,0,12715.56472459108,10.08585731590174
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,working,360,270,90,0,115,155,0,170,190,0,13986.44293527317,7.197335652935171
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,weekend,336,295,41,0,103,192,0,144,192,0,44841566.565682404,389.8785841671016
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,holiday,144,128,16,0,56,72,0,72,72,0,14685559.342407761,338.7195482439132
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,working,360,274,86,0,152,122,0,207,153,0,15936688.30470555,241.1702635122643
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,weekend,336,295,41,0,104,191,0,144,192,0,27219.97383659519,9.605784598416212
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,holiday,144,125,19,0,32,93,0,48,96,0,12970.90021030296,10.186618756114498
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,working,360,270,90,0,115,155,0,170,190,0,13974.63431244834,7.194296689803651
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,weekend,336,295,41,0,103,192,0,144,192,0,27594553.738568135,305.84450318869466
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,holiday,144,128,16,0,56,72,0,72,72,0,11832531.738524275,304.042191491939
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,working,360,274,86,0,152,122,0,207,153,0,10934304.036746785,199.76541019960024
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,weekend,336,295,41,0,104,191,0,144,192,0,17807.200799390805,7.769388170268481
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,holiday,144,125,19,0,32,93,0,48,96,0,11931.539598999156,9.769970153075866
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,working,360,270,90,0,115,155,0,170,190,0,13499.755521532243,7.0710037847673
+development,outage_90d,profile,debit_horaire,weekend,336,295,41,0,295,0,0,336,0,0,5402714.2555665355,135.3302834257357
+development,outage_90d,profile,debit_horaire,holiday,144,128,16,0,128,0,0,144,0,0,7382029.45195643,240.15017196206546
+development,outage_90d,profile,debit_horaire,working,360,274,86,0,274,0,0,360,0,0,13236899.651591597,219.79502438188865
+development,outage_90d,profile,taux_occupation,weekend,336,295,41,0,295,0,0,336,0,0,7442.832963094425,5.022941593108337
+development,outage_90d,profile,taux_occupation,holiday,144,125,19,0,125,0,0,144,0,0,9979.579089930237,8.93513473426349
+development,outage_90d,profile,taux_occupation,working,360,270,90,0,270,0,0,360,0,0,10089.047349057715,6.112842385792971
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,weekend,336,295,41,0,295,0,0,336,0,0,5402714.2555665355,135.3302834257357
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,holiday,144,128,16,0,128,0,0,144,0,0,7382029.45195643,240.15017196206546
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,working,360,274,86,0,274,0,0,360,0,0,13236899.651591597,219.79502438188865
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,weekend,336,295,41,0,52,243,0,73,263,0,47157.804522231774,12.643455401200322
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,holiday,144,125,19,0,30,95,0,43,101,0,19729.049945956103,12.563136533829791
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,working,360,270,90,0,33,237,0,72,288,0,34645.76575031623,11.32773812052067
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,weekend,336,295,41,0,295,0,0,336,0,0,5402714.2555665355,135.3302834257357
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,holiday,144,128,16,0,128,0,0,144,0,0,7382029.45195643,240.15017196206546
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,working,360,274,86,0,274,0,0,360,0,0,13236899.651591597,219.79502438188865
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,weekend,336,295,41,0,52,243,0,73,263,0,36176.190424007305,11.073895158420354
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,holiday,144,125,19,0,30,95,0,43,101,0,11605.265767429302,9.635461905868054
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,working,360,270,90,0,33,237,0,72,288,0,20222.83122651079,8.654442495793875
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,weekend,336,295,41,0,295,0,0,336,0,0,5402714.2555665355,135.3302834257357
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,holiday,144,128,16,0,128,0,0,144,0,0,7382029.45195643,240.15017196206546
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,working,360,274,86,0,274,0,0,360,0,0,13236899.651591597,219.79502438188865
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,weekend,336,295,41,0,52,243,0,73,263,0,32511.874083303068,10.498082808554361
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,holiday,144,125,19,0,30,95,0,43,101,0,11405.276299032914,9.552078851865875
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,working,360,270,90,0,33,237,0,72,288,0,19331.8103229931,8.46163680930392
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,weekend,336,295,41,0,103,192,0,144,192,0,36977212.51040754,354.0430525884207
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,holiday,144,128,16,0,56,72,0,72,72,0,12180696.682835614,308.4828890467885
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,working,360,274,86,0,152,122,0,207,153,0,11591163.684834009,205.67818819197709
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,weekend,336,295,41,0,104,191,0,144,192,0,26764.356427209026,9.525052858469646
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,holiday,144,125,19,0,32,93,0,48,96,0,12697.062008150286,10.078516560744557
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,working,360,270,90,0,115,155,0,170,190,0,14105.074132107435,7.227794636270569
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,weekend,336,295,41,0,103,192,0,144,192,0,45101565.20805879,391.0072399869767
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,holiday,144,128,16,0,56,72,0,72,72,0,14734424.013557622,339.282607284722
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,working,360,274,86,0,152,122,0,207,153,0,16198044.02806898,243.13977257444128
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,weekend,336,295,41,0,104,191,0,144,192,0,26858.02394521112,9.541705768195609
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,holiday,144,125,19,0,32,93,0,48,96,0,12773.684988382453,10.108881239141136
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,working,360,270,90,0,115,155,0,170,190,0,14032.499025741667,7.209176001032159
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,weekend,336,295,41,0,103,192,0,144,192,0,29058884.61753075,313.8545739968565
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,holiday,144,128,16,0,56,72,0,72,72,0,12236582.493642673,309.18974874918376
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,working,360,274,86,0,152,122,0,207,153,0,11581911.469969472,205.59608432652487
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,weekend,336,295,41,0,104,191,0,144,192,0,17258.05846618943,7.6486530255808365
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,holiday,144,125,19,0,32,93,0,48,96,0,11746.035420479278,9.693723916216834
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,working,360,270,90,0,115,155,0,170,190,0,13534.320556613833,7.080050365120563
+development,outage_180d,profile,debit_horaire,weekend,336,295,41,0,295,0,0,336,0,0,8808360.130247189,172.79712931395306
+development,outage_180d,profile,debit_horaire,holiday,144,128,16,0,128,0,0,144,0,0,8706224.31253911,260.8014138031307
+development,outage_180d,profile,debit_horaire,working,360,274,86,0,274,0,0,360,0,0,21429570.262388915,279.6607059396705
+development,outage_180d,profile,taux_occupation,weekend,336,295,41,0,295,0,0,336,0,0,7299.938381998031,4.974490309296166
+development,outage_180d,profile,taux_occupation,holiday,144,125,19,0,125,0,0,144,0,0,9777.738134989915,8.844314845137486
+development,outage_180d,profile,taux_occupation,working,360,270,90,0,270,0,0,360,0,0,10209.03558657565,6.149084721586063
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,weekend,336,295,41,0,295,0,0,336,0,0,8808360.130247189,172.79712931395306
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,holiday,144,128,16,0,128,0,0,144,0,0,8706224.31253911,260.8014138031307
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,working,360,274,86,0,274,0,0,360,0,0,21429570.262388915,279.6607059396705
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,weekend,336,295,41,0,52,243,0,73,263,0,47402.58414133114,12.676226800701281
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,holiday,144,125,19,0,30,95,0,43,101,0,19645.982487176687,12.536660635807827
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,working,360,270,90,0,33,237,0,72,288,0,34742.35270921262,11.343517109102061
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,weekend,336,295,41,0,295,0,0,336,0,0,8808360.130247189,172.79712931395306
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,holiday,144,128,16,0,128,0,0,144,0,0,8706224.31253911,260.8014138031307
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,working,360,274,86,0,274,0,0,360,0,0,21429570.262388915,279.6607059396705
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,weekend,336,295,41,0,52,243,0,73,263,0,36035.22378613742,11.052298447379956
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,holiday,144,125,19,0,30,95,0,43,101,0,11467.39717512172,9.578057078602829
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,working,360,270,90,0,33,237,0,72,288,0,19999.335000498475,8.606486571938477
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,weekend,336,295,41,0,295,0,0,336,0,0,8808360.130247189,172.79712931395306
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,holiday,144,128,16,0,128,0,0,144,0,0,8706224.31253911,260.8014138031307
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,working,360,274,86,0,274,0,0,360,0,0,21429570.262388915,279.6607059396705
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,weekend,336,295,41,0,52,243,0,73,263,0,32479.189901276815,10.492804621162422
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,holiday,144,125,19,0,30,95,0,43,101,0,11457.512173419476,9.57392800199353
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,working,360,270,90,0,33,237,0,72,288,0,19150.12575067977,8.421780789665826
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,weekend,336,295,41,0,103,192,0,144,192,0,37005837.745586045,354.1800640657907
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,holiday,144,128,16,0,56,72,0,72,72,0,12198904.408473125,308.7133633181374
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,working,360,274,86,0,152,122,0,207,153,0,11611805.90769831,205.86124860626649
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,weekend,336,295,41,0,104,191,0,144,192,0,26667.90978960393,9.507875377919467
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,holiday,144,125,19,0,32,93,0,48,96,0,12598.253597397495,10.039224510846442
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,working,360,270,90,0,115,155,0,170,190,0,14009.746808455797,7.203329170767422
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,weekend,336,295,41,0,103,192,0,144,192,0,44569351.76588475,388.69338604989326
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,holiday,144,128,16,0,56,72,0,72,72,0,14543084.244320141,337.0724635130421
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,working,360,274,86,0,152,122,0,207,153,0,15586288.62048184,238.50422436144584
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,weekend,336,295,41,0,104,191,0,144,192,0,25891.396887941926,9.368428207429956
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,holiday,144,125,19,0,32,93,0,48,96,0,12653.684629880303,10.061286052937886
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,working,360,270,90,0,115,155,0,170,190,0,14000.742265069934,7.201013885678911
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,weekend,336,295,41,0,103,192,0,144,192,0,28153942.73001044,308.92894652336383
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,holiday,144,128,16,0,56,72,0,72,72,0,11813137.63125683,303.792919180474
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,working,360,274,86,0,152,122,0,207,153,0,10685268.554324098,197.47741767157564
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,weekend,336,295,41,0,104,191,0,144,192,0,17240.272944690663,7.644710799130418
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,holiday,144,125,19,0,32,93,0,48,96,0,11686.12504685356,9.66897100910063
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,working,360,270,90,0,115,155,0,170,190,0,13444.656010753544,7.0565588116340505
+development,outage_365d,profile,debit_horaire,weekend,192,151,41,0,151,0,0,192,0,0,2316508.9896892197,123.85927150203452
+development,outage_365d,profile,debit_horaire,holiday,72,56,16,0,56,0,0,72,0,0,3312829.6545752306,243.22350298260469
+development,outage_365d,profile,debit_horaire,working,216,161,55,0,161,0,0,216,0,0,2966354.85985463,135.7371148467624
+development,outage_365d,profile,taux_occupation,weekend,192,151,41,0,151,0,0,192,0,0,2897.8484976155805,4.380759027050371
+development,outage_365d,profile,taux_occupation,holiday,72,56,16,0,56,0,0,72,0,0,5696.1382251937275,10.085472424300042
+development,outage_365d,profile,taux_occupation,working,216,161,55,0,161,0,0,216,0,0,4852.154113341765,5.489772598975131
+development,outage_365d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,weekend,192,151,41,0,151,0,0,192,0,0,2316508.9896892197,123.85927150203452
+development,outage_365d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,holiday,72,56,16,0,56,0,0,72,0,0,3312829.6545752306,243.22350298260469
+development,outage_365d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,working,216,161,55,0,161,0,0,216,0,0,2966354.85985463,135.7371148467624
+development,outage_365d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,weekend,192,151,41,0,4,147,0,25,167,0,26049.722612592785,13.134485878354505
+development,outage_365d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,holiday,72,56,16,0,6,50,0,19,53,0,8591.73181181164,12.386435417575925
+development,outage_365d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,working,216,161,55,0,15,146,0,35,181,0,16661.294892282636,10.172821814952533
+development,outage_365d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,weekend,192,151,41,0,151,0,0,192,0,0,2316508.9896892197,123.85927150203452
+development,outage_365d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,holiday,72,56,16,0,56,0,0,72,0,0,3312829.6545752306,243.22350298260469
+development,outage_365d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,working,216,161,55,0,161,0,0,216,0,0,2966354.85985463,135.7371148467624
+development,outage_365d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,weekend,192,151,41,0,4,147,0,25,167,0,23899.328416957465,12.580687506076373
+development,outage_365d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,holiday,72,56,16,0,6,50,0,19,53,0,7029.0617601270305,11.203524445560353
+development,outage_365d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,working,216,161,55,0,15,146,0,35,181,0,12286.88370020534,8.73590566726555
+development,outage_365d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,weekend,192,151,41,0,151,0,0,192,0,0,2316508.9896892197,123.85927150203452
+development,outage_365d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,holiday,72,56,16,0,56,0,0,72,0,0,3312829.6545752306,243.22350298260469
+development,outage_365d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,working,216,161,55,0,161,0,0,216,0,0,2966354.85985463,135.7371148467624
+development,outage_365d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,weekend,192,151,41,0,4,147,0,25,167,0,26081.10931138774,13.14239621306217
+development,outage_365d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,holiday,72,56,16,0,6,50,0,19,53,0,6999.819838083216,11.18019601004001
+development,outage_365d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,working,216,161,55,0,15,146,0,35,181,0,13085.160548934522,9.015225406156905
+development,outage_365d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,weekend,192,151,41,0,103,48,0,144,48,0,22405647.22191043,385.2035431840237
+development,outage_365d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,holiday,72,56,16,0,56,0,0,72,0,0,3312829.6545752306,243.22350298260469
+development,outage_365d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,working,216,161,55,0,151,10,0,206,10,0,5921293.964802855,191.77649330371193
+development,outage_365d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,weekend,192,151,41,0,104,47,0,144,48,0,6948.437315152983,6.783519820856538
+development,outage_365d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,holiday,72,56,16,0,32,24,0,48,24,0,5940.931113479651,10.299905611113672
+development,outage_365d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,working,216,161,55,0,114,47,0,169,47,0,6658.123474850022,6.430770108751754
+development,outage_365d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,weekend,192,151,41,0,103,48,0,144,48,0,24590629.115027804,403.5490657205054
+development,outage_365d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,holiday,72,56,16,0,56,0,0,72,0,0,3312829.6545752306,243.22350298260469
+development,outage_365d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,working,216,161,55,0,151,10,0,206,10,0,5921293.964802855,191.77649330371193
+development,outage_365d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,weekend,192,151,41,0,104,47,0,144,48,0,6453.595913988059,6.53751067211369
+development,outage_365d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,holiday,72,56,16,0,32,24,0,48,24,0,6166.5014110187585,10.49362171156055
+development,outage_365d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,working,216,161,55,0,114,47,0,169,47,0,6957.0463006707,6.573543010130016
+development,outage_365d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,weekend,192,151,41,0,103,48,0,144,48,0,21485533.0343068,377.211211710949
+development,outage_365d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,holiday,72,56,16,0,56,0,0,72,0,0,3312829.6545752306,243.22350298260469
+development,outage_365d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,working,216,161,55,0,151,10,0,206,10,0,5623267.3641558,186.88800519412624
+development,outage_365d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,weekend,192,151,41,0,104,47,0,144,48,0,4595.895030744056,5.516918608433501
+development,outage_365d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,holiday,72,56,16,0,32,24,0,48,24,0,5797.5128458125,10.174822607976742
+development,outage_365d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,working,216,161,55,0,114,47,0,169,47,0,5884.518146492609,6.045643237251766

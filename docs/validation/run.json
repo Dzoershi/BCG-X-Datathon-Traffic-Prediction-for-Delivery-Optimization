@@ -1,0 +1,396 @@
+{
+  "schema_version": 1,
+  "development_cutoffs": [
+    "2024-11-07 00:00:00",
+    "2024-12-19 00:00:00",
+    "2024-12-26 00:00:00",
+    "2025-04-17 00:00:00",
+    "2025-07-10 00:00:00",
+    "2025-10-16 00:00:00",
+    "2025-11-06 00:00:00",
+    "2026-10-22 00:00:00"
+  ],
+  "recent_validation_cutoff": "2026-10-29 00:00:00",
+  "outage_days": [
+    28,
+    90,
+    180,
+    365
+  ],
+  "skipped_outages": [
+    {
+      "cutoff": "2026-10-22 00:00:00",
+      "outage_days": 28,
+      "reason": "less than 56 pre-outage calendar days or no observed target truth"
+    },
+    {
+      "cutoff": "2026-10-22 00:00:00",
+      "outage_days": 90,
+      "reason": "less than 56 pre-outage calendar days or no observed target truth"
+    },
+    {
+      "cutoff": "2026-10-22 00:00:00",
+      "outage_days": 180,
+      "reason": "less than 56 pre-outage calendar days or no observed target truth"
+    },
+    {
+      "cutoff": "2024-11-07 00:00:00",
+      "outage_days": 365,
+      "reason": "less than 56 pre-outage calendar days or no observed target truth"
+    },
+    {
+      "cutoff": "2024-12-19 00:00:00",
+      "outage_days": 365,
+      "reason": "less than 56 pre-outage calendar days or no observed target truth"
+    },
+    {
+      "cutoff": "2024-12-26 00:00:00",
+      "outage_days": 365,
+      "reason": "less than 56 pre-outage calendar days or no observed target truth"
+    },
+    {
+      "cutoff": "2026-10-22 00:00:00",
+      "outage_days": 365,
+      "reason": "less than 56 pre-outage calendar days or no observed target truth"
+    }
+  ],
+  "scoring": {
+    "pooled_rmse": "sqrt(sum((prediction-truth)^2)/n_scored)",
+    "macro_rmse": "unweighted mean of nonempty arc/window RMSEs",
+    "organiser_aggregation": "unspecified in brief; targets reported separately",
+    "truth_policy": "independent, measured targets only; identical rows across candidates",
+    "final_test": "November 7-11 reserved, never evaluated",
+    "recent_check": "one fixed-settings diagnostic; not claimed independent of all team exploration"
+  },
+  "model_settings": {
+    "baseline_day_type": "DayTypeProfileBaseline",
+    "baseline_holiday_aware": "HolidayAwarePreviousWeekBaseline",
+    "lightgbm_no_weather": "LightGBM global, separate targets, flow=raw; parameters {\"deterministic\": true, \"force_col_wise\": true, \"importance_type\": \"gain\", \"learning_rate\": 0.05, \"max_depth\": 6, \"min_child_samples\": 30, \"n_estimators\": 200, \"n_jobs\": 1, \"num_leaves\": 31, \"objective\": \"regression\", \"random_state\": 42, \"reg_lambda\": 1.0, \"verbosity\": -1}; lags [168, 336, 504, 672] h; weather=lagged; training profiles gap=168 h; fallback HolidayAwarePreviousWeekBaseline if fewer than 168 valid hours in the last 28 days"
+  },
+  "weather_inputs": "All weather covariates are explicitly missing; calendar/traffic-only diagnostic, not production E5",
+  "outage_settings": {
+    "methods": [
+      "profile",
+      "copy",
+      "offset",
+      "linear"
+    ],
+    "min_pairs": 20,
+    "min_pre_outage_calendar_days": 56,
+    "input": "previous week, at or before cutoff"
+  },
+  "data": {
+    "content_sha256": "848d155025972573d77aa22de7195a84a39f7a30624b7a3ecba62cff822f0094",
+    "rows": 124680,
+    "start": "2024-01-01 00:00:00",
+    "end": "2026-11-04 23:00:00",
+    "observations_sha256": "3d47f3daf03ac4a9e66bbe8c2eed1431bc6f86731eb1ac14785df47d1ada668e",
+    "audit_inputs": {
+      "schema_version": 1,
+      "start": "2024-01-01",
+      "end": "2026-11-04",
+      "config": "configs/baseline.yaml",
+      "source_order_note": "Historical archives then their extracted boundary then one bounded API snapshot per verified directed arc.",
+      "sensor_snapshot": {
+        "path": "data/raw/quality_52/sensors_20261105.json",
+        "sha256": "e4482e3e2bb5f0b4d5d58ba96822f6483869d0a1ecb5b470ea9f20ef1578c3c7"
+      },
+      "sources": [
+        {
+          "path": "data/raw/historical/2024/opendata_txt_2024_zip.zip",
+          "sha256": "f74a620bd8ccb96e63a1c1d12368aa979a6048cc0473bf490528882a75c6ae7e",
+          "url": "https://opendata.paris.fr/api/datasets/1.0/comptages-routiers-permanents-historique/attachments/opendata_txt_2024_zip/"
+        },
+        {
+          "path": "data/raw/historical/2025/opendata_txt_2025_zip.zip",
+          "sha256": "9549fea12ac05d7f46d6d3c951a094604e47019e9b95a6aacb6a56eb01cdcd09",
+          "url": "https://opendata.paris.fr/api/datasets/1.0/comptages-routiers-permanents-historique/attachments/opendata_txt_2025_zip/"
+        },
+        {
+          "path": "data/raw/historical/2025/opendata_txt_2025_zip2.zip",
+          "sha256": "9549fea12ac05d7f46d6d3c951a094604e47019e9b95a6aacb6a56eb01cdcd09",
+          "url": "https://opendata.paris.fr/api/datasets/1.0/comptages-routiers-permanents-historique/attachments/opendata_txt_2025_zip2/"
+        },
+        {
+          "path": "data/raw/recent/rebuild_20261101/boundary_20240101T000000_Paris.jsonl",
+          "sha256": "39c844028e03854fc972d472e4be1a97938c3117198836e4111541f36ae58624",
+          "provenance": {
+            "archive_sha256": "675c185e63bee3b9abcee0a9aee69a908c74771a5e421a43b03f628a69197cd9",
+            "source": "https://opendata.paris.fr/api/datasets/1.0/comptages-routiers-permanents-historique/attachments/opendata_txt_2023_zip/",
+            "members_crc_checked": [
+              {
+                "member": "trafic_capteurs_2023_W52_20231229_20240101.txt",
+                "size_bytes": 57247372,
+                "crc32": 1560152630
+              },
+              {
+                "member": "trafic_capteurs_2023_W52_20231231_20240101.txt",
+                "size_bytes": 19080994,
+                "crc32": 549080016
+              }
+            ],
+            "boundary": "2024-01-01 00:00:00",
+            "rows_before_deduplication": 10,
+            "road_ids": [
+              191,
+              4264,
+              4265,
+              4272,
+              5671
+            ],
+            "output": "data/raw/recent/rebuild_20261101/boundary_20240101T000000_Paris.jsonl",
+            "output_sha256": "39c844028e03854fc972d472e4be1a97938c3117198836e4111541f36ae58624"
+          }
+        },
+        {
+          "path": "data/raw/quality_52/recent/traffic_20251231T230000000000Z_20261104T230000000000Z_npelhjt7.jsonl",
+          "sha256": "406377d4a237f11d71764b6d2d484b91d817121ec7a64d56a7ceb6c5c4c7fadb",
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/exports/jsonl?where=%28t_1h+%3E%3D+date%272025-12-31T23%3A00%3A00Z%27+AND+t_1h+%3C+date%272026-11-04T23%3A00%3A00Z%27%29+AND+iu_ac+%3D+%274264%27&limit=-1&timezone=UTC",
+          "retrieved_at_utc": "2026-11-05T08:29:34.558288+00:00",
+          "start_inclusive": "2026-01-01T00:00:00+01:00",
+          "end_exclusive": "2026-11-05T00:00:00+01:00",
+          "road_id": 4264
+        },
+        {
+          "path": "data/raw/quality_52/recent/traffic_20251231T230000000000Z_20261104T230000000000Z_zkdv4mo7.jsonl",
+          "sha256": "00a436a481166a9ef034b029ecb47f913e4290028ded320b5408afda42b1fcaf",
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/exports/jsonl?where=%28t_1h+%3E%3D+date%272025-12-31T23%3A00%3A00Z%27+AND+t_1h+%3C+date%272026-11-04T23%3A00%3A00Z%27%29+AND+iu_ac+%3D+%275671%27&limit=-1&timezone=UTC",
+          "retrieved_at_utc": "2026-11-05T08:29:36.344221+00:00",
+          "start_inclusive": "2026-01-01T00:00:00+01:00",
+          "end_exclusive": "2026-11-05T00:00:00+01:00",
+          "road_id": 5671
+        },
+        {
+          "path": "data/raw/quality_52/recent/traffic_20251231T230000000000Z_20261104T230000000000Z_pu5gg8ta.jsonl",
+          "sha256": "afda69ef709c21dc2354ac85d09880c6aa958f08bcb4879f6072489daa14212a",
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/exports/jsonl?where=%28t_1h+%3E%3D+date%272025-12-31T23%3A00%3A00Z%27+AND+t_1h+%3C+date%272026-11-04T23%3A00%3A00Z%27%29+AND+iu_ac+%3D+%27191%27&limit=-1&timezone=UTC",
+          "retrieved_at_utc": "2026-11-05T08:29:38.537163+00:00",
+          "start_inclusive": "2026-01-01T00:00:00+01:00",
+          "end_exclusive": "2026-11-05T00:00:00+01:00",
+          "road_id": 191
+        },
+        {
+          "path": "data/raw/quality_52/recent/traffic_20251231T230000000000Z_20261104T230000000000Z_wza5w2vs.jsonl",
+          "sha256": "31452a93cad74d4ed08f8fc6e9f0b827717b35b2261a3a9c0c626986b163cd92",
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/exports/jsonl?where=%28t_1h+%3E%3D+date%272025-12-31T23%3A00%3A00Z%27+AND+t_1h+%3C+date%272026-11-04T23%3A00%3A00Z%27%29+AND+iu_ac+%3D+%274272%27&limit=-1&timezone=UTC",
+          "retrieved_at_utc": "2026-11-05T08:29:40.112349+00:00",
+          "start_inclusive": "2026-01-01T00:00:00+01:00",
+          "end_exclusive": "2026-11-05T00:00:00+01:00",
+          "road_id": 4272
+        },
+        {
+          "path": "data/raw/quality_52/recent/traffic_20251231T230000000000Z_20261104T230000000000Z_997h1dpr.jsonl",
+          "sha256": "1499f59e58cea6cf244f2d19412c91e74da85ca7b320943329b91e2ed1c56684",
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/exports/jsonl?where=%28t_1h+%3E%3D+date%272025-12-31T23%3A00%3A00Z%27+AND+t_1h+%3C+date%272026-11-04T23%3A00%3A00Z%27%29+AND+iu_ac+%3D+%274265%27&limit=-1&timezone=UTC",
+          "retrieved_at_utc": "2026-11-05T08:29:44.335541+00:00",
+          "start_inclusive": "2026-01-01T00:00:00+01:00",
+          "end_exclusive": "2026-11-05T00:00:00+01:00",
+          "road_id": 4265
+        }
+      ],
+      "config_sha256": "e723677e6dca6ba7add09f09048e6258e2b8df06524f3309beed069aea0e734e"
+    },
+    "audit_report": {
+      "schema_version": 1,
+      "period": {
+        "start": "2024-01-01 00:00:00",
+        "end": "2026-11-04 23:00:00"
+      },
+      "sources": [
+        {
+          "path": "data/raw/historical/2024/opendata_txt_2024_zip.zip",
+          "sha256": "f74a620bd8ccb96e63a1c1d12368aa979a6048cc0473bf490528882a75c6ae7e",
+          "url": "https://opendata.paris.fr/api/datasets/1.0/comptages-routiers-permanents-historique/attachments/opendata_txt_2024_zip/",
+          "raw_rows": 27333593,
+          "selected_rows": 41365,
+          "cache_sha256": "e556c01838af01d8f4befe6936ca1699d126c9121b06dc083bc0f714655e4f62"
+        },
+        {
+          "path": "data/raw/historical/2025/opendata_txt_2025_zip.zip",
+          "sha256": "9549fea12ac05d7f46d6d3c951a094604e47019e9b95a6aacb6a56eb01cdcd09",
+          "url": "https://opendata.paris.fr/api/datasets/1.0/comptages-routiers-permanents-historique/attachments/opendata_txt_2025_zip/",
+          "raw_rows": 28912601,
+          "selected_rows": 43800,
+          "cache_sha256": "649c5b182486030574e4bb4a799c656206f05f0c912624fd524679495cd7733b"
+        },
+        {
+          "path": "data/raw/recent/rebuild_20261101/boundary_20240101T000000_Paris.jsonl",
+          "sha256": "39c844028e03854fc972d472e4be1a97938c3117198836e4111541f36ae58624",
+          "provenance": {
+            "archive_sha256": "675c185e63bee3b9abcee0a9aee69a908c74771a5e421a43b03f628a69197cd9",
+            "source": "https://opendata.paris.fr/api/datasets/1.0/comptages-routiers-permanents-historique/attachments/opendata_txt_2023_zip/",
+            "members_crc_checked": [
+              {
+                "member": "trafic_capteurs_2023_W52_20231229_20240101.txt",
+                "size_bytes": 57247372,
+                "crc32": 1560152630
+              },
+              {
+                "member": "trafic_capteurs_2023_W52_20231231_20240101.txt",
+                "size_bytes": 19080994,
+                "crc32": 549080016
+              }
+            ],
+            "boundary": "2024-01-01 00:00:00",
+            "rows_before_deduplication": 10,
+            "road_ids": [
+              191,
+              4264,
+              4265,
+              4272,
+              5671
+            ],
+            "output": "data/raw/recent/rebuild_20261101/boundary_20240101T000000_Paris.jsonl",
+            "output_sha256": "39c844028e03854fc972d472e4be1a97938c3117198836e4111541f36ae58624"
+          },
+          "raw_rows": 10,
+          "selected_rows": 10,
+          "cache_sha256": "b51d9c2fa9c6bbce99dfd2147ea7a6bcf4f7168c6c2703cdd2e2de3a382df22d"
+        },
+        {
+          "path": "data/raw/quality_52/recent/traffic_20251231T230000000000Z_20261104T230000000000Z_npelhjt7.jsonl",
+          "sha256": "406377d4a237f11d71764b6d2d484b91d817121ec7a64d56a7ceb6c5c4c7fadb",
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/exports/jsonl?where=%28t_1h+%3E%3D+date%272025-12-31T23%3A00%3A00Z%27+AND+t_1h+%3C+date%272026-11-04T23%3A00%3A00Z%27%29+AND+iu_ac+%3D+%274264%27&limit=-1&timezone=UTC",
+          "retrieved_at_utc": "2026-11-05T08:29:34.558288+00:00",
+          "start_inclusive": "2026-01-01T00:00:00+01:00",
+          "end_exclusive": "2026-11-05T00:00:00+01:00",
+          "road_id": 4264,
+          "raw_rows": 7263,
+          "selected_rows": 7263,
+          "cache_sha256": "f6d9965fff9bd799ad4a43ef08bb1849bd41cc2e459c12d0efac7b9c0e47c768"
+        },
+        {
+          "path": "data/raw/quality_52/recent/traffic_20251231T230000000000Z_20261104T230000000000Z_zkdv4mo7.jsonl",
+          "sha256": "00a436a481166a9ef034b029ecb47f913e4290028ded320b5408afda42b1fcaf",
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/exports/jsonl?where=%28t_1h+%3E%3D+date%272025-12-31T23%3A00%3A00Z%27+AND+t_1h+%3C+date%272026-11-04T23%3A00%3A00Z%27%29+AND+iu_ac+%3D+%275671%27&limit=-1&timezone=UTC",
+          "retrieved_at_utc": "2026-11-05T08:29:36.344221+00:00",
+          "start_inclusive": "2026-01-01T00:00:00+01:00",
+          "end_exclusive": "2026-11-05T00:00:00+01:00",
+          "road_id": 5671,
+          "raw_rows": 7263,
+          "selected_rows": 7263,
+          "cache_sha256": "29ef1317557e14b24472308ad362fe70f85fdb8d8a7c41bf1c6db9dcc9173cd9"
+        },
+        {
+          "path": "data/raw/quality_52/recent/traffic_20251231T230000000000Z_20261104T230000000000Z_pu5gg8ta.jsonl",
+          "sha256": "afda69ef709c21dc2354ac85d09880c6aa958f08bcb4879f6072489daa14212a",
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/exports/jsonl?where=%28t_1h+%3E%3D+date%272025-12-31T23%3A00%3A00Z%27+AND+t_1h+%3C+date%272026-11-04T23%3A00%3A00Z%27%29+AND+iu_ac+%3D+%27191%27&limit=-1&timezone=UTC",
+          "retrieved_at_utc": "2026-11-05T08:29:38.537163+00:00",
+          "start_inclusive": "2026-01-01T00:00:00+01:00",
+          "end_exclusive": "2026-11-05T00:00:00+01:00",
+          "road_id": 191,
+          "raw_rows": 7263,
+          "selected_rows": 7263,
+          "cache_sha256": "371d606ff3e8d810a1a5d50b816ebc38a24f0db8b3e9c0744dadaf0932a29e57"
+        },
+        {
+          "path": "data/raw/quality_52/recent/traffic_20251231T230000000000Z_20261104T230000000000Z_wza5w2vs.jsonl",
+          "sha256": "31452a93cad74d4ed08f8fc6e9f0b827717b35b2261a3a9c0c626986b163cd92",
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/exports/jsonl?where=%28t_1h+%3E%3D+date%272025-12-31T23%3A00%3A00Z%27+AND+t_1h+%3C+date%272026-11-04T23%3A00%3A00Z%27%29+AND+iu_ac+%3D+%274272%27&limit=-1&timezone=UTC",
+          "retrieved_at_utc": "2026-11-05T08:29:40.112349+00:00",
+          "start_inclusive": "2026-01-01T00:00:00+01:00",
+          "end_exclusive": "2026-11-05T00:00:00+01:00",
+          "road_id": 4272,
+          "raw_rows": 7263,
+          "selected_rows": 7263,
+          "cache_sha256": "a29476f721c1c3b39da35433b5ac9832ab15e7d4304f953be8481e8e93d73237"
+        },
+        {
+          "path": "data/raw/quality_52/recent/traffic_20251231T230000000000Z_20261104T230000000000Z_997h1dpr.jsonl",
+          "sha256": "1499f59e58cea6cf244f2d19412c91e74da85ca7b320943329b91e2ed1c56684",
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/exports/jsonl?where=%28t_1h+%3E%3D+date%272025-12-31T23%3A00%3A00Z%27+AND+t_1h+%3C+date%272026-11-04T23%3A00%3A00Z%27%29+AND+iu_ac+%3D+%274265%27&limit=-1&timezone=UTC",
+          "retrieved_at_utc": "2026-11-05T08:29:44.335541+00:00",
+          "start_inclusive": "2026-01-01T00:00:00+01:00",
+          "end_exclusive": "2026-11-05T00:00:00+01:00",
+          "road_id": 4265,
+          "raw_rows": 7263,
+          "selected_rows": 7263,
+          "cache_sha256": "18c57db08e16670b6a869108e02b6622860d34250175ea5bffe90080c0608386"
+        }
+      ],
+      "identical_files_skipped": [
+        "data/raw/historical/2025/opendata_txt_2025_zip2.zip"
+      ],
+      "duplicate_hour_rows_removed": 10,
+      "source_order": "manifest order; last supplied row wins; no source row means absent",
+      "rows": 124680,
+      "months": 35,
+      "suspect_zero_flow_hours": 209,
+      "unexpected_sensor_rows": 0,
+      "sensor_inventory_matches": true,
+      "configuration": [
+        {
+          "name": "Champs-Elysées",
+          "role": "evalue",
+          "upstream_node": "Av_Champs_Elysees-Washington",
+          "downstream_node": "Av_Champs_Elysees-Berri",
+          "iu_ac": 4264
+        },
+        {
+          "name": "Convention",
+          "role": "evalue",
+          "upstream_node": "Lecourbe-Convention",
+          "downstream_node": "Convention-Blomet",
+          "iu_ac": 5671
+        },
+        {
+          "name": "Saint-Pères",
+          "role": "evalue",
+          "upstream_node": "Sts_Peres-Voltaire",
+          "downstream_node": "Sts_Peres-Universite",
+          "iu_ac": 191
+        },
+        {
+          "name": "Champs-Elysées proxy La Boétie-Berri",
+          "role": "proxy",
+          "upstream_node": "Av_Champs_Elysees-La_Boetie",
+          "downstream_node": "Av_Champs_Elysees-Berri",
+          "iu_ac": 4272
+        },
+        {
+          "name": "Champs-Elysées proxy Washington-Balzac",
+          "role": "proxy",
+          "upstream_node": "Av_Champs_Elysees-Washington",
+          "downstream_node": "Av_Champs_Elysees-Balzac",
+          "iu_ac": 4265
+        }
+      ],
+      "config_sha256": "e723677e6dca6ba7add09f09048e6258e2b8df06524f3309beed069aea0e734e",
+      "sensor_snapshot_sha256": "e4482e3e2bb5f0b4d5d58ba96822f6483869d0a1ecb5b470ea9f20ef1578c3c7",
+      "inputs_sha256": "14d727fb24ef986ee82fb2e24022c0b10fab7a1e50148446286c9929ce1e6d31",
+      "code_sha256": "c768b961245d8df993fdeeb2e75905a25411599c2c5972ce211a6902eaf4a7fd",
+      "dependency_sha256": {
+        "src/traffic_prediction/data/traffic.py": "d187c8f0cd066e94e33dde5bba0c7a63b2bbc66aa1e47e8fb7ef2d70bc5c9a3d",
+        "src/traffic_prediction/data/historical.py": "0854ccd04565b73536138c77536d7c3615c7e880d74f289090e4e004811564b4",
+        "src/traffic_prediction/evaluate.py": "01c04eceded9103a3c5729da9fcc046998b53a67b4bd72c944d633f5f7d6ae44"
+      },
+      "environment": {
+        "python": "3.12.10",
+        "numpy": "2.2.6",
+        "pandas": "2.3.3",
+        "pyarrow": "25.0.1",
+        "PyYAML": "6.0.3",
+        "stream-unzip": "0.0.100"
+      }
+    },
+    "calendar_sha256": "ccf6d22f27c005c4993c0c1fef9103f11f9b4d9811a5d1d731788342325b0225"
+  },
+  "code_sha256": {
+    "src\\traffic_prediction\\validation.py": "4b4618fc8a53d315d85fda00cf4aee38fdc49938af7a0111a5aad1cca4be2ce9",
+    "src\\traffic_prediction\\evaluate.py": "7e151ea313df46871f9b700cde8e4105b4404a75572bc277890d3265c827d37d",
+    "src\\traffic_prediction\\models\\proxy.py": "3369227a5faa8caca68fd18064a5175f6dfa612aed72c05fb52d34eefb8cf48f",
+    "src\\traffic_prediction\\models\\baselines.py": "0f763ed8407e71b5222f0936ad9539091fa4b715155c15a7b37b40f5fc0e050a",
+    "src\\traffic_prediction\\train.py": "763134dcece9ffd185319d462380e782b6bafe7503fa18c3844699d84223dd28",
+    "src\\traffic_prediction\\features.py": "d06260e7608229979f345cac0cc2e253067c61b5fece77fcafccf426270c1011"
+  },
+  "git_commit": "2be7fed9d38c6204cdaada8e796c578bca88cee7",
+  "environment": {
+    "python": "3.12.10",
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "pyarrow": "25.0.1",
+    "holidays": "0.107",
+    "lightgbm": "4.7.0",
+    "scikit-learn": "1.7.2"
+  }
+}
