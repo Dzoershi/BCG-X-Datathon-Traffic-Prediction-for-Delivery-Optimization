@@ -19,8 +19,8 @@ traffic:
       downstream_node: "Sts_Peres-Universite"
       iu_ac: 191
 
-  # Neighboring arcs used as substitutes: the Champs-Elysées sensor (4264)
-  # has no measurements after 2025-11-19 11:00.
+  # Auxiliary proxy candidates; they do not replace the official target (#51/#52).
+  # Target 4264 last valid flow: 2025-11-19 11:00; occupancy: 2025-11-19 12:00.
   proxy_arcs:
     - name: "Champs-Elysées proxy La Boétie-Berri"
       upstream_node: "Av_Champs_Elysees-La_Boetie"

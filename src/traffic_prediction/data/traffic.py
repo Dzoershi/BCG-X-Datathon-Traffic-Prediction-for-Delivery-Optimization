@@ -169,7 +169,8 @@ def normalize_raw(raw: pd.DataFrame, arcs: list[Arc]) -> pd.DataFrame:
     rows = filter_arcs(raw, arcs)
     debit, debit_invalid = parse_measure(rows["q"])
     taux, taux_invalid = parse_measure(rows["k"], upper=100)
-    # No vehicle counted while the loop is occupied: a sensor fault.
+    # Conservatively exclude ambiguous zero-flow/occupied-loop values (#52).
+    # This pattern alone does not prove a sensor fault; raw values remain auditable.
     zero_flow = debit.eq(0) & taux.gt(0)
     debit = debit.mask(zero_flow)
 

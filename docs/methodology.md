@@ -29,7 +29,8 @@ Le statut « implémenté » décrit l'arbre de travail ; le statut de publicati
 17. [Timestral](#timestral-issue-20)
 18. [Variables tabulaires](#variables-tabulaires-issue-30)
 19. [LightGBM](#lightgbm-issue-31)
-20. [Décisions ouvertes](#décisions-ouvertes)
+20. [Audit qualité par cible](#audit-qualité-par-cible-issue-52)
+21. [Décisions ouvertes](#décisions-ouvertes)
 
 ## Périmètre du brief
 
@@ -1431,6 +1432,22 @@ python -m traffic_prediction.predict --team-name <équipe> --model holiday-aware
 L'ensemble exige `requirements-timestral.txt` et le `covariates.parquet` du dataset #22 ; il échoue avec un message explicite sinon. L'historique de rendu reçoit l'indicateur férié du calendrier et la météo passée des covariables, comme dans le dataset du backtest. Une panne d'un membre arrête le rendu au lieu de changer de modèle en silence. Hors ligne, un rendu complet prend environ 12 s sur un Mac M1. **LightGBM tourne sur un seul fil** dans l'ensemble : sur macOS, une fois PyTorch chargé, LightGBM multifil se bloque dans OpenMP (plusieurs copies de `libomp`) ; ses prévisions sont identiques au bit près avec 1 et 4 fils.
 
 [`test_ensemble.py`](../tests/test_ensemble.py) vérifie les poids E5 (complets, positifs, de somme 1), les types de jour de la semaine du rendu, l'application des poids par variable et type de jour, qu'un membre de poids nul ne tourne pas, les poids invalides refusés, des membres incohérents ou en panne, les bornes et le contrat du CSV.
+
+## Audit qualité par cible (issue #52)
+
+```powershell
+python -m traffic_prediction.data.audit --inputs docs/data_quality/inputs.json --output-dir outputs/metrics/quality_52
+```
+
+L'audit du 5 novembre porte sur les étiquettes horaires du **1er janvier 2024 au 4 novembre 2026 inclus**, sans observation de la période finale. Le [rapport détaillé](data_quality/README.md) publie les CSV mensuels, les effets sur l'éligibilité et l'inventaire des capteurs. Son manifeste fixe les bruts, leur ordre et leurs empreintes. Les ZIP sont parcourus par morceaux ; seuls les cinq arcs configurés sont conservés dans un cache vérifié. Les valeurs originales et leurs coordonnées source restent accessibles dans les fichiers locaux, sans réécriture du dataset de production.
+
+**Une cible disponible ne dépend pas de sa partenaire.** L'audit distingue ligne source absente, valeur nulle, valeur hors domaine et zéro suspect, séparément pour le débit et l'occupation. Il retrouve 57 965 débits et 83 410 occupations utilisables, contre 56 483 paires complètes sur les cinq arcs. Ce gain de disponibilité n'est pas un gain prédictif mesuré. Les modèles et le backtest gardent ici leur politique existante ; l'adoption d'un masque d'évaluation cohérent relève de #53. Sur les trois arcs officiels et les huit fenêtres configurées, l'éligibilité passe de 1 684 à 1 691 vérités de débit et reste à 1 684 pour l'occupation.
+
+**Zéros et proxies.** Les 209 heures `q=0, k>0` concernent exclusivement les proxies (98 La Boétie, 111 Washington). Leurs états et voisins ne prouvent pas une panne : la règle conservatrice existante reste en place, avec conservation du zéro brut et de l'occupation valide. Champs-Élysées a son dernier débit valide le 19 novembre 2025 à 11 h et sa dernière occupation à 12 h, dans ce périmètre. Aucune substitution par un proxy n'est introduite.
+
+**Identité des arcs.** Un inventaire indépendant interroge les paires de nœuds orientées, sans filtre d'identifiant, avec contrôle du sens inverse. Il confirme les trois IDs officiels et les deux proxies à la date du snapshot. Le téléchargement récent filtré par ID pourrait néanmoins manquer un futur changement d'identifiant ; un nouvel inventaire daté est nécessaire avant une actualisation finale. La date de fin du référentiel ne remplace pas les dates des mesures observées.
+
+La vérification indépendante retrouve les comptes sur 124 680 lignes d'audit et ne détecte aucune différence sur les 124 080 lignes de production existantes. La suite locale passe **705 tests et 27 sous-tests**, dont 25 tests d'audit et son contrôle d'import. Les scores antérieurs restent attachés à leurs propres snapshots ; cet audit ne constitue pas une actualisation de ces scores.
 
 ## Décisions ouvertes
 
