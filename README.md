@@ -139,6 +139,14 @@ Checks the hourly grid, schema, duplicates, partition labels, and data constrain
 
 Use `--data-dir`, `--config`, or paired `--start` / `--end` dates to choose what to validate. Missing measurements are reported separately from missing rows. The CSV check enforces the brief's 360-row format; it does not generate forecasts. PR tests are configured for Windows/Linux and Python 3.10/3.13. [Validation details](docs/methodology.md#vérification-et-tests).
 
+### Audit traffic quality by target (#52)
+
+```powershell
+python -m traffic_prediction.data.audit --inputs docs/data_quality/inputs.json --output-dir outputs/metrics/quality_52
+```
+
+Requires the recorded raw snapshots. Reports monthly coverage, missing/invalid values, zero-flow cases, sensor IDs and per-target eligibility without changing production data. [Results and reproduction instructions](docs/data_quality/README.md).
+
 ## 8. Backtest a forecasting model
 
 Prepare the calendar required by the baseline (see [calendar features](docs/methodology.md#calendrier-horaire-issue-16)):
