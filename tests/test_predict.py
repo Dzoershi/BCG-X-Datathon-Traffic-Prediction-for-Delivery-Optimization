@@ -14,6 +14,10 @@ from traffic_prediction import predict
 from traffic_prediction.data import build, traffic, validate
 from traffic_prediction.data.validate import SUBMISSION_ARCS, validate_submission
 
+# Pinned copy of the provisional (unapproved) review, so tests do not depend on the
+# delivery-day decision recorded in configs/disruptions_review.json.
+PROVISIONAL_REVIEW = Path(__file__).parent / "fixtures" / "disruptions_review_provisional.json"
+
 SCHOOL_PATH = Path(__file__).parent / "fixtures/paris_school_holidays.json"
 
 
@@ -43,7 +47,7 @@ def local_data(tmp_path, history):
         frames.append(frame)
     build.write_partitions(pd.concat(frames), tmp_path / "traffic")
     return dict(data_dir=tmp_path / "traffic", output_dir=tmp_path / "submissions",
-                school_holidays_path=SCHOOL_PATH)
+                school_holidays_path=SCHOOL_PATH, closure_review_path=PROVISIONAL_REVIEW)
 
 
 def test_cutoff_clipping_types_and_order(history):

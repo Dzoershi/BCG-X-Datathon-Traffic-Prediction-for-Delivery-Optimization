@@ -1,6 +1,7 @@
 """Offline evidence, review authorization and historical-only assessment checks (#57)."""
 import copy
 import json
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -10,6 +11,10 @@ from traffic_prediction import predict
 from traffic_prediction.constants import TARGET_TIMES
 from traffic_prediction.data import disruption_review as review, disruptions, traffic
 from traffic_prediction.models.postprocess import closure_hours
+
+# Pinned copy of the provisional (unapproved) review, so tests do not depend on the
+# delivery-day decision recorded in configs/disruptions_review.json.
+PROVISIONAL_REVIEW = Path(__file__).parent / "fixtures" / "disruptions_review_provisional.json"
 
 
 @pytest.fixture
@@ -24,14 +29,14 @@ def event():
 
 
 def approved():
-    data = review.read_review()
+    data = review.read_review(PROVISIONAL_REVIEW)
     data["events"][0].update(status="confirmed", evidence_kind="traffic_order", hours_verified=True,
         direction_verified=True, action="copy_prior_year", source_url="https://example.org/official-order")
     return data
 
 
 def test_default_and_missing_reviews_preserve_predictions(event):
-    for data in (review.read_review(), {"schema_version": 1, "events": []}):
+    for data in (review.read_review(PROVISIONAL_REVIEW), {"schema_version": 1, "events": []}):
         selected, decisions = review.reviewed_events(event, data, TARGET_TIMES)
         assert selected.empty and decisions[0]["action"] == "none"
         assert len(decisions[0]["candidate_labels"]) == 7
