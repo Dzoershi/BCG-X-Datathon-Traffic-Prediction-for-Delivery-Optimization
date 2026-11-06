@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en" data-theme="light" style="color-scheme:light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weekly Traffic Planner</title>
+<style>
+:root{--dg:#03522D;--g:#29BA74;--lg:#DFF3E8;--tx:#2F2F2F;--mu:#6E6F73;--bd:#E2E2E2;--bg:#F6F6F4;--card:#FFFFFF;--busy:#03522D;--mid:#7FD3A8;--clear:#EAF7F0;--night:#EDEDED}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:"Trebuchet MS",Helvetica,Arial,sans-serif;font-size:14px}
+.wrap{max-width:1280px;margin:0 auto;padding:20px 16px 28px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;border-bottom:2px solid var(--g);padding-bottom:10px}
+h1{margin:0;font-size:22px;color:var(--g);font-weight:normal}
+.sub{color:var(--mu);font-size:13px;margin-top:4px}
+.tag{background:var(--lg);color:var(--dg);border-radius:4px;padding:3px 8px;font-size:12px}
+.tabs{display:flex;gap:8px;margin:16px 0 12px;flex-wrap:wrap}
+.tabs button{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:8px 14px;border-radius:6px;cursor:pointer;font:inherit}
+.tabs button.on{background:var(--dg);color:#fff;border-color:var(--dg)}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:14px}
+.card h2{margin:0 0 4px;font-size:15px;color:var(--tx)}
+.card .note{color:var(--mu);font-size:12px;margin-bottom:10px}
+.hm{overflow-x:auto}
+table.heat{border-collapse:separate;border-spacing:2px;width:100%;min-width:640px}
+table.heat td,table.heat th{font-size:10px;text-align:center;padding:0}
+table.heat th{color:var(--mu);font-weight:normal}
+table.heat td.c{height:30px;border-radius:3px}
+table.heat td.day{text-align:left;font-size:12px;color:var(--tx);padding-right:6px;white-space:nowrap}
+td.c.sel{outline:3px solid #F5B800;outline-offset:-3px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--mu)}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:5px;vertical-align:-2px;background:var(--c)}
+.slot{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd)}
+.slot:last-child{border-bottom:none}
+.slot b{font-size:14px}
+.slot .when{font-size:15px;color:var(--dg);font-weight:bold}
+.slot small{display:block;color:var(--mu);font-size:11px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+@media (max-width:640px){.kpis{grid-template-columns:1fr}}
+.kpi{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:12px}
+.kpi .v{font-size:24px;color:var(--g)}
+.kpi .l{color:var(--mu);font-size:12px}
+svg text{fill:var(--mu);font-size:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}@media (max-width:900px){.grid3{grid-template-columns:1fr}}
+.badge{display:inline-block;font-size:10px;border-radius:3px;padding:1px 6px;margin-left:6px;vertical-align:1px}
+.badge.ok{background:var(--lg);color:var(--dg)}.badge.warn{background:#FFF1C2;color:#7A5A00}.badge.close{background:#EEE;color:#555}
+.trow{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bd);font-size:13px}.trow:last-child{border-bottom:none}.trow b{color:var(--dg)}
+.seg{display:flex;align-items:center;gap:6px;margin:6px 0 8px;font-size:12px;color:var(--mu)}.seg button{border:1px solid var(--bd);background:var(--card);padding:3px 10px;border-radius:5px;cursor:pointer;font:inherit;color:var(--tx)}.seg button.on{background:var(--dg);color:#fff;border-color:var(--dg)}
+td.c.part{background-image:repeating-linear-gradient(45deg,rgba(0,0,0,.22),rgba(0,0,0,.22) 2px,transparent 2px,transparent 5px)!important}
+.foot{color:var(--mu);font-size:11px;margin-top:14px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <div><h1>LivraisonCo · Weekly traffic planner</h1>
+ <div class="sub">Forecast for Saturday 7 to Wednesday 11 November 2026, built on Thursday 5 November at 23:00</div></div>
+ <div class="tag">Prototype · step 2 of 5 · forecasting live, slot optimisation next</div>
+</header>
+<div class="tabs" id="tabs"></div>
+<div class="kpis" id="kpis"></div>
+<div class="grid">
+ <div class="card">
+  <h2 id="hmTitle">When is the road clear?</h2>
+  <div class="note" id="hmNote"></div>
+  <div class="hm" id="heat"></div>
+  <div class="legend"><span style="--c:var(--clear)">Clear</span><span style="--c:var(--mid)">Moderate</span><span style="--c:var(--busy)">Busy</span><span style="--c:repeating-linear-gradient(45deg,#ccc,#ccc 2px,#fff 2px,#fff 4px)">Closed (11 Nov ceremony)</span><span style="--c:transparent;box-shadow:inset 0 0 0 2px #F5B800">Yellow frame: recommended 4-hour day shift</span></div>
+ </div>
+ <div class="card">
+  <h2>Recommended day shift</h2>
+  <div class="seg" id="seg"></div>
+  <div class="note">The brief sets shifts of 4 to 8 hours, paid €10/h by day (08:00 to 20:00) and €14/h at night. The prototype shows the single clearest day shift per day; combining several shifts and drivers is the next step (roadmap, step 3). Badge: how clear the shift is compared with the whole week's daytime traffic.</div>
+  <div id="slots"></div>
+ </div>
+</div>
+<div class="grid3">
+ <div class="card"><h2>When should we switch to night?</h2><div class="note">A night hour costs 40% more (€14 vs €10). Night is cheaper per parcel only if a driver delivers at least 1.4 times more parcels per hour than in the best day shift.</div><div id="breakeven"></div><div class="note" style="margin-top:8px">Is the evening (20:00 to 24:00) clearer than the best day shift? Clearer traffic is needed but not enough: the parcels-per-hour gain has to be measured in the pilot.</div><div id="night"></div></div>
+ <div class="card"><h2>How far to trust it</h2><div class="note">Tested on 8 past weeks, data cut on a Thursday night like today.</div><div id="trust"></div></div>
+</div>
+<div class="card" style="margin-top:14px">
+ <h2 id="lineTitle">Forecast vehicle flow, hour by hour</h2>
+ <div class="note" id="lineNote">Vehicles per hour on the selected road. Yellow bands: recommended shifts.</div>
+ <div id="line"></div>
+</div>
+<div class="foot" id="foot"></div>
+</div>
+<script>
+const DATA = __DATA__;
+const ROADS = ["Convention","Saint-Pères","Champs-Elysées"];
+const NAMES = {"ALL":"All 3 roads","Convention":"Rue de la Convention","Saint-Pères":"Rue des Saints-Pères","Champs-Elysées":"Champs-Élysées"};
+const DAYS = ["2026-11-07","2026-11-08","2026-11-09","2026-11-10","2026-11-11"];
+const DLAB = {"2026-11-07":"Sat 7","2026-11-08":"Sun 8","2026-11-09":"Mon 9","2026-11-10":"Tue 10","2026-11-11":"Wed 11 (holiday)"};
+const YEL = "#F5B800", SHADES = {"Convention":"#03522D","Saint-Pères":"#29BA74","Champs-Elysées":"#8A8B8F"};
+let road = "ALL", L = 4;
+const closed = (r,day,h) => r==="Champs-Elysées" && day==="2026-11-11" && h>=7 && h<14;
+const pad = h => String(h).padStart(2,"0");
+// Labels mark the end of the hour (Open Data Paris): "08:00" covers 07:00-08:00. Re-key on the starting hour.
+function series(r){
+  const m = {};
+  DATA.filter(d=>d.arc===r).forEach(d=>{
+    const t = new Date(d.datetime.replace(" ","T")+":00"); t.setHours(t.getHours()-1);
+    const day = t.getFullYear()+"-"+pad(t.getMonth()+1)+"-"+pad(t.getDate());
+    if (closed(r, day, t.getHours())) return;          // closed hours carry no traffic to plan on
+    m[day+"|"+t.getHours()] = {occ:d.taux_occupation, flow:d.debit_horaire};
+  });
+  return m;
+}
+const S = Object.fromEntries(ROADS.map(r=>[r, series(r)]));
+const dayHours = m => Object.entries(m).filter(([k])=>{const h=+k.split("|")[1];return h>=8&&h<20;}).map(([,d])=>d.occ);
+const mean = a => a.reduce((x,y)=>x+y,0)/a.length;
+const median = a => {const s=[...a].sort((x,y)=>x-y);return s[Math.floor(s.length/2)];};
+const REF = Object.fromEntries(ROADS.map(r=>[r, mean(dayHours(S[r]))]));
+// "All 3 roads": each road's occupancy divided by its own daytime average, then averaged over open roads.
+function combined(){
+  const m = {};
+  DAYS.forEach(day=>{for(let h=0;h<24;h++){
+    const parts = ROADS.map(r=>S[r][day+"|"+h]).map((d,i)=>d?{r:ROADS[i],v:d.occ/REF[ROADS[i]],d}:null).filter(Boolean);
+    if(parts.length) m[day+"|"+h] = {occ:mean(parts.map(p=>p.v)), flow:null, parts, partial: parts.length<ROADS.length};
+  }});
+  return m;
+}
+function q(arr,p){const s=[...arr].sort((a,b)=>a-b);return s[Math.floor(p*(s.length-1))];}
+function blocks(m, day, starts, len){
+  const out=[];
+  for(const s of starts){const v=[];for(let h=s;h<s+len;h++){const d=m[day+"|"+(h%24)];if(d&&!d.partial)v.push(d.occ);} if(v.length===len) out.push({s,v:mean(v)});}
+  return out.sort((a,b)=>a.v-b.v);
+}
+function render(){
+  document.getElementById("tabs").innerHTML = ["ALL",...ROADS].map(r=>`<button class="${r===road?"on":""}" data-r="${r}">${NAMES[r]}</button>`).join("");
+  document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{road=b.dataset.r;render();});
+  document.getElementById("seg").innerHTML = `<span>Shift length</span>`+[4,8].map(l=>`<button class="${l===L?"on":""}" data-l="${l}">${l} h</button>`).join("");
+  document.querySelectorAll("#seg button").forEach(b=>b.onclick=()=>{L=+b.dataset.l;render();});
+  const all = road==="ALL";
+  const m = all ? combined() : S[road];
+  const occ = dayHours(m); const t1=q(occ,0.33), t2=q(occ,0.66);
+  const usual = median(occ);
+  const level = v => v<=t1?"var(--clear)":v<=t2?"var(--mid)":"var(--busy)";
+  const best = {};
+  DAYS.forEach(day=>{
+    const bl = blocks(m, day, Array.from({length:21-L-8},(_,i)=>8+i), L);
+    const b = bl[0], alt = bl.find(x=>Math.abs(x.s-b.s)>=2);
+    const dh = []; for(let h=8;h<20;h++){const d=m[day+"|"+h]; if(d) dh.push(d.occ);}
+    best[day] = {s:b.s, v:b.v, peak:Math.max(...dh), alt: alt && alt.v <= b.v*1.05 ? alt : null,
+                 night: blocks(m, day, [20], 4)[0] || null};
+  });
+  // heatmap
+  let h = `<table class="heat"><tr><th></th>${Array.from({length:24},(_,i)=>`<th>${pad(i)}</th>`).join("")}</tr>`;
+  DAYS.forEach(day=>{
+    h += `<tr><td class="day">${DLAB[day]}</td>`;
+    for(let i=0;i<24;i++){
+      const d=m[day+"|"+i]; const night=i<8||i>=20; const cl=!all&&closed(road,day,i);
+      const inBest = i>=best[day].s && i<best[day].s+L;
+      let tip = "";
+      if(cl) tip = "Road closed for the 11 November ceremony";
+      else if(d && all) tip = `${DLAB[day]} ${pad(i)}:00 · `+d.parts.map(p=>`${NAMES[p.r]} ${p.d.occ.toFixed(1)}%`).join(" · ");
+      else if(d) tip = `${DLAB[day]} ${pad(i)}:00-${pad(i+1)}:00 · occupancy ${d.occ.toFixed(1)}% · ${Math.round(d.flow)} veh/h`;
+      const bg = cl ? "repeating-linear-gradient(45deg,var(--night),var(--night) 3px,var(--card) 3px,var(--card) 6px)" : (d?level(d.occ):"transparent");
+      const part = all && d && d.partial;
+      if(part) tip = `${DLAB[day]} ${pad(i)}:00 · Champs-Élysées closed: only the two other roads count, so this hour is not recommended`;
+      h += `<td class="c${inBest?" sel":""}${part?" part":""}" title="${tip}" style="background:${bg};${night?"opacity:.55":""}"></td>`;
+    }
+    h += "</tr>";
+  });
+  document.getElementById("heat").innerHTML = h + "</table>";
+  document.getElementById("hmNote").textContent = all
+    ? "A driver's round crosses several roads, so this view looks for hours when all three are clear at once. Each road is scaled to its own usual level, then the three are averaged, so the busy Champs-Élysées does not dominate. Hatched: Champs-Élysées closed for the 11 November ceremony, only two roads count, so these hours are never recommended. Night hours (20:00 to 08:00) are faded."
+    : "Forecast road occupancy per hour; darker means busier. Night hours (20:00 to 08:00) are faded.";
+  document.getElementById("hmTitle").textContent = all ? "When are all three roads clear at the same time?" : `When is ${NAMES[road]} clear?`;
+  // shifts with badges
+  document.getElementById("slots").innerHTML = DAYS.map(day=>{
+    const b=best[day]; const gain=Math.round((1-b.v/b.peak)*100);
+    const badge = b.v <= t1 ? `<span class="badge ok">clear</span>` : b.v <= t2 ? `<span class="badge close">moderate</span>` : `<span class="badge warn">busy all day, least-bad slot</span>`;
+    const close = b.alt ? `<span class="badge close">close call: ${pad(b.alt.s)}:00 to ${pad(b.alt.s+L)}:00 is almost as good</span>` : "";
+    return `<div class="slot"><div><b>${DLAB[day]}</b>${badge}<small>${gain}% less busy than the day's busiest hour ${close}</small></div><div class="when">${pad(b.s)}:00 to ${pad(b.s+L)}:00</div></div>`;
+  }).join("");
+  // night option
+  document.getElementById("night").innerHTML = DAYS.map(day=>{
+    const b=best[day], n=b.night; if(!n) return `<div class="trow"><span>${DLAB[day].split(" (")[0]} · 20:00 to 24:00</span><span>outside the forecast window</span></div>`;
+    const r = Math.round((1-n.v/b.v)*100);
+    const txt = r>0 ? `${r}% less busy than the best day shift: worth testing` : `not clearer: stay on the day shift`;
+    return `<div class="trow"><span>${DLAB[day].split(" (")[0]} · 20:00 to 24:00</span><span>${txt}</span></div>`;
+  }).join("");
+  { const W2=520,H2=184,p={l:46,r:12,t:26,b:34}; const xs=[1,2], ys=[0.6,1.5];
+    const X2=x=>p.l+(x-xs[0])/(xs[1]-xs[0])*(W2-p.l-p.r), Y2=y=>H2-p.b-(y-ys[0])/(ys[1]-ys[0])*(H2-p.t-p.b);
+    let c=`<svg viewBox="0 0 ${W2} ${H2}" width="100%" role="img" aria-label="Night break-even">`;
+    c+=`<rect x="${X2(1.4)}" y="${p.t}" width="${X2(2)-X2(1.4)}" height="${H2-p.t-p.b}" fill="var(--lg)"/>`;
+    c+=`<text x="${X2(1.7)}" y="${p.t+14}" text-anchor="middle">night cheaper per parcel</text><text x="${X2(1.2)}" y="${p.t+14}" text-anchor="middle">day cheaper</text>`;
+    c+=`<line x1="${p.l}" x2="${W2-p.r}" y1="${Y2(1)}" y2="${Y2(1)}" stroke="var(--mu)" stroke-dasharray="4 3"/><text x="${p.l-4}" y="${Y2(1)+3}" text-anchor="end">day</text>`;
+    const pts=[];for(let x=1;x<=2.001;x+=0.05)pts.push(X2(x)+","+Y2(1.4/x));
+    c+=`<polyline fill="none" stroke="var(--dg)" stroke-width="2" points="${pts.join(" ")}"/>`;
+    c+=`<circle cx="${X2(1.4)}" cy="${Y2(1)}" r="5" fill="${YEL}" stroke="var(--dg)"/><text x="${X2(1.4)+9}" y="${Y2(1)-8}" style="fill:var(--dg);font-weight:bold">break-even: 1.4×</text>`;
+    [1,1.2,1.4,1.6,1.8,2].forEach(x=>{c+=`<text x="${X2(x)}" y="${H2-p.b+14}" text-anchor="middle">${x.toFixed(1)}×</text>`;});
+    c+=`<text x="${(p.l+W2-p.r)/2}" y="${H2-4}" text-anchor="middle">parcels per hour at night, compared with the best day shift</text>`;
+    c+=`<text x="${p.l-4}" y="${Y2(1.4)+3}" text-anchor="end">1.4×</text><text x="${p.l}" y="12">night cost per parcel (day = 1)</text></svg>`;
+    document.getElementById("breakeven").innerHTML=c; }
+  document.getElementById("trust").innerHTML =
+    `<div class="trow"><span>Hourly volume error vs last-week planning</span><b>−10% flow, −16% occupancy</b></div>`+
+    `<div class="trow"><span>Busy hours correctly flagged</span><b>about 3 in 4</b></div>`+
+    `<div class="trow"><span>Clearest 4-hour shift found</span><b>about 7 days in 10</b></div>`+
+    `<div class="trow"><span>Treat a "close call" as</span><b>either slot is fine</b></div>`;
+  // KPIs
+  let bd=DAYS[0]; DAYS.forEach(d=>{if(best[d].v<best[bd].v)bd=d;});
+  let pk=null; Object.entries(m).forEach(([k,d])=>{if(!pk||d.occ>pk[1].occ)pk=[k,d];});
+  const [pkDay,pkH]=pk[0].split("|");
+  const clearDays = DAYS.filter(d=>best[d].v<=t1).length;
+  document.getElementById("kpis").innerHTML =
+    `<div class="kpi"><div class="v">${DLAB[bd].split(" (")[0]}, ${pad(best[bd].s)}:00 to ${pad(best[bd].s+L)}:00</div><div class="l">clearest ${L}-hour day shift of the week${all?" on all three roads":""}</div></div>`+
+    `<div class="kpi"><div class="v">${DLAB[pkDay].split(" (")[0]}, ${pad(+pkH)}:00</div><div class="l">busiest hour to avoid${all?"":` (${pk[1].occ.toFixed(1)}% occupancy, ${Math.round(pk[1].flow)} veh/h)`}</div></div>`+
+    `<div class="kpi"><div class="v">${clearDays} of 5 days</div><div class="l">offer a truly clear ${L}-hour shift (lowest third of the week)</div></div>`;
+  // line chart: one road = flow; all roads = each road relative to its own average
+  const W=1200,H=220,P={l:44,r:10,t:10,b:28};
+  const lines = all ? ROADS.map(r=>({r, pts:[].concat(...DAYS.map((day,di)=>Array.from({length:24},(_,i)=>{const d=S[r][day+"|"+i];return d?{x:di*24+i,y:d.occ/REF[r]}:null;}).filter(Boolean)))}))
+                    : [{r:road, pts:[].concat(...DAYS.map((day,di)=>Array.from({length:24},(_,i)=>{const d=m[day+"|"+i];return d?{x:di*24+i,y:d.flow}:null;}).filter(Boolean)))}];
+  const ymax=Math.max(...lines.flatMap(l=>l.pts.map(p=>p.y)))*1.1;
+  const X=x=>P.l+x/120*(W-P.l-P.r), Y=y=>H-P.b-y/ymax*(H-P.t-P.b);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Forecast by hour">`;
+  DAYS.forEach((day,di)=>{s+=`<rect x="${X(di*24)}" y="${P.t}" width="${X(8)-X(0)}" height="${H-P.t-P.b}" fill="var(--night)"/><rect x="${X(di*24+20)}" y="${P.t}" width="${X(4)-X(0)}" height="${H-P.t-P.b}" fill="var(--night)"/>`;
+    s+=`<rect x="${X(di*24+best[day].s)}" y="${P.t}" width="${X(L)-X(0)}" height="${H-P.t-P.b}" fill="${YEL}" opacity=".28"/>`;
+    s+=`<text x="${X(di*24+12)}" y="${H-8}" text-anchor="middle">${DLAB[day]}</text>`;});
+  (all?[0,1,1.5].filter(v=>v<ymax):[0,0.5,1].map(f=>Math.round(ymax*f/1.1))).forEach(v=>{s+=`<text x="${P.l-6}" y="${Y(v)+3}" text-anchor="end">${all?v.toFixed(1)+"×":v}</text><line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--bd)"/>`;});
+  lines.forEach(l=>{s+=`<polyline fill="none" stroke="${all?SHADES[l.r]:"var(--dg)"}" stroke-width="${all?1.6:2}" points="${l.pts.map(p=>X(p.x)+","+Y(p.y)).join(" ")}"/>`;});
+  if(all) ROADS.forEach((r,i)=>{s+=`<rect x="${P.l+8+i*190}" y="${P.t+4}" width="12" height="3" fill="${SHADES[r]}"/><text x="${P.l+24+i*190}" y="${P.t+9}">${NAMES[r]}</text>`;});
+  s+="</svg>";
+  document.getElementById("line").innerHTML=s;
+  document.getElementById("lineTitle").textContent = all ? "Forecast occupancy of each road, relative to its own average" : "Forecast vehicle flow, hour by hour";
+  document.getElementById("lineNote").textContent = all ? "1.0× = the road's usual daytime level. Grey bands: night hours (20:00 to 08:00). Yellow bands: recommended shift on all three roads." : "Vehicles per hour on the selected road. Grey bands: night hours (20:00 to 08:00). Yellow bands: recommended shift.";
+  document.getElementById("foot").innerHTML = `Source: X-Tra Delivery forecast (weighted mix of a last-week baseline, Timestral-5M and LightGBM), submitted file of 6 November 2026, data up to Thursday 5 November 23:00. Clear / moderate / busy = lower, middle and upper third of forecast daytime occupancy${all?" (each road scaled to its own average, then averaged)":" on this road"}. Badges: clear, moderate or busy relative to the week's daytime hours. Champs-Élysées: no sensor data since 19 November 2025 (historical day-type profile); closed 07:00 to 14:00 on 11 November. Trust figures: 8 past test weeks on Convention and Saints-Pères. Next step: add parcel forecasts and driver costs to turn these windows into a weekly shift plan.`;
+}
+render();
+</script>
+</body>
+</html>

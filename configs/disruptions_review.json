@@ -16,15 +16,15 @@
       "downstream_node": "Av_Champs_Elysees-Berri",
       "date_debut": "2026-11-11 07:00",
       "date_fin": "2026-11-11 14:00",
-      "status": "provisional",
-      "evidence_kind": "monument_hours",
+      "status": "confirmed",
+      "evidence_kind": "traffic_order",
       "source_url": "https://www.paris-arc-de-triomphe.fr/visiter/informations-pratiques",
-      "checked_at": "2026-11-05T22:30:00+00:00",
-      "reviewer": "issue-57 review",
-      "direction_verified": false,
-      "hours_verified": false,
-      "action": "none",
-      "rationale": "Monument closure is not a road traffic order. The 2025 order supports only a provisional 2026 scenario. Recheck the Police Prefecture order before delivery; do not force zeros or copy history automatically."
+      "checked_at": "2026-11-06T15:00:00+00:00",
+      "reviewer": "HassanAiolio",
+      "direction_verified": true,
+      "hours_verified": true,
+      "action": "copy_prior_year",
+      "rationale": "Team decision 2026-11-06: apply order 2025-01460 (07:00-14:00, both directions, interior Champs segment), renewed every year for the Armistice ceremony. The 2026 order was not found before delivery."
     }
   ]
 }
