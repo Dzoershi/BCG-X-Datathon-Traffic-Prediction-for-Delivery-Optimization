@@ -1,0 +1,21 @@
+cutoff,arc,datetime,variable,truth,prediction,reference_prediction,truth_valid,truth_source,day_kind,forecast_source,is_fallback,forecast_details,phase,scenario,model,absolute_error
+2025-11-06,Champs-Elysées,2025-11-11 12:00:00,debit_horaire,12.0,1165.0,1005.0,True,observed,holiday,last_sunday,False,,development,observed,baseline_holiday_aware,1153.0
+2024-12-26,Champs-Elysées,2025-01-01 00:00:00,debit_horaire,0.0,973.0,799.0,True,observed,holiday,last_sunday,False,,development,observed,baseline_holiday_aware,973.0
+2025-11-06,Champs-Elysées,2025-11-11 13:00:00,debit_horaire,119.0,1073.0,1005.0,True,observed,holiday,last_sunday,False,,development,observed,baseline_holiday_aware,954.0
+2024-12-26,Champs-Elysées,2024-12-31 18:00:00,debit_horaire,24.0,921.0,921.0,True,observed,working,previous_week,False,,development,observed,baseline_holiday_aware,897.0
+2024-12-26,Champs-Elysées,2024-12-31 22:00:00,debit_horaire,1.0,888.0,888.0,True,observed,working,previous_week,False,,development,observed,baseline_holiday_aware,887.0
+2024-12-26,Champs-Elysées,2024-12-31 21:00:00,debit_horaire,2.0,873.0,873.0,True,observed,working,previous_week,False,,development,observed,baseline_holiday_aware,871.0
+2024-12-26,Champs-Elysées,2024-12-31 20:00:00,debit_horaire,54.0,894.0,894.0,True,observed,working,previous_week,False,,development,observed,baseline_holiday_aware,840.0
+2024-12-26,Champs-Elysées,2024-12-31 23:00:00,debit_horaire,0.0,832.0,832.0,True,observed,working,previous_week,False,,development,observed,baseline_holiday_aware,832.0
+2025-11-06,Champs-Elysées,2025-11-11 11:00:00,debit_horaire,19.0,835.0,978.0,True,observed,holiday,last_sunday,False,,development,observed,baseline_holiday_aware,816.0
+2025-04-17,Champs-Elysées,2025-04-20 01:00:00,debit_horaire,1114.0,299.0,299.0,True,observed,weekend,previous_week,False,,development,observed,baseline_holiday_aware,815.0
+2024-12-19,Champs-Elysées,2024-12-21 16:00:00,taux_occupation,26.60889,59.18667,59.18667,True,observed,weekend,previous_week,False,,development,observed,baseline_holiday_aware,32.577780000000004
+2024-12-19,Champs-Elysées,2024-12-21 17:00:00,taux_occupation,25.81222,57.89222,57.89222,True,observed,weekend,previous_week,False,,development,observed,baseline_holiday_aware,32.08
+2024-12-19,Champs-Elysées,2024-12-24 11:00:00,taux_occupation,17.47389,49.40667,49.40667,True,observed,working,previous_week,False,,development,observed,baseline_holiday_aware,31.932779999999998
+2024-12-26,Champs-Elysées,2024-12-31 18:00:00,taux_occupation,0.13056,31.72389,31.72389,True,observed,working,previous_week,False,,development,observed,baseline_holiday_aware,31.59333
+2024-12-19,Champs-Elysées,2024-12-24 10:00:00,taux_occupation,11.28167,42.095,42.095,True,observed,working,previous_week,False,,development,observed,baseline_holiday_aware,30.81333
+2025-07-10,Champs-Elysées,2025-07-14 19:00:00,taux_occupation,59.12389,28.35611,,True,observed,holiday,sunday_before,False,,development,observed,baseline_holiday_aware,30.767780000000002
+2024-12-19,Champs-Elysées,2024-12-22 15:00:00,taux_occupation,21.34556,50.20167,50.20167,True,observed,weekend,previous_week,False,,development,observed,baseline_holiday_aware,28.85611
+2024-12-19,Champs-Elysées,2024-12-21 18:00:00,taux_occupation,29.71834,57.68111,57.68111,True,observed,weekend,previous_week,False,,development,observed,baseline_holiday_aware,27.962769999999995
+2024-12-19,Champs-Elysées,2024-12-22 16:00:00,taux_occupation,24.26222,52.155,52.155,True,observed,weekend,previous_week,False,,development,observed,baseline_holiday_aware,27.892780000000002
+2024-12-19,Champs-Elysées,2024-12-24 09:00:00,taux_occupation,6.18278,32.82,32.82,True,observed,working,previous_week,False,,development,observed,baseline_holiday_aware,26.63722

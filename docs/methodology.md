@@ -1,6 +1,6 @@
 # Méthodologie
 
-Ce document consigne les choix présents dans le code au **1er novembre 2026**, leurs raisons, leurs limites et les questions encore ouvertes. Le [README](../README.md) reste le guide de commandes rapide.
+Ce document consigne les choix présents dans le code, leurs raisons, leurs limites et les questions encore ouvertes. Les expériences sont datées dans leurs sections et rapports. Le [README](../README.md) reste le guide de commandes rapide.
 
 - **Implémenté** : comportement observable dans les modules et couvert par les tests indiqués.
 - **Provisoire** : règle ou hypothèse en place qui doit encore être justifiée par les données ou le métier.
@@ -29,7 +29,11 @@ Le statut « implémenté » décrit l'arbre de travail ; le statut de publicati
 17. [Timestral](#timestral-issue-20)
 18. [Variables tabulaires](#variables-tabulaires-issue-30)
 19. [LightGBM](#lightgbm-issue-31)
-20. [Décisions ouvertes](#décisions-ouvertes)
+20. [Audit qualité par cible](#audit-qualité-par-cible-issue-52)
+21. [Évaluation comparable](#évaluation-comparable-issue-53)
+22. [Complexité et valeur des variables](#complexité-et-valeur-des-variables-issue-55)
+23. [Profils et erreurs](#profils-et-erreurs-issue-56)
+24. [Décisions ouvertes](#décisions-ouvertes)
 
 ## Périmètre du brief
 
@@ -498,9 +502,9 @@ Le framework ne transmet aucune ligne après le jeudi. Le modèle doit réinitia
 
 `BacktestResult.scores` contient une ligne par cutoff, arc évalué, variable et sous-ensemble (`all` ou `atypical`). `per_arc` moyenne les fenêtres par arc/variable/sous-ensemble ; `summary` moyenne les couples arc/fenêtre par variable/sous-ensemble. Seuls les arcs `role == "evalue"` sont évalués, y compris ceux présents dans l’entrée mais sans aucune vérité dans une fenêtre. Un arc totalement absent de l’entrée ne peut pas être découvert : conserver la grille produite par le pipeline.
 
-La vérité est réindexée sur tous les couples arc × 120 heures. Une heure est ignorée si la ligne manque, si `qualite_mesure != "ok"` ou si la valeur de la cible est absente, non finie ou hors limites physiques (débit ≥ 0, occupation entre 0 et 100). `n_expected`, `n_scored` et `n_ignored` sont rapportés pour chaque cible et sous-ensemble. Une prévision absente ou non finie **sur une vérité valide fait échouer le run**, afin de ne pas améliorer artificiellement le score. Des prévisions manquantes sur une vérité ignorée sont autorisées.
+La vérité est réindexée sur tous les couples arc × 120 heures. Depuis #53, chaque cible mesurée est évaluée indépendamment : une ligne `partielle`, ou la partenaire valide d'une mesure masquée sur une ligne `invalide`, reste utilisable pour sa valeur disponible. Les valeurs absentes, non finies, hors domaine et les zéros de débit suspects restent exclus ; une estimation proxy ne devient jamais une vérité observée. Une étiquette `invalide` avec deux valeurs pourtant dans le domaine reste exclue comme incohérente. `truth_policy="paired"` retrouve le masque historique. `n_expected`, `n_scored` et `n_ignored` accompagnent chaque cible et sous-ensemble. Une prévision absente ou non finie **sur une vérité valide fait échouer le run** ; elle reste autorisée sur une vérité ignorée.
 
-`rmse = sqrt(mean((prediction - vérité)**2))` est calculée séparément pour les deux variables. Les jours atypiques sont samedi, dimanche ou jour férié de France métropolitaine (`holidays.France`, sans jours régionaux). Une fenêtre sans vérité produit une RMSE `NaN`, avec 120 heures ignorées par cible. Les moyennes sont des **moyennes arithmétiques des RMSE disponibles**, sans pondération par nombre d’heures ; elles ne sont pas une RMSE des erreurs mises en commun. `n_groups`, `n_groups_scored` et `n_groups_normalized` rendent explicite le nombre de contributions. Comparer deux modèles demande les mêmes cutoffs et données.
+`rmse = sqrt(mean((prediction - vérité)**2))` est calculée séparément pour les deux variables. Les jours atypiques sont samedi, dimanche ou jour férié de France métropolitaine (`holidays.France`, sans jours régionaux). Une fenêtre sans vérité produit une RMSE `NaN`, avec 120 heures ignorées par cible. Dans `per_arc` et `summary`, la colonne historique `rmse`, aussi nommée `macro_rmse`, reste la moyenne arithmétique des RMSE arc/fenêtre disponibles. La nouvelle `pooled_rmse` vaut `sqrt(sum_squared_error / n_scored)` ; elle pondère donc les observations, et peut classer différemment les modèles. `n_groups`, `n_groups_scored` et `n_groups_normalized` indiquent les contributions. Le protocole #53 compare les modèles sur des vérités identiques et sauvegarde les erreurs horaires permettant de recalculer les deux agrégations.
 
 `PreviousWeekModel` fournit la référence minimale nécessaire à la normalisation : même arc, même heure locale sept jours avant, uniquement si la qualité source est `ok`. Aucun proxy, entraînement ou remplissage n’est appliqué. `baseline_n_scored` compte les vérités valides dont la référence est finie ; `baseline_rmse` est calculée sur ces seules heures. `normalized_score = rmse / baseline_rmse` est défini uniquement si la référence couvre **toutes** les vérités valides du groupe et si sa RMSE est strictement positive. Sinon le ratio reste `NaN` (y compris une référence parfaite) ; aucune division par zéro ni comparaison sur des heures différentes. Un ratio inférieur à 1 indique une amélioration sur la référence.
 
@@ -788,24 +792,29 @@ Les erreurs de `HolidayAwarePreviousWeekBaseline` ont été recalculées heure p
 - Les sources ne décrivent que l'état du jour : la table doit être reconstruite juste avant le rendu.
 - La liste manuelle n'est pas exhaustive (8 mai, Saint-Sylvestre 2025, autres manifestations) et Paris Respire n'est pas toujours appliqué.
 
-### Fermeture du 11/11 dans le rendu (issue #47)
+### Fermeture du 11/11 dans le rendu (issues #47 et #57)
 
-Aucun modèle ne prévoit la fermeture des Champs-Élysées pour la cérémonie : sans mesure récente, tous y prennent le profil de repli, de 268 à 698 véh/h entre 7 h et 14 h, alors que le 11/11/2025 a mesuré de 12 à 119 véh/h. Sur la fenêtre de backtest du 06/11/2025, recopier l'année précédente faisait passer la RMSE du débit du 11/11 de 436 à 162 véh/h sur cet arc.
+La copie de la même date un an plus tôt reste une correction possible, mesurée sur
+la fenêtre historique de novembre 2025. La [revue #57](disruption_review/README.md)
+remplace son activation automatique : une ligne `ceremonie` seule ne suffit plus.
+La restriction routière 2026 n'est pas confirmée par la page d'ouverture du monument.
+Le rendu conserve donc les prévisions tant qu'aucune décision n'est approuvée dans
+`configs/disruptions_review.json`. Il affiche et journalise cette incertitude.
 
-[`models/postprocess.py`](../src/traffic_prediction/models/postprocess.py) remplace donc, dans `build_submission`, après le modèle et avant le bornage et l'arrondi, le débit et l'occupation des heures de cérémonie par les valeurs mesurées un an plus tôt, **à la même date** (le 11/11/2025 était un mardi, le 11/11/2026 est un mercredi).
-
-- **Heures** : lues dans [`events_manual.csv`](../data/raw/events_manual.csv), lignes de type `ceremonie` sur un arc précis et dans la fenêtre du rendu ; rien n'est codé en dur. Les étiquettes de début et de fin sont toutes deux remplacées (7:00 à 14:00, 8 heures), à la différence de `active_hours` (8:00 à 14:00) : recopier 7:00 et 14:00 garde les transitions mesurées (323 et 601 véh/h en 2025) au lieu de les deviner.
-- **Garde-fous** : une heure de référence absente ou non `ok` arrête le rendu avec la liste des heures manquantes. Les heures remplacées sont marquées `closure_copy_2025` dans `sources_` du modèle.
-- **Options** : `--events-file` choisit un autre fichier ; un fichier sans ligne de cérémonie désactive la correction.
-- **Vérifié** : un rendu hors ligne ne modifie que ces 8 lignes, et le validateur l'accepte. [`test_postprocess.py`](../tests/test_postprocess.py) couvre les heures retenues, la copie par date et non par jour de semaine, les autres heures et arcs inchangés, les valeurs manquantes ou invalides, les sources, l'arrondi et la ligne du fichier versionné.
-- **Limite** : les horaires 2026 sont provisoires (étape 4 de la check-list) ; il suffit de corriger la ligne du fichier, sans toucher au code.
+Une approbation exige l'arrêté routier, la direction et les heures exactes, l'identité
+4264 Washington → Berri, la source, l'auteur et la justification. Une restriction
+07:00–14:00 sélectionne désormais **08:00–14:00**, sept étiquettes de fin d'heure ;
+l'ancienne heuristique incluait 07:00. Une référence absente ou invalide arrête le
+rendu. Les valeurs avant/après, dates de référence et sources sont consignées dans
+le JSON de rendu ; aucune valeur n'est forcée à zéro. L'essai 2024 → 2025 est
+exploratoire, pas une validation indépendante de l'efficacité en 2026.
 
 ### Check-list du vendredi 6 novembre
 
 1. Lancer `python -m traffic_prediction.data.build --disruptions` et lire le contrôle affiché.
 2. Contrôler à la main `circulation_evenement` et `fermetures-voirie` : à 500 m ou moins, les chantiers perturbants et fermetures qui commencent ou finissent entre le 31/10 et le 11/11.
 3. Quai Voltaire (`CP002700` dans `chantiers-perturbants`) : vérifier que le chantier est vraiment terminé (`date_fin`, `statut`), puis comparer le trafic de Saint-Pères du 03 au 05/11 à celui du 13 au 15/10.
-4. Remplacer les horaires provisoires du 11/11/2026 dans `events_manual.csv` par ceux de l'arrêté de la préfecture de police, retirer « PROVISOIRES », relancer l'étape 1. Le rendu lit cette ligne pour recopier le 11/11/2025 sur ces heures ([fermeture du 11/11](#fermeture-du-1111-dans-le-rendu-issue-47)).
+4. Suivre la [check-list #57](disruption_review/README.md) : vérifier l'arrêté routier 2026, la direction et les heures, puis enregistrer la décision dans `configs/disruptions_review.json`. Modifier seulement `events_manual.csv` n'active plus de copie historique.
 5. Confirmer la grève du 05/11 avec les plans de transport SNCF publiés le 04/11.
 6. Comparer le samedi 31/10 et le dimanche 01/11 sur Saint-Pères et Convention à un samedi et un dimanche normaux. S'ils sont perturbés, la semaine recopiée par `HolidayAwarePreviousWeek` est biaisée pour le 07/11, le 08/11 et le 11/11.
 7. Vérifier les dates du rendu dans [`constants.py`](../src/traffic_prediction/constants.py), seul endroit où elles sont définies (#46) : coupure `CUTOFF` le jeudi 05/11 23:00, fenêtre `TARGET_TIMES` du samedi 07/11 00:00 au mercredi 11/11 23:00. `predict`, le validateur, le calendrier, la météo et les perturbations les importent. Seule la commande manuelle du dataset les recopie : `--end` doit être le jour de `CUTOFF`, soit `python -m traffic_prediction.data.build --dataset --end 2026-11-05`.
@@ -1432,6 +1441,85 @@ L'ensemble exige `requirements-timestral.txt` et le `covariates.parquet` du data
 
 [`test_ensemble.py`](../tests/test_ensemble.py) vérifie les poids E5 (complets, positifs, de somme 1), les types de jour de la semaine du rendu, l'application des poids par variable et type de jour, qu'un membre de poids nul ne tourne pas, les poids invalides refusés, des membres incohérents ou en panne, les bornes et le contrat du CSV.
 
+## Audit qualité par cible (issue #52)
+
+```powershell
+python -m traffic_prediction.data.audit --inputs docs/data_quality/inputs.json --output-dir outputs/metrics/quality_52
+```
+
+L'audit du 5 novembre porte sur les étiquettes horaires du **1er janvier 2024 au 4 novembre 2026 inclus**, sans observation de la période finale. Le [rapport détaillé](data_quality/README.md) publie les CSV mensuels, les effets sur l'éligibilité et l'inventaire des capteurs. Son manifeste fixe les bruts, leur ordre et leurs empreintes. Les ZIP sont parcourus par morceaux ; seuls les cinq arcs configurés sont conservés dans un cache vérifié. Les valeurs originales et leurs coordonnées source restent accessibles dans les fichiers locaux, sans réécriture du dataset de production.
+
+**Une cible disponible ne dépend pas de sa partenaire.** L'audit distingue ligne source absente, valeur nulle, valeur hors domaine et zéro suspect, séparément pour le débit et l'occupation. Il retrouve 57 965 débits et 83 410 occupations utilisables, contre 56 483 paires complètes sur les cinq arcs. Ce gain de disponibilité n'est pas un gain prédictif mesuré. Les modèles et le backtest gardent ici leur politique existante ; l'adoption d'un masque d'évaluation cohérent relève de #53. Sur les trois arcs officiels et les huit fenêtres configurées, l'éligibilité passe de 1 684 à 1 691 vérités de débit et reste à 1 684 pour l'occupation.
+
+**Zéros et proxies.** Les 209 heures `q=0, k>0` concernent exclusivement les proxies (98 La Boétie, 111 Washington). Leurs états et voisins ne prouvent pas une panne : la règle conservatrice existante reste en place, avec conservation du zéro brut et de l'occupation valide. Champs-Élysées a son dernier débit valide le 19 novembre 2025 à 11 h et sa dernière occupation à 12 h, dans ce périmètre. Aucune substitution par un proxy n'est introduite.
+
+**Identité des arcs.** Un inventaire indépendant interroge les paires de nœuds orientées, sans filtre d'identifiant, avec contrôle du sens inverse. Il confirme les trois IDs officiels et les deux proxies à la date du snapshot. Le téléchargement récent filtré par ID pourrait néanmoins manquer un futur changement d'identifiant ; un nouvel inventaire daté est nécessaire avant une actualisation finale. La date de fin du référentiel ne remplace pas les dates des mesures observées.
+
+La vérification indépendante retrouve les comptes sur 124 680 lignes d'audit et ne détecte aucune différence sur les 124 080 lignes de production existantes. La suite locale passe **705 tests et 27 sous-tests**, dont 25 tests d'audit et son contrôle d'import. Les scores antérieurs restent attachés à leurs propres snapshots ; cet audit ne constitue pas une actualisation de ces scores.
+
+## Évaluation comparable (issue #53)
+
+```powershell
+python -m traffic_prediction.validation
+python -m traffic_prediction.validation --verify-only
+```
+
+Le [rapport du 5 novembre](validation/README.md) fournit les paramètres, empreintes, commandes et CSV complets. Le brief confirme la RMSE pour deux variables et trois arcs, mais ne précise ni leur agrégation ni le traitement des capteurs sans vérité : ces points restent explicitement non confirmés. Aucun score mélangeant véhicules/heure et points d'occupation n'est inventé.
+
+Le protocole reprend les huit cutoffs de développement et ajoute un contrôle récent à paramètres fixes : cutoff du **29 octobre 2026**, prévision du **31 octobre au 4 novembre**. La vérité et l'historique viennent du snapshot borné #52. Le contrôle récent n'est pas présenté comme indépendant de toutes les explorations de l'équipe. Les bornes, grilles complètes, vérités et masques doivent être identiques entre candidats ; une prévision manquante ne réduit pas l'échantillon. Le 7–11 novembre est interdit dans ce protocole.
+
+Les candidats exécutés sont les profils par type de jour, la baseline semaine précédente adaptée aux fériés, et LightGBM avec paramètres fixes et météo explicitement manquante. Ce dernier est un diagnostic calendrier/trafic, distinct du LightGBM et de l'ensemble E5 de production. Les entraînements gardent leurs conventions existantes ; le changement de masque concerne la vérité évaluée, pas une nouvelle politique d'entraînement. Les sorties distinguent jours ouvrés, week-ends et fériés (férié prioritaire), prévision principale, repli et attribution inconnue. Pour un ensemble, le repli total exige que tous les membres de poids positif de la variable concernée utilisent leur repli.
+
+L'expérience de panne cache les mesures de Champs-Élysées pendant 28, 90, 180 ou 365 jours avant chaque cutoff admissible. Elle compare un profil de contrôle à copie, écart moyen et régression linéaire pour chacun des deux proxies. Chaque calibration utilise uniquement les paires observées strictement antérieures à la panne ; écart/régression exigent 20 paires et la régression une variance non nulle. La prévision utilise le proxy connu une semaine avant l'heure cible, toujours avant le cutoff, sinon le profil. Les observations originales restent la vérité et ne sont pas remplacées par les estimations. Aucune des variantes actives ne bat ici le contrôle en RMSE regroupée ; les effectifs et replis rendent explicites les égalités par absence de proxy.
+
+L'exécution sauvegarde **61 440 lignes horaires** et vérifie indépendamment **1 402 lignes agrégées**, par sommes d'erreurs dans des boucles Python distinctes du calcul Pandas. La suite locale passe **743 tests et 27 sous-tests** ; une seconde exécution complète reproduit les mêmes octets de prévisions horaires. Les résultats de développement et du contrôle récent sont séparés, avec couverture à chaque comparaison. Les anciens scores gardent leur propre snapshot, masque et définition d'agrégation ; ce protocole ne choisit ni ne remplace le modèle de rendu.
+
+## Complexité et valeur des variables (issue #55)
+
+```powershell
+python -m traffic_prediction.comparison
+```
+
+Le [rapport et les tables mesurées](complexity/README.md) comparent sur les mêmes entrées #53
+les références simples, LightGBM, Chronos-2 et Timestral 5M/28M/209M. Les retraits contrôlés
+de colonnes gardent les lignes d'entraînement et les hyperparamètres fixes. Le retrait du
+calendrier explicite conserve l'information temporelle indirecte des profils et décalages ;
+ce n'est pas une suppression totale du calendrier. Les prévisions météo sans dates d'émission
+vérifiées restent exclues, et aucun gain de tendance ou proxy non implémenté n'est inventé.
+
+Les scores sont accompagnés de couverture, replis, contrôles récents et pannes simulées.
+Les chronométrages distinguent chargement, fenêtres observées et préparation/entraînement/
+inférence de LightGBM ; la mémoire et les tailles sont décrites avec leurs limites de mesure.
+Le choix de référence de cette expérience est figé indépendamment de la PR #54, qui reste
+la responsabilité de son auteur. Aucun changement du modèle de rendu n'est automatique.
+
+## Profils et erreurs (issue #56)
+
+```powershell
+python -m traffic_prediction.analysis
+```
+
+Le [rapport et ses six figures](traffic_analysis/README.md) croisent la qualité #52, le
+calendrier et les prévisions #55 sur leurs empreintes vérifiées. Chaque figure conserve
+unités, période, effectifs et trous d'observation ; les comparaisons vacances scolaires
+restent descriptives. Les erreurs sont ventilées par arc, cible, heure et fenêtre sans
+mélanger les unités. L'exemple historique est choisi par une règle explicite sur le seul
+développement, avec observations, prévisions et replis distingués. Les événements manuels
+servent de contexte incertain, pas de preuve causale. Aucune vérité du 7–11 novembre n'est
+utilisée. Les 350 cellules mensuelles sont vérifiées indépendamment ; la suite locale
+passe 762 tests et 27 sous-tests. Les exports SVG/PDF/PNG alimentent la présentation #35.
+
+## Vérification des perturbations (issue #57)
+
+`python -m traffic_prediction.data.disruption_review --refresh --assess-history`
+conserve une nouvelle capture immuable des références dirigées, chantiers, événements
+et sources documentaires, avec URL, heure UTC et SHA-256. La relecture hors ligne
+contrôle les empreintes et les nœuds. Les tableaux distinguent déclarations de travaux,
+restrictions voisines et calendrier provisoire ; la proximité ne prouve pas un effet
+sur la cible. Le [rapport](disruption_review/README.md) contient l'essai annuel,
+les limites et le passage de relais à #32, #33 et #35. Le rendu lit la revue explicite,
+préserve les prédictions non corrigées et journalise chaque décision et ajustement.
+
 ## Décisions ouvertes
 
 | Point | Comportement ou constat actuel | Prochain arbitrage |
@@ -1446,7 +1534,7 @@ L'ensemble exige `requirements-timestral.txt` et le `covariates.parquet` du data
 | Météo dans le backtest | Historique Historical Forecast : prévisions à très courte échéance, presque observées. Le gain mesuré grâce à la météo est un plafond. | Backtest strict avec l'API Previous Runs (`*_previous_dayN`) si le temps le permet. |
 | Reproductibilité finale | Bruts conservés et manifeste des fichiers traités disponible ; pas de provenance complète d'un modèle. | Figer le cutoff et toutes les entrées utilisées pour chaque score et pour le rendu. |
 | Validation réelle 2023 | Archive complète téléchargée et CRC vérifiés le 1er novembre ; frontière 2024 récupérée depuis les deux derniers membres. | Transformer l'année entière uniquement si un modèle a besoin de cet historique supplémentaire. |
-| Jours perturbés dans le rendu | Les grosses erreurs de l'examen blanc viennent de jours perturbés, à l'heure prédite ou dans la semaine recopiée. Pour le rendu : Champs-Élysées fermés le 11/11 de 7 h à 14 h (horaires provisoires) ; week-end de référence du 31/10 au 01/11 avec manifestation. | #32 et #18 : décider comment traiter ces heures ; une correction simple est chiffrée en #19 ([jours perturbés](#jours-perturbés-pour-lessai-retenu)) ; confirmer avec la [check-list du 6 novembre](#check-list-du-vendredi-6-novembre). |
+| Jours perturbés dans le rendu | Revue #57 : restriction routière 2026 non vérifiée ; chantiers et voisins recensés avec leurs incertitudes. | [Sources et check-list](disruption_review/README.md) : aucune correction numérique sans approbation explicite, journal complet des changements. |
 
 ## Mise à jour de ce document
 

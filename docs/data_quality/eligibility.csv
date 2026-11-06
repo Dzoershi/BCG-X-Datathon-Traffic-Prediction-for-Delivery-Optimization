@@ -1,0 +1,81 @@
+cutoff,arc,role,variable,expected_hours,legacy_scored,target_scored,scored_including_suspect_zeros,legacy_training,target_training
+2024-11-07,Champs-Elysées,evalue,debit_horaire,120,89,89,89,7025,7074
+2024-11-07,Champs-Elysées,evalue,taux_occupation,120,89,89,89,7025,7025
+2024-11-07,Convention,evalue,debit_horaire,120,0,0,0,1939,1939
+2024-11-07,Convention,evalue,taux_occupation,120,0,0,0,1939,2084
+2024-11-07,Saint-Pères,evalue,debit_horaire,120,89,89,89,4642,4642
+2024-11-07,Saint-Pères,evalue,taux_occupation,120,89,89,89,4642,4642
+2024-11-07,Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,120,0,0,0,507,507
+2024-11-07,Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,120,0,89,89,507,7071
+2024-11-07,Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,120,89,89,89,7193,7221
+2024-11-07,Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,120,89,89,89,7193,7193
+2024-12-19,Champs-Elysées,evalue,debit_horaire,120,120,120,120,7580,7629
+2024-12-19,Champs-Elysées,evalue,taux_occupation,120,120,120,120,7580,7580
+2024-12-19,Convention,evalue,debit_horaire,120,81,81,81,2262,2262
+2024-12-19,Convention,evalue,taux_occupation,120,81,81,81,2262,2408
+2024-12-19,Saint-Pères,evalue,debit_horaire,120,0,0,0,4754,4754
+2024-12-19,Saint-Pères,evalue,taux_occupation,120,0,0,0,4754,4754
+2024-12-19,Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,120,0,0,0,507,507
+2024-12-19,Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,120,0,120,120,507,7646
+2024-12-19,Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,120,120,120,120,7779,7807
+2024-12-19,Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,120,120,120,120,7779,7779
+2024-12-26,Champs-Elysées,evalue,debit_horaire,120,113,120,120,7748,7797
+2024-12-26,Champs-Elysées,evalue,taux_occupation,120,113,113,113,7748,7748
+2024-12-26,Convention,evalue,debit_horaire,120,120,120,120,2360,2360
+2024-12-26,Convention,evalue,taux_occupation,120,120,120,120,2360,2506
+2024-12-26,Saint-Pères,evalue,debit_horaire,120,0,0,0,4754,4754
+2024-12-26,Saint-Pères,evalue,taux_occupation,120,0,0,0,4754,4754
+2024-12-26,Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,120,0,0,0,507,507
+2024-12-26,Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,120,0,110,110,507,7814
+2024-12-26,Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,120,120,120,120,7947,7975
+2024-12-26,Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,120,120,120,120,7947,7947
+2025-04-17,Champs-Elysées,evalue,debit_horaire,120,119,119,119,10369,10427
+2025-04-17,Champs-Elysées,evalue,taux_occupation,120,119,119,119,10369,10369
+2025-04-17,Convention,evalue,debit_horaire,120,1,1,1,3374,3472
+2025-04-17,Convention,evalue,taux_occupation,120,1,1,1,3374,3527
+2025-04-17,Saint-Pères,evalue,debit_horaire,120,0,0,0,4754,4754
+2025-04-17,Saint-Pères,evalue,taux_occupation,120,0,0,0,4754,4754
+2025-04-17,Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,120,0,0,0,507,507
+2025-04-17,Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,120,0,119,119,507,10429
+2025-04-17,Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,120,0,0,0,10111,10139
+2025-04-17,Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,120,0,119,119,10111,10616
+2025-07-10,Champs-Elysées,evalue,debit_horaire,120,38,38,38,12142,12206
+2025-07-10,Champs-Elysées,evalue,taux_occupation,120,38,38,38,12142,12142
+2025-07-10,Convention,evalue,debit_horaire,120,120,120,120,4281,4379
+2025-07-10,Convention,evalue,taux_occupation,120,120,120,120,4281,4631
+2025-07-10,Saint-Pères,evalue,debit_horaire,120,0,0,0,4754,4754
+2025-07-10,Saint-Pères,evalue,taux_occupation,120,0,0,0,4754,4754
+2025-07-10,Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,120,0,0,0,507,507
+2025-07-10,Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,120,0,38,38,507,12211
+2025-07-10,Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,120,0,0,0,10122,10157
+2025-07-10,Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,120,0,0,0,10122,12075
+2025-10-16,Champs-Elysées,evalue,debit_horaire,120,95,95,95,14253,14317
+2025-10-16,Champs-Elysées,evalue,taux_occupation,120,95,95,95,14253,14253
+2025-10-16,Convention,evalue,debit_horaire,120,120,120,120,6608,6706
+2025-10-16,Convention,evalue,taux_occupation,120,120,120,120,6608,6958
+2025-10-16,Saint-Pères,evalue,debit_horaire,120,31,31,31,4754,4754
+2025-10-16,Saint-Pères,evalue,taux_occupation,120,31,31,31,4754,4754
+2025-10-16,Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,120,0,0,0,507,507
+2025-10-16,Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,120,0,94,94,507,14325
+2025-10-16,Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,120,0,0,0,10122,10560
+2025-10-16,Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,120,0,0,0,10122,12336
+2025-11-06,Champs-Elysées,evalue,debit_horaire,120,116,116,116,14729,14793
+2025-11-06,Champs-Elysées,evalue,taux_occupation,120,116,116,116,14729,14729
+2025-11-06,Convention,evalue,debit_horaire,120,120,120,120,7102,7200
+2025-11-06,Convention,evalue,taux_occupation,120,120,120,120,7102,7452
+2025-11-06,Saint-Pères,evalue,debit_horaire,120,119,119,119,5145,5145
+2025-11-06,Saint-Pères,evalue,taux_occupation,120,119,119,119,5145,5145
+2025-11-06,Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,120,0,0,0,507,507
+2025-11-06,Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,120,0,118,118,507,14800
+2025-11-06,Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,120,0,0,0,10122,10654
+2025-11-06,Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,120,0,0,0,10122,12336
+2026-10-22,Champs-Elysées,evalue,debit_horaire,120,0,0,0,15022,15088
+2026-10-22,Champs-Elysées,evalue,taux_occupation,120,0,0,0,15022,15023
+2026-10-22,Convention,evalue,debit_horaire,120,97,97,97,14896,14994
+2026-10-22,Convention,evalue,taux_occupation,120,97,97,97,14896,15247
+2026-10-22,Saint-Pères,evalue,debit_horaire,120,96,96,96,13379,13379
+2026-10-22,Saint-Pères,evalue,taux_occupation,120,96,96,96,13379,13379
+2026-10-22,Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,120,0,0,0,507,507
+2026-10-22,Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,120,0,96,96,507,22497
+2026-10-22,Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,120,0,95,95,12108,13142
+2026-10-22,Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,120,0,0,0,12108,16408

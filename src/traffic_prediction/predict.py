@@ -7,6 +7,7 @@ from http.client import HTTPException
 from pathlib import Path
 import random
 import re
+import sys
 from tempfile import TemporaryDirectory
 import time
 
@@ -15,7 +16,7 @@ import numpy as np
 import pandas as pd
 
 from traffic_prediction.constants import CUTOFF, SUBMISSION_DECIMALS, TARGET_TIMES
-from traffic_prediction.data import calendar_events, disruptions, query, traffic, update, weather
+from traffic_prediction.data import calendar_events, disruption_review, disruptions, query, traffic, update, weather
 from traffic_prediction.data.build import DEFAULT_DATASET_DIR
 from traffic_prediction.data.validate import SUBMISSION_ARCS, SUBMISSION_COLUMNS, validate_submission
 from traffic_prediction.models.base import ForecastModel
@@ -69,13 +70,13 @@ SEED = 42
 
 
 def build_submission(history: pd.DataFrame, model: ForecastModel,
-                     events: pd.DataFrame | None = None) -> pd.DataFrame:
+                     events: pd.DataFrame | None = None, *, closure_review: dict | None = None) -> pd.DataFrame:
     """Fit the chosen model on cutoff-limited data and enforce the export contract.
 
     Model.predict fits the existing baselines and constructs their lag/profile
     features. Preserve local end-of-hour labels pending organizer clarification.
-    With `events` (data/raw/events_manual.csv), ceremony closures are copied from the
-    previous year before clipping and rounding (#47); `model.sources_` marks those hours.
+    Ceremony copies require an exact confirmed traffic-order review (#57).
+    Provisional/missing reviews preserve the forecast and are recorded in the run log.
     """
     random.seed(SEED)
     np.random.seed(SEED)
@@ -83,10 +84,28 @@ def build_submission(history: pd.DataFrame, model: ForecastModel,
     if history.empty:
         raise ValueError("No traffic history at or before the submission cutoff.")
     table = model.predict(history, TARGET_TIMES.copy())[SUBMISSION_COLUMNS].copy()
+    model.closure_review_ = []
+    model.closure_adjustments_ = []
     if events is not None:
-        replaced = copy_closures_from_previous_year(table, history, events)
+        approved, model.closure_review_ = disruption_review.reviewed_events(
+            events, disruption_review.read_review() if closure_review is None else closure_review, TARGET_TIMES)
+        for decision in model.closure_review_:
+            if decision["action"] == "none":
+                print(f"Closure review: {decision['arc']} {decision['date_debut']}: "
+                      f"{decision['status']}; forecast unchanged ({decision['reason']}).", file=sys.stderr)
+        before = table.set_index(["arc", "datetime"])[["debit_horaire", "taux_occupation"]].copy()
+        replaced = copy_closures_from_previous_year(table, history, approved)
+        after = table.set_index(["arc", "datetime"])
+        for arc, label in replaced:
+            model.closure_adjustments_.append({
+                "arc": arc, "datetime": str(label), "reference_datetime": str(label - pd.DateOffset(years=1)),
+                "before": before.loc[(arc, label)].to_dict(),
+                "after_before_rounding": after.loc[(arc, label), before.columns].to_dict(),
+            })
         sources = getattr(model, "sources_", None)
-        if isinstance(sources, pd.Series) and len(replaced):
+        if len(replaced):
+            if not isinstance(sources, pd.Series):
+                sources = pd.Series(type(model).__name__, index=pd.MultiIndex.from_frame(table[["arc", "datetime"]]))
             sources = sources.astype(object)
             sources.loc[replaced] = [f"closure_copy_{time.year - 1}" for _, time in replaced]
             model.sources_ = sources
@@ -131,6 +150,7 @@ def run_submission(
     raw_dir: str | Path = traffic.REPO_ROOT / "data/raw/recent",
     school_holidays_path: str | Path = calendar_events.DEFAULT_SCHOOL_PATH,
     events_path: str | Path = disruptions.DEFAULT_EVENTS_PATH,
+    closure_review_path: str | Path = disruption_review.DEFAULT_REVIEW,
     skip_update: bool = False, update_start: str | None = None,
     model_name: str = "holiday-aware",
 ) -> Path:
@@ -177,7 +197,7 @@ def run_submission(
         model = e5_ensemble(calendar, covariates)
     else:
         model = MODELS[model_name](calendar)
-    table = build_submission(history, model, events)
+    table = build_submission(history, model, events, closure_review=disruption_review.read_review(closure_review_path))
     path = export_submission(table, team_name, output_dir)
     write_run_log(path, history=history, table=table, model=model, model_name=model_name,
                   cutoff=CUTOFF, seed=SEED, started=started)
@@ -195,7 +215,9 @@ def main() -> None:
     parser.add_argument("--raw-dir", type=Path, default=traffic.REPO_ROOT / "data/raw/recent")
     parser.add_argument("--school-holidays-file", type=Path, default=calendar_events.DEFAULT_SCHOOL_PATH)
     parser.add_argument("--events-file", type=Path, default=disruptions.DEFAULT_EVENTS_PATH,
-                        help="Hand-checked events; ceremony closures are copied from the previous year (#47).")
+                        help="Candidate events; numeric corrections require an approved traffic-order review.")
+    parser.add_argument("--closure-review", type=Path, default=disruption_review.DEFAULT_REVIEW,
+                        help="Reviewed closure evidence/actions; provisional restrictions do not change predictions.")
     parser.add_argument("--skip-update", action="store_true", help="Use frozen local data without network access.")
     parser.add_argument("--update-start", help="First inclusive refresh date; required when bootstrapping recent data.")
     args = parser.parse_args()
@@ -206,6 +228,7 @@ def main() -> None:
             args.team_name, data_dir=args.data_dir, output_dir=args.output_dir,
             config_path=args.config, raw_dir=args.raw_dir,
             school_holidays_path=args.school_holidays_file, events_path=args.events_file,
+            closure_review_path=args.closure_review,
             skip_update=args.skip_update,
             update_start=args.update_start, model_name=args.model,
         )

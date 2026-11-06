@@ -1,0 +1,11 @@
+{
+  "historical_prediction_records_checked": 2160,
+  "historical_score_cells_checked": 48,
+  "adjusted_records": 42,
+  "candidate_hour_rows": 9878,
+  "hour_count_cells_checked": 487,
+  "raw_snapshot_checksums_verified": true,
+  "final_test_observations_used": false,
+  "method": "Independent Python math.fsum RMSE and per-row frozen-prediction/reference/eligibility checks; per-hour candidate recounts.",
+  "historical_predictions_sha256": "d3371fd7d5890aae067b618aa0ed10feaea1e931c4d07ed2ed446098bf2d0fd8"
+}

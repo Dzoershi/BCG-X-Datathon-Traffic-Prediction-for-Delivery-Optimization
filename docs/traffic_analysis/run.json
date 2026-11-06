@@ -1,0 +1,43 @@
+{
+  "period": {
+    "first": "2024-01-01 00:00:00",
+    "last": "2026-11-04 23:00:00"
+  },
+  "observation_rows": 124680,
+  "long_rows": 249360,
+  "chosen_example": {
+    "cutoff": "2024-12-26 00:00:00",
+    "arc": "Champs-Elysées",
+    "flow_rmse": 345.0107969325018,
+    "selection": "largest baseline development arc/window flow RMSE with >=72 observed hours"
+  },
+  "inputs": {
+    "audit": "3d47f3daf03ac4a9e66bbe8c2eed1431bc6f86731eb1ac14785df47d1ada668e",
+    "predictions": "3e5a4e8ff3177336edc69f7179d052500af358efa680ef1f4eacc78a3033f095",
+    "calendar": "ccf6d22f27c005c4993c0c1fef9103f11f9b4d9811a5d1d731788342325b0225"
+  },
+  "comparison_data_sha256": "848d155025972573d77aa22de7195a84a39f7a30624b7a3ecba62cff822f0094",
+  "manual_event_context_sha256": "30ccd0c19676428d74378f1abbae73d5e882644fbdf0c7a00db2fee642f6d942",
+  "code_sha256": "8ef9d3cdc14b4a953137df2af0d140218ff8f8c4beeb26a46ffaff6041fe78bb",
+  "figures": {
+    "01_coverage.png": "f4e7b7043d5bcc77bc18b3fd8fae096ba497ae45d0de7c1fdc59182faaeb70b9",
+    "01_coverage.svg": "f24907cfd1107596b27d11befddfba3dc80d0dbbc77746ae828edcb53d10a1eb",
+    "01_coverage.pdf": "31e13fea3890553f2cce6fe7da9aaa367f0f2153a6aec87d741a7d88cfee28c3",
+    "02_hourly_patterns.png": "2d02a2997558318fb089d1a37b8c5ee161d14b8674ca1389d809c26c95b16b23",
+    "02_hourly_patterns.svg": "f7b67542db1f63dfa4c3c58d8b9624db32ee5d043554c59fb9c5b1fbc00dcbfb",
+    "02_hourly_patterns.pdf": "e89f24fc566e66b9a8a831f3618cda42670cc119fcfb8dcaf20cd4ccc6c98dc9",
+    "03_monthly_patterns.png": "6a3e8503369dc397997282aa80bb7954d2dce8d62a82d73341880c844b4c3c03",
+    "03_monthly_patterns.svg": "7a2d42fa8ec045151057994cea5310adf19e34e12f2393c819341f3042eaac62",
+    "03_monthly_patterns.pdf": "6c86365af497ccecfc201da8c3757c04dd74a30c6724ac7f5cf1ff80e64259a0",
+    "04_hourly_errors.png": "63314d48c52850b837ac00987bfd69e53775e2963a5efbbdca1594873195e412",
+    "04_hourly_errors.svg": "dcb94143356fdd8c165333ef2b9e2077a94e3297d4a571cb2ecdb6fc136e304d",
+    "04_hourly_errors.pdf": "93087aa2558fe166a6d1fb619ac28ae33cdc74fa65aa451479108d2e6a5799e4",
+    "05_error_example.png": "ac9345aea3b17f4061db77514341203660223380439fe986a3aa632bf0e439f5",
+    "05_error_example.svg": "19846c065b3da9310e2bd04d869ff2c66b3be4f7849dfe9ed6987f07bb9c473d",
+    "05_error_example.pdf": "0bae1fa05ce86f0888c168d35a540695deba1818e9b1f60e6a0bbf309acc006e",
+    "06_school_holidays.png": "d80873040095c0608ee62e39abf4a29118863cc2072cf0222122c1cd8d19654b",
+    "06_school_holidays.svg": "036b40a14fa378198f2b9e8aa97be9ab1a32ab7bb81b689cb5651f6821ecd7d3",
+    "06_school_holidays.pdf": "597818fd3ba6414e31e3e1edb0ed3f26e69324dba008fe9c95866bde59907e87"
+  },
+  "interpretation": "Descriptive associations; counts/coverage differ. No causal school-holiday or event effect is estimated."
+}

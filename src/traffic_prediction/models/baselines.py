@@ -2,7 +2,8 @@
 
 The four models follow the ``ForecastModel`` contract (``models/base.py``)
 and are rebuilt from the cutoff-limited history at every call. They only use
-evaluated arcs and ``qualite_mesure == "ok"`` hours, like the backtest truth;
+evaluated arcs and ``qualite_mesure == "ok"`` hours; evaluation can separately
+score each measured target even when its partner is unavailable (#53);
 proxies are ignored.
 
 Each model first applies its own rule, then falls back, in order, to the

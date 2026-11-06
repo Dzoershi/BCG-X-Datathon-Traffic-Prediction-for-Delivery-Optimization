@@ -1,0 +1,93 @@
+phase,scenario,model,variable,arc,n_expected,n_scored,n_ignored,n_estimated_truth,n_fallback,n_native,n_source_unknown,n_forecast_fallback,n_forecast_native,n_forecast_unknown,sum_squared_error,rmse
+development,observed,baseline_day_type,debit_horaire,Champs-Elysées,960,697,263,0,0,697,0,0,960,0,24799766.341593027,188.62854094364027
+development,observed,baseline_day_type,taux_occupation,Champs-Elysées,960,690,270,0,0,690,0,0,960,0,25297.52718035029,6.055004778699426
+development,observed,baseline_day_type,debit_horaire,Convention,960,659,301,0,0,659,0,0,960,0,7744782.536759819,108.40814337010244
+development,observed,baseline_day_type,taux_occupation,Convention,960,659,301,0,0,659,0,0,960,0,3544.710955223763,2.3192507539117297
+development,observed,baseline_day_type,debit_horaire,Saint-Pères,960,335,625,0,0,335,0,0,960,0,3074123.686625275,95.79399050458157
+development,observed,baseline_day_type,taux_occupation,Saint-Pères,960,335,625,0,0,335,0,0,960,0,1437.2315653643416,2.0712902931987895
+development,observed,baseline_holiday_aware,debit_horaire,Champs-Elysées,960,697,263,0,2,695,0,122,838,0,37531675.744242236,232.0505428551546
+development,observed,baseline_holiday_aware,taux_occupation,Champs-Elysées,960,690,270,0,2,688,0,122,838,0,52680.562769274016,8.737770979752217
+development,observed,baseline_holiday_aware,debit_horaire,Convention,960,659,301,0,1,658,0,240,720,0,5694658.242214533,92.9589319982852
+development,observed,baseline_holiday_aware,taux_occupation,Convention,960,659,301,0,1,658,0,240,720,0,2444.156698162356,1.925847151418235
+development,observed,baseline_holiday_aware,debit_horaire,Saint-Pères,960,335,625,0,31,304,0,600,360,0,3746087.7693797955,105.74663848268393
+development,observed,baseline_holiday_aware,taux_occupation,Saint-Pères,960,335,625,0,31,304,0,600,360,0,1702.2641844229759,2.254192898831689
+development,observed,lightgbm_no_weather,debit_horaire,Champs-Elysées,960,697,263,0,0,697,0,120,840,0,25495447.09875891,191.2559377225836
+development,observed,lightgbm_no_weather,taux_occupation,Champs-Elysées,960,690,270,0,0,690,0,120,840,0,21901.77493224404,5.633977529273052
+development,observed,lightgbm_no_weather,debit_horaire,Convention,960,659,301,0,1,658,0,240,720,0,4455965.207470921,82.22960201074245
+development,observed,lightgbm_no_weather,taux_occupation,Convention,960,659,301,0,1,658,0,240,720,0,2626.043900427533,1.9962194543449399
+development,observed,lightgbm_no_weather,debit_horaire,Saint-Pères,960,335,625,0,31,304,0,600,360,0,3255630.9208898945,98.58144478748395
+development,observed,lightgbm_no_weather,taux_occupation,Saint-Pères,960,335,625,0,31,304,0,600,360,0,1405.0968557322378,2.048003655351972
+recent_check,observed,baseline_day_type,debit_horaire,Champs-Elysées,120,0,120,0,0,0,0,0,120,0,0.0,
+recent_check,observed,baseline_day_type,taux_occupation,Champs-Elysées,120,0,120,0,0,0,0,0,120,0,0.0,
+recent_check,observed,baseline_day_type,debit_horaire,Convention,120,119,1,0,0,119,0,0,120,0,391457.50674985215,57.35467618469185
+recent_check,observed,baseline_day_type,taux_occupation,Convention,120,119,1,0,0,119,0,0,120,0,311.6093745301932,1.6181984342232667
+recent_check,observed,baseline_day_type,debit_horaire,Saint-Pères,120,120,0,0,0,120,0,0,120,0,790301.7296794872,81.15323620983368
+recent_check,observed,baseline_day_type,taux_occupation,Saint-Pères,120,120,0,0,0,120,0,0,120,0,510.1725795605226,2.061901589068779
+recent_check,observed,baseline_holiday_aware,debit_horaire,Champs-Elysées,120,0,120,0,0,0,0,120,0,0,0.0,
+recent_check,observed,baseline_holiday_aware,taux_occupation,Champs-Elysées,120,0,120,0,0,0,0,120,0,0,0.0,
+recent_check,observed,baseline_holiday_aware,debit_horaire,Convention,120,119,1,0,0,119,0,0,120,0,641323.0,73.41164013671828
+recent_check,observed,baseline_holiday_aware,taux_occupation,Convention,120,119,1,0,0,119,0,0,120,0,762.8031092293,2.5318195357471187
+recent_check,observed,baseline_holiday_aware,debit_horaire,Saint-Pères,120,120,0,0,0,120,0,0,120,0,789782.0,81.12654723742818
+recent_check,observed,baseline_holiday_aware,taux_occupation,Saint-Pères,120,120,0,0,0,120,0,0,120,0,517.2661298099,2.076186668329504
+recent_check,observed,lightgbm_no_weather,debit_horaire,Champs-Elysées,120,0,120,0,0,0,0,120,0,0,0.0,
+recent_check,observed,lightgbm_no_weather,taux_occupation,Champs-Elysées,120,0,120,0,0,0,0,120,0,0,0.0,
+recent_check,observed,lightgbm_no_weather,debit_horaire,Convention,120,119,1,0,0,119,0,0,120,0,418145.9910608261,59.277583095585136
+recent_check,observed,lightgbm_no_weather,taux_occupation,Convention,120,119,1,0,0,119,0,0,120,0,315.54991342711236,1.62839796879192
+recent_check,observed,lightgbm_no_weather,debit_horaire,Saint-Pères,120,120,0,0,0,120,0,0,120,0,516151.9001177108,65.58403642895317
+recent_check,observed,lightgbm_no_weather,taux_occupation,Saint-Pères,120,120,0,0,0,120,0,0,120,0,416.75066242974964,1.8635777920211918
+development,outage_28d,profile,debit_horaire,Champs-Elysées,840,697,143,0,697,0,0,840,0,0,25129619.449774913,189.87883869883132
+development,outage_28d,profile,taux_occupation,Champs-Elysées,840,690,150,0,690,0,0,840,0,0,26386.885068499654,6.184000518929105
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,Champs-Elysées,840,697,143,0,697,0,0,840,0,0,25129619.449774913,189.87883869883132
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,Champs-Elysées,840,690,150,0,115,575,0,188,652,0,101200.18708679178,12.11061261072059
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,Champs-Elysées,840,697,143,0,697,0,0,840,0,0,25129619.449774913,189.87883869883132
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,Champs-Elysées,840,690,150,0,115,575,0,188,652,0,67171.56886185138,9.86661541764878
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,Champs-Elysées,840,697,143,0,697,0,0,840,0,0,25129619.449774913,189.87883869883132
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,Champs-Elysées,840,690,150,0,115,575,0,188,652,0,60316.7360252937,9.349628840598294
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,Champs-Elysées,840,697,143,0,311,386,0,423,417,0,60748452.6299251,295.2237014576092
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,Champs-Elysées,840,690,150,0,251,439,0,362,478,0,53454.05436587189,8.801684157507015
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,Champs-Elysées,840,697,143,0,311,386,0,423,417,0,75463814.21279572,329.04325072928634
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,Champs-Elysées,840,690,150,0,251,439,0,362,478,0,54165.50835934649,8.860064150595981
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,Champs-Elysées,840,697,143,0,311,386,0,423,417,0,50361389.51383919,268.80197976208444
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,Champs-Elysées,840,690,150,0,251,439,0,362,478,0,43238.49591992221,7.916090375966343
+development,outage_90d,profile,debit_horaire,Champs-Elysées,840,697,143,0,697,0,0,840,0,0,26021643.359114565,193.21950764245662
+development,outage_90d,profile,taux_occupation,Champs-Elysées,840,690,150,0,690,0,0,840,0,0,27511.45940208238,6.314402607758949
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,Champs-Elysées,840,697,143,0,697,0,0,840,0,0,26021643.359114565,193.21950764245662
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,Champs-Elysées,840,690,150,0,115,575,0,188,652,0,101532.62021850412,12.130487416190405
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,Champs-Elysées,840,697,143,0,697,0,0,840,0,0,26021643.359114565,193.21950764245662
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,Champs-Elysées,840,690,150,0,115,575,0,188,652,0,68004.2874179474,9.927584715673813
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,Champs-Elysées,840,697,143,0,697,0,0,840,0,0,26021643.359114565,193.21950764245662
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,Champs-Elysées,840,690,150,0,115,575,0,188,652,0,63248.96070532908,9.574192417248879
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,Champs-Elysées,840,697,143,0,311,386,0,423,417,0,60749072.87807716,295.22520858643264
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,Champs-Elysées,840,690,150,0,251,439,0,362,478,0,53566.49256746675,8.810936268289815
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,Champs-Elysées,840,697,143,0,311,386,0,423,417,0,76034033.24968539,330.2840680959333
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,Champs-Elysées,840,690,150,0,251,439,0,362,478,0,53664.20795933524,8.81896901195481
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,Champs-Elysées,840,697,143,0,311,386,0,423,417,0,52877378.581142895,275.43464694227646
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,Champs-Elysées,840,690,150,0,251,439,0,362,478,0,42538.41444328254,7.851743500952977
+development,outage_180d,profile,debit_horaire,Champs-Elysées,840,697,143,0,697,0,0,840,0,0,38944154.70517521,236.37674711875454
+development,outage_180d,profile,taux_occupation,Champs-Elysées,840,690,150,0,690,0,0,840,0,0,27286.712103563597,6.28855782913555
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,Champs-Elysées,840,697,143,0,697,0,0,840,0,0,38944154.70517521,236.37674711875454
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,Champs-Elysées,840,690,150,0,115,575,0,188,652,0,101790.91933772045,12.145907603137061
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,Champs-Elysées,840,697,143,0,697,0,0,840,0,0,38944154.70517521,236.37674711875454
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,Champs-Elysées,840,690,150,0,115,575,0,188,652,0,67501.95596175762,9.890850402453102
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,Champs-Elysées,840,697,143,0,697,0,0,840,0,0,38944154.70517521,236.37674711875454
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,Champs-Elysées,840,690,150,0,115,575,0,188,652,0,63086.827825376065,9.561913263263174
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,Champs-Elysées,840,697,143,0,311,386,0,423,417,0,60816548.061757475,295.38911929169257
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,Champs-Elysées,840,690,150,0,251,439,0,362,478,0,53275.910195457225,8.787005408635371
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,Champs-Elysées,840,697,143,0,311,386,0,423,417,0,74698724.63068673,327.37099955497325
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,Champs-Elysées,840,690,150,0,251,439,0,362,478,0,52545.82378289216,8.726589700524082
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,Champs-Elysées,840,697,143,0,311,386,0,423,417,0,50652348.91559137,269.57735376638965
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,Champs-Elysées,840,690,150,0,251,439,0,362,478,0,42371.054002297766,7.83628257791992
+development,outage_365d,profile,debit_horaire,Champs-Elysées,480,368,112,0,368,0,0,480,0,0,8595693.50411908,152.8327935455355
+development,outage_365d,profile,taux_occupation,Champs-Elysées,480,368,112,0,368,0,0,480,0,0,13446.140836151073,6.0447023239522
+development,outage_365d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,Champs-Elysées,480,368,112,0,368,0,0,480,0,0,8595693.50411908,152.8327935455355
+development,outage_365d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,Champs-Elysées,480,368,112,0,25,343,0,79,401,0,51302.74931668706,11.807186154300346
+development,outage_365d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,Champs-Elysées,480,368,112,0,368,0,0,480,0,0,8595693.50411908,152.8327935455355
+development,outage_365d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,Champs-Elysées,480,368,112,0,25,343,0,79,401,0,43215.27387728984,10.8366419821436
+development,outage_365d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,Champs-Elysées,480,368,112,0,368,0,0,480,0,0,8595693.50411908,152.8327935455355
+development,outage_365d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,Champs-Elysées,480,368,112,0,25,343,0,79,401,0,46166.08969840548,11.200505823496936
+development,outage_365d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,Champs-Elysées,480,368,112,0,310,58,0,422,58,0,31639770.84128851,293.21943686542215
+development,outage_365d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,Champs-Elysées,480,368,112,0,250,118,0,361,119,0,19547.491903482656,7.288222315512426
+development,outage_365d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,Champs-Elysées,480,368,112,0,310,58,0,422,58,0,33824752.73440589,303.17501373330543
+development,outage_365d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,Champs-Elysées,480,368,112,0,250,118,0,361,119,0,19577.143625677516,7.293747997592496
+development,outage_365d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,Champs-Elysées,480,368,112,0,310,58,0,422,58,0,30421630.053037833,287.51951754656847
+development,outage_365d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,Champs-Elysées,480,368,112,0,250,118,0,361,119,0,16277.926023049165,6.650826612373156

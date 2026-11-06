@@ -1,0 +1,1319 @@
+{
+  "data_sha256": "848d155025972573d77aa22de7195a84a39f7a30624b7a3ecba62cff822f0094",
+  "calendar_sha256": "ccf6d22f27c005c4993c0c1fef9103f11f9b4d9811a5d1d731788342325b0225",
+  "audit_observations_sha256": "3d47f3daf03ac4a9e66bbe8c2eed1431bc6f86731eb1ac14785df47d1ada668e",
+  "cutoffs": [
+    "2024-11-07 00:00:00",
+    "2024-12-19 00:00:00",
+    "2024-12-26 00:00:00",
+    "2025-04-17 00:00:00",
+    "2025-07-10 00:00:00",
+    "2025-10-16 00:00:00",
+    "2025-11-06 00:00:00",
+    "2026-10-22 00:00:00"
+  ],
+  "recent": "2026-10-29 00:00:00",
+  "code_sha256": {
+    "src\\traffic_prediction\\comparison.py": "5e7eebe6cb3ce41681c1f9d0a425b1f9343d42bec56a53374727c2549ea66ac9",
+    "src\\traffic_prediction\\evaluate.py": "7e151ea313df46871f9b700cde8e4105b4404a75572bc277890d3265c827d37d",
+    "src\\traffic_prediction\\validation.py": "8b3d8f10b5d394812896a1797b3e1ab265acd0b0f1da075e4c7060a909b36c5e",
+    "src\\traffic_prediction\\train.py": "12002961e16528c8200ab0131e8ab152861a535bfec7e6aa01fb483519fc3916",
+    "src\\traffic_prediction\\features.py": "d06260e7608229979f345cac0cc2e253067c61b5fece77fcafccf426270c1011",
+    "src\\traffic_prediction\\models\\chronos.py": "22029119a3b5194b4500a68d7d4e08b880eb46203e6e561feb936e738f808bfd",
+    "src\\traffic_prediction\\models\\timestral.py": "82dc99f4b704a36025f80b91a01eea006d7619381c11d92dd10e25c756ac52fa",
+    "src\\traffic_prediction\\models\\baselines.py": "0f763ed8407e71b5222f0936ad9539091fa4b715155c15a7b37b40f5fc0e050a"
+  },
+  "threads": 6,
+  "versions": {
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "pyarrow": "25.0.1",
+    "holidays": "0.107",
+    "lightgbm": "4.7.0",
+    "torch": "2.14.1+cpu",
+    "chronos-forecasting": "2.3.2",
+    "timestral": "1.0.0"
+  },
+  "runs": {
+    "baseline_holiday_aware": {
+      "cache_key": "a686f87344c850bcf988941f59852d1a3820a7228cf277b948ba41f31d136637",
+      "settings": "HolidayAwarePreviousWeekBaseline",
+      "wall_seconds": 4.69824639998842,
+      "memory_before": {
+        "rss_bytes": 397246464,
+        "process_lifetime_peak_bytes": 452808704
+      },
+      "memory_after": {
+        "rss_bytes": 384782336,
+        "process_lifetime_peak_bytes": 452808704
+      },
+      "cold_load_seconds": 0.0,
+      "windows": [
+        {
+          "phase": "development",
+          "cutoff": "2024-11-07 00:00:00",
+          "wall_seconds": 0.5189517999533564
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-19 00:00:00",
+          "wall_seconds": 0.17869940004311502
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-26 00:00:00",
+          "wall_seconds": 0.17930709989741445
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-04-17 00:00:00",
+          "wall_seconds": 0.18983659998048097
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-07-10 00:00:00",
+          "wall_seconds": 0.2326809000223875
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-10-16 00:00:00",
+          "wall_seconds": 0.21180250006727874
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-11-06 00:00:00",
+          "wall_seconds": 0.21751310001127422
+        },
+        {
+          "phase": "development",
+          "cutoff": "2026-10-22 00:00:00",
+          "wall_seconds": 0.2508771999273449
+        },
+        {
+          "phase": "recent_check",
+          "cutoff": "2026-10-29 00:00:00",
+          "wall_seconds": 0.2511365000391379
+        }
+      ],
+      "skipped_outages": [
+        {
+          "days": 28,
+          "cutoff": "2026-10-22 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-11-07 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-19 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-26 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2026-10-22 00:00:00"
+        }
+      ],
+      "hourly_sha256": "5c4f9d5950541ff401fe9a6ce8735ef3d1bbba8e5dcb4c68bbb2387752aa8bff"
+    },
+    "baseline_day_type": {
+      "cache_key": "c4101a8bdf7445d99941f50e8138c9674212b45d6fb7f56fd8f282f2c5f8bdb9",
+      "settings": "DayTypeProfileBaseline",
+      "wall_seconds": 4.1045525999506935,
+      "memory_before": {
+        "rss_bytes": 375455744,
+        "process_lifetime_peak_bytes": 452808704
+      },
+      "memory_after": {
+        "rss_bytes": 378904576,
+        "process_lifetime_peak_bytes": 452808704
+      },
+      "cold_load_seconds": 0.0,
+      "windows": [
+        {
+          "phase": "development",
+          "cutoff": "2024-11-07 00:00:00",
+          "wall_seconds": 0.17280089994892478
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-19 00:00:00",
+          "wall_seconds": 0.17168240004684776
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-26 00:00:00",
+          "wall_seconds": 0.16974099993240088
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-04-17 00:00:00",
+          "wall_seconds": 0.1859491999493912
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-07-10 00:00:00",
+          "wall_seconds": 0.19353449996560812
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-10-16 00:00:00",
+          "wall_seconds": 0.19983840000350028
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-11-06 00:00:00",
+          "wall_seconds": 0.2000289000570774
+        },
+        {
+          "phase": "development",
+          "cutoff": "2026-10-22 00:00:00",
+          "wall_seconds": 0.2488744999282062
+        },
+        {
+          "phase": "recent_check",
+          "cutoff": "2026-10-29 00:00:00",
+          "wall_seconds": 0.2446560999378562
+        }
+      ],
+      "skipped_outages": [
+        {
+          "days": 28,
+          "cutoff": "2026-10-22 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-11-07 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-19 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-26 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2026-10-22 00:00:00"
+        }
+      ],
+      "hourly_sha256": "a8e768adaca4da0f8011c4d394c194d349d372623ce272a8b0f5f4a66e732681"
+    },
+    "lightgbm_all": {
+      "cache_key": "4bc18b9789852568fc799a24af3a73ac9802c86908173e0993c177a4ef216c87",
+      "settings": "LightGBM global, separate targets, flow=raw; parameters {\"deterministic\": true, \"force_col_wise\": true, \"importance_type\": \"gain\", \"learning_rate\": 0.05, \"max_depth\": 6, \"min_child_samples\": 30, \"n_estimators\": 200, \"n_jobs\": 1, \"num_leaves\": 31, \"objective\": \"regression\", \"random_state\": 42, \"reg_lambda\": 1.0, \"verbosity\": -1}; lags [168, 336, 504, 672] h; weather=lagged; training profiles gap=168 h; feature_groups=['calendar', 'lags', 'profiles', 'weather']; fallback HolidayAwarePreviousWeekBaseline if fewer than 168 valid hours in the last 28 days",
+      "wall_seconds": 20.658077399944887,
+      "memory_before": {
+        "rss_bytes": 377860096,
+        "process_lifetime_peak_bytes": 452808704
+      },
+      "memory_after": {
+        "rss_bytes": 452739072,
+        "process_lifetime_peak_bytes": 533209088
+      },
+      "cold_load_seconds": 0.0,
+      "windows": [
+        {
+          "phase": "development",
+          "cutoff": "2024-11-07 00:00:00",
+          "wall_seconds": 2.8932487999554724,
+          "preparation_seconds": 0.20938759995624423,
+          "fit_seconds": 0.8685674000298604,
+          "inference_seconds": 0.010105599998496473
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-19 00:00:00",
+          "wall_seconds": 1.371962899924256,
+          "preparation_seconds": 0.2259179000975564,
+          "fit_seconds": 0.8841557999840006,
+          "inference_seconds": 0.01022890000604093
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-26 00:00:00",
+          "wall_seconds": 1.402335499995388,
+          "preparation_seconds": 0.23758119996637106,
+          "fit_seconds": 0.9138493000064045,
+          "inference_seconds": 0.010201900033280253
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-04-17 00:00:00",
+          "wall_seconds": 1.5164399000350386,
+          "preparation_seconds": 0.2494909999659285,
+          "fit_seconds": 1.0131861000554636,
+          "inference_seconds": 0.007660900009796023
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-07-10 00:00:00",
+          "wall_seconds": 1.678497300017625,
+          "preparation_seconds": 0.27190129994414747,
+          "fit_seconds": 1.1170705000404269,
+          "inference_seconds": 0.010075299884192646
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-10-16 00:00:00",
+          "wall_seconds": 1.879523399984464,
+          "preparation_seconds": 0.28877560002729297,
+          "fit_seconds": 1.305894699995406,
+          "inference_seconds": 0.009758400032296777
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-11-06 00:00:00",
+          "wall_seconds": 1.8277091999771073,
+          "preparation_seconds": 0.2836214000126347,
+          "fit_seconds": 1.328976799850352,
+          "inference_seconds": 0.012634400045499206
+        },
+        {
+          "phase": "development",
+          "cutoff": "2026-10-22 00:00:00",
+          "wall_seconds": 2.577422900008969,
+          "preparation_seconds": 0.3675465000560507,
+          "fit_seconds": 1.8711408999515697,
+          "inference_seconds": 0.00919500004965812
+        },
+        {
+          "phase": "recent_check",
+          "cutoff": "2026-10-29 00:00:00",
+          "wall_seconds": 2.5980076999403536,
+          "preparation_seconds": 0.3737258000764996,
+          "fit_seconds": 1.8813360999338329,
+          "inference_seconds": 0.009402399999089539
+        }
+      ],
+      "skipped_outages": [
+        {
+          "days": 28,
+          "cutoff": "2026-10-22 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-11-07 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-19 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-26 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2026-10-22 00:00:00"
+        }
+      ],
+      "hourly_sha256": "286b2f6546b7b43c7eeee6a5837ab9c861aee918c77b606b2f37fb6a45857af4"
+    },
+    "lightgbm_without_calendar": {
+      "cache_key": "def4f189a5b9ae6ccdafb9fae028d6c0c6485826ec22ee7bcb1f732fd7556905",
+      "settings": "LightGBM global, separate targets, flow=raw; parameters {\"deterministic\": true, \"force_col_wise\": true, \"importance_type\": \"gain\", \"learning_rate\": 0.05, \"max_depth\": 6, \"min_child_samples\": 30, \"n_estimators\": 200, \"n_jobs\": 1, \"num_leaves\": 31, \"objective\": \"regression\", \"random_state\": 42, \"reg_lambda\": 1.0, \"verbosity\": -1}; lags [168, 336, 504, 672] h; weather=lagged; training profiles gap=168 h; feature_groups=['lags', 'profiles', 'weather']; fallback HolidayAwarePreviousWeekBaseline if fewer than 168 valid hours in the last 28 days",
+      "wall_seconds": 15.63325780001469,
+      "memory_before": {
+        "rss_bytes": 440127488,
+        "process_lifetime_peak_bytes": 533209088
+      },
+      "memory_after": {
+        "rss_bytes": 468967424,
+        "process_lifetime_peak_bytes": 533209088
+      },
+      "cold_load_seconds": 0.0,
+      "windows": [
+        {
+          "phase": "development",
+          "cutoff": "2024-11-07 00:00:00",
+          "wall_seconds": 1.0535164999309927,
+          "preparation_seconds": 0.21044000005349517,
+          "fit_seconds": 0.6047896000090986,
+          "inference_seconds": 0.009670900064520538
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-19 00:00:00",
+          "wall_seconds": 1.1177421000320464,
+          "preparation_seconds": 0.22044140007346869,
+          "fit_seconds": 0.6500198999419808,
+          "inference_seconds": 0.01004830002784729
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-26 00:00:00",
+          "wall_seconds": 1.1143622999079525,
+          "preparation_seconds": 0.2190979999722913,
+          "fit_seconds": 0.6578137000324205,
+          "inference_seconds": 0.010028800112195313
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-04-17 00:00:00",
+          "wall_seconds": 1.2205434000352398,
+          "preparation_seconds": 0.24158749997150153,
+          "fit_seconds": 0.7279469000641257,
+          "inference_seconds": 0.006885499926283956
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-07-10 00:00:00",
+          "wall_seconds": 1.3174510999815539,
+          "preparation_seconds": 0.25825029995758086,
+          "fit_seconds": 0.7900519000831991,
+          "inference_seconds": 0.009933399967849255
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-10-16 00:00:00",
+          "wall_seconds": 1.468437800067477,
+          "preparation_seconds": 0.2798071999568492,
+          "fit_seconds": 0.9070085999555886,
+          "inference_seconds": 0.009619100019335747
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-11-06 00:00:00",
+          "wall_seconds": 1.4404748999513686,
+          "preparation_seconds": 0.293285800027661,
+          "fit_seconds": 0.9335694999899715,
+          "inference_seconds": 0.012080600019544363
+        },
+        {
+          "phase": "development",
+          "cutoff": "2026-10-22 00:00:00",
+          "wall_seconds": 1.9670145000563934,
+          "preparation_seconds": 0.36979520006570965,
+          "fit_seconds": 1.2574744999874383,
+          "inference_seconds": 0.008931900025345385
+        },
+        {
+          "phase": "recent_check",
+          "cutoff": "2026-10-29 00:00:00",
+          "wall_seconds": 1.9786787999328226,
+          "preparation_seconds": 0.37204589997418225,
+          "fit_seconds": 1.264701999956742,
+          "inference_seconds": 0.009441699949093163
+        }
+      ],
+      "skipped_outages": [
+        {
+          "days": 28,
+          "cutoff": "2026-10-22 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-11-07 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-19 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-26 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2026-10-22 00:00:00"
+        }
+      ],
+      "hourly_sha256": "8864d0a9e493781583cd3c04e35fdeddf786d8c8093c355447a4ca9521335949"
+    },
+    "lightgbm_without_lags": {
+      "cache_key": "8e3ebdc29af1330dadd01cd97b5af6b84a2e72166e0e7f9145c1abe88318cc22",
+      "settings": "LightGBM global, separate targets, flow=raw; parameters {\"deterministic\": true, \"force_col_wise\": true, \"importance_type\": \"gain\", \"learning_rate\": 0.05, \"max_depth\": 6, \"min_child_samples\": 30, \"n_estimators\": 200, \"n_jobs\": 1, \"num_leaves\": 31, \"objective\": \"regression\", \"random_state\": 42, \"reg_lambda\": 1.0, \"verbosity\": -1}; lags [168, 336, 504, 672] h; weather=lagged; training profiles gap=168 h; feature_groups=['calendar', 'profiles', 'weather']; fallback HolidayAwarePreviousWeekBaseline if fewer than 168 valid hours in the last 28 days",
+      "wall_seconds": 14.41469030000735,
+      "memory_before": {
+        "rss_bytes": 446705664,
+        "process_lifetime_peak_bytes": 533209088
+      },
+      "memory_after": {
+        "rss_bytes": 471973888,
+        "process_lifetime_peak_bytes": 533209088
+      },
+      "cold_load_seconds": 0.0,
+      "windows": [
+        {
+          "phase": "development",
+          "cutoff": "2024-11-07 00:00:00",
+          "wall_seconds": 0.9022602998884395,
+          "preparation_seconds": 0.21260690002236515,
+          "fit_seconds": 0.46187080000527203,
+          "inference_seconds": 0.008668599999509752
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-19 00:00:00",
+          "wall_seconds": 0.9527237000875175,
+          "preparation_seconds": 0.2380047000478953,
+          "fit_seconds": 0.4776522000320256,
+          "inference_seconds": 0.008589899982325733
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-26 00:00:00",
+          "wall_seconds": 0.933561300043948,
+          "preparation_seconds": 0.21420279995072633,
+          "fit_seconds": 0.4794399000238627,
+          "inference_seconds": 0.008557199849747121
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-04-17 00:00:00",
+          "wall_seconds": 1.082185999955982,
+          "preparation_seconds": 0.24081410001963377,
+          "fit_seconds": 0.5925705999834463,
+          "inference_seconds": 0.00633219990413636
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-07-10 00:00:00",
+          "wall_seconds": 1.1700069999787956,
+          "preparation_seconds": 0.25822319998405874,
+          "fit_seconds": 0.6456419000169262,
+          "inference_seconds": 0.008576699998229742
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-10-16 00:00:00",
+          "wall_seconds": 1.334868900012225,
+          "preparation_seconds": 0.28227279998827726,
+          "fit_seconds": 0.7748793999198824,
+          "inference_seconds": 0.00874439999461174
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-11-06 00:00:00",
+          "wall_seconds": 1.2940716999582946,
+          "preparation_seconds": 0.28528609999921173,
+          "fit_seconds": 0.7929867998464033,
+          "inference_seconds": 0.0107744000852108
+        },
+        {
+          "phase": "development",
+          "cutoff": "2026-10-22 00:00:00",
+          "wall_seconds": 1.871328099980019,
+          "preparation_seconds": 0.37733920000027865,
+          "fit_seconds": 1.1530726000200957,
+          "inference_seconds": 0.008284499985165894
+        },
+        {
+          "phase": "recent_check",
+          "cutoff": "2026-10-29 00:00:00",
+          "wall_seconds": 1.8646577999461442,
+          "preparation_seconds": 0.373289099894464,
+          "fit_seconds": 1.1520243998384103,
+          "inference_seconds": 0.008454800001345575
+        }
+      ],
+      "skipped_outages": [
+        {
+          "days": 28,
+          "cutoff": "2026-10-22 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-11-07 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-19 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-26 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2026-10-22 00:00:00"
+        }
+      ],
+      "hourly_sha256": "2d59567b49a852b87b539c1bef465c8171715ff282b7a9822153979b9b6c0c1a"
+    },
+    "lightgbm_without_profiles": {
+      "cache_key": "ef104d4d9f15bb7b20b2e81e31440c788e96029ce4b9f37133a3c3eafd3ad98d",
+      "settings": "LightGBM global, separate targets, flow=raw; parameters {\"deterministic\": true, \"force_col_wise\": true, \"importance_type\": \"gain\", \"learning_rate\": 0.05, \"max_depth\": 6, \"min_child_samples\": 30, \"n_estimators\": 200, \"n_jobs\": 1, \"num_leaves\": 31, \"objective\": \"regression\", \"random_state\": 42, \"reg_lambda\": 1.0, \"verbosity\": -1}; lags [168, 336, 504, 672] h; weather=lagged; training profiles gap=168 h; feature_groups=['calendar', 'lags', 'weather']; fallback HolidayAwarePreviousWeekBaseline if fewer than 168 valid hours in the last 28 days",
+      "wall_seconds": 18.128188600065187,
+      "memory_before": {
+        "rss_bytes": 451866624,
+        "process_lifetime_peak_bytes": 533209088
+      },
+      "memory_after": {
+        "rss_bytes": 472371200,
+        "process_lifetime_peak_bytes": 534396928
+      },
+      "cold_load_seconds": 0.0,
+      "windows": [
+        {
+          "phase": "development",
+          "cutoff": "2024-11-07 00:00:00",
+          "wall_seconds": 1.2079372999724,
+          "preparation_seconds": 0.2126740999519825,
+          "fit_seconds": 0.7552279999945313,
+          "inference_seconds": 0.01073430001270026
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-19 00:00:00",
+          "wall_seconds": 1.262474499992095,
+          "preparation_seconds": 0.22047469997778535,
+          "fit_seconds": 0.8029083999572322,
+          "inference_seconds": 0.010919900145381689
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-26 00:00:00",
+          "wall_seconds": 1.2730207000859082,
+          "preparation_seconds": 0.22187910007778555,
+          "fit_seconds": 0.8113926999503747,
+          "inference_seconds": 0.010379900108091533
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-04-17 00:00:00",
+          "wall_seconds": 1.4258970000082627,
+          "preparation_seconds": 0.24256949999835342,
+          "fit_seconds": 0.9306867000414059,
+          "inference_seconds": 0.007128200144506991
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-07-10 00:00:00",
+          "wall_seconds": 1.5957000000635162,
+          "preparation_seconds": 0.28624010004568845,
+          "fit_seconds": 1.0393298000562936,
+          "inference_seconds": 0.010594499995931983
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-10-16 00:00:00",
+          "wall_seconds": 1.7443815999431536,
+          "preparation_seconds": 0.2797026999760419,
+          "fit_seconds": 1.1781060000648722,
+          "inference_seconds": 0.010183300008065999
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-11-06 00:00:00",
+          "wall_seconds": 1.7457112000556663,
+          "preparation_seconds": 0.29496209998615086,
+          "fit_seconds": 1.230214000097476,
+          "inference_seconds": 0.013554999837651849
+        },
+        {
+          "phase": "development",
+          "cutoff": "2026-10-22 00:00:00",
+          "wall_seconds": 2.4399708999553695,
+          "preparation_seconds": 0.3690099000232294,
+          "fit_seconds": 1.7292066999943927,
+          "inference_seconds": 0.009585100109688938
+        },
+        {
+          "phase": "recent_check",
+          "cutoff": "2026-10-29 00:00:00",
+          "wall_seconds": 2.465280700009316,
+          "preparation_seconds": 0.36578729993198067,
+          "fit_seconds": 1.7555100999306887,
+          "inference_seconds": 0.00998330011498183
+        }
+      ],
+      "skipped_outages": [
+        {
+          "days": 28,
+          "cutoff": "2026-10-22 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-11-07 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-19 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-26 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2026-10-22 00:00:00"
+        }
+      ],
+      "hourly_sha256": "0c9c594d0abeceafba8b6e2c83d42f8800146fd0a34a51012e827d2d3afeed94"
+    },
+    "lightgbm_without_weather": {
+      "cache_key": "97b69bd0daa59d9fbeb930422470837f5af24a19b9902053d8a7e16cb32fc093",
+      "settings": "LightGBM global, separate targets, flow=raw; parameters {\"deterministic\": true, \"force_col_wise\": true, \"importance_type\": \"gain\", \"learning_rate\": 0.05, \"max_depth\": 6, \"min_child_samples\": 30, \"n_estimators\": 200, \"n_jobs\": 1, \"num_leaves\": 31, \"objective\": \"regression\", \"random_state\": 42, \"reg_lambda\": 1.0, \"verbosity\": -1}; lags [168, 336, 504, 672] h; weather=lagged; training profiles gap=168 h; feature_groups=['calendar', 'lags', 'profiles']; fallback HolidayAwarePreviousWeekBaseline if fewer than 168 valid hours in the last 28 days",
+      "wall_seconds": 18.963323100004345,
+      "memory_before": {
+        "rss_bytes": 454955008,
+        "process_lifetime_peak_bytes": 534396928
+      },
+      "memory_after": {
+        "rss_bytes": 474877952,
+        "process_lifetime_peak_bytes": 537661440
+      },
+      "cold_load_seconds": 0.0,
+      "windows": [
+        {
+          "phase": "development",
+          "cutoff": "2024-11-07 00:00:00",
+          "wall_seconds": 1.2875488999998197,
+          "preparation_seconds": 0.20948560000397265,
+          "fit_seconds": 0.8475964999524876,
+          "inference_seconds": 0.009961599949747324
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-19 00:00:00",
+          "wall_seconds": 1.3371998999500647,
+          "preparation_seconds": 0.2193521000444889,
+          "fit_seconds": 0.8789550999645144,
+          "inference_seconds": 0.010159899946302176
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-26 00:00:00",
+          "wall_seconds": 1.33920719998423,
+          "preparation_seconds": 0.2158775000134483,
+          "fit_seconds": 0.8864500999916345,
+          "inference_seconds": 0.010059199994429946
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-04-17 00:00:00",
+          "wall_seconds": 1.511690300074406,
+          "preparation_seconds": 0.24303640006110072,
+          "fit_seconds": 1.0152105999877676,
+          "inference_seconds": 0.007046199985779822
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-07-10 00:00:00",
+          "wall_seconds": 1.6400335000362247,
+          "preparation_seconds": 0.26283070002682507,
+          "fit_seconds": 1.107250800007023,
+          "inference_seconds": 0.010244500008411705
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-10-16 00:00:00",
+          "wall_seconds": 1.8553101998986676,
+          "preparation_seconds": 0.28020889998879284,
+          "fit_seconds": 1.291954700020142,
+          "inference_seconds": 0.009849500027485192
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-11-06 00:00:00",
+          "wall_seconds": 1.8572712999302894,
+          "preparation_seconds": 0.2871173999737948,
+          "fit_seconds": 1.3557514999993145,
+          "inference_seconds": 0.012600000016391277
+        },
+        {
+          "phase": "development",
+          "cutoff": "2026-10-22 00:00:00",
+          "wall_seconds": 2.5856174000073224,
+          "preparation_seconds": 0.3709103000583127,
+          "fit_seconds": 1.8719885000027716,
+          "inference_seconds": 0.009143500006757677
+        },
+        {
+          "phase": "recent_check",
+          "cutoff": "2026-10-29 00:00:00",
+          "wall_seconds": 2.599650699994527,
+          "preparation_seconds": 0.36912780010607094,
+          "fit_seconds": 1.887099999934435,
+          "inference_seconds": 0.009585599997080863
+        }
+      ],
+      "skipped_outages": [
+        {
+          "days": 28,
+          "cutoff": "2026-10-22 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-11-07 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-19 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-26 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2026-10-22 00:00:00"
+        }
+      ],
+      "hourly_sha256": "6be95d9cdffff9a468faef8424041acec845de61519615e143c26ba0495ee89e"
+    },
+    "chronos_calendar": {
+      "cache_key": "bd40806cd9c95b52cf8d7372a0e229447c85e444216cabd1c34fcdfbfc02d942",
+      "settings": "Chronos-2 zero-shot (amazon/chronos-2@29ec3766), context 8192 h, covariates ['is_holiday', 'is_school_holiday', 'is_day_before_holiday', 'is_bridge', 'is_sunday_or_holiday', 'day_type'], multivariate, median of quantiles; fallback HolidayAwarePreviousWeekBaseline if fewer than 168 ok hours in the last 28 days",
+      "wall_seconds": 123.67239650001284,
+      "memory_before": {
+        "rss_bytes": 455958528,
+        "process_lifetime_peak_bytes": 537661440
+      },
+      "memory_after": {
+        "rss_bytes": 1350205440,
+        "process_lifetime_peak_bytes": 1663201280
+      },
+      "cold_load_seconds": 38.5518498000456,
+      "windows": [
+        {
+          "phase": "development",
+          "cutoff": "2024-11-07 00:00:00",
+          "wall_seconds": 10.375224499963224
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-19 00:00:00",
+          "wall_seconds": 10.488551400019787
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-26 00:00:00",
+          "wall_seconds": 9.945236500003375
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-04-17 00:00:00",
+          "wall_seconds": 5.01103450008668
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-07-10 00:00:00",
+          "wall_seconds": 8.745685800095089
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-10-16 00:00:00",
+          "wall_seconds": 9.048364499933086
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-11-06 00:00:00",
+          "wall_seconds": 12.769468700047582
+        },
+        {
+          "phase": "development",
+          "cutoff": "2026-10-22 00:00:00",
+          "wall_seconds": 7.957011699909344
+        },
+        {
+          "phase": "recent_check",
+          "cutoff": "2026-10-29 00:00:00",
+          "wall_seconds": 8.07794989994727
+        }
+      ],
+      "skipped_outages": [
+        {
+          "days": 28,
+          "cutoff": "2026-10-22 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-11-07 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-19 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-26 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2026-10-22 00:00:00"
+        }
+      ],
+      "hourly_sha256": "08eebb1e4bac26e46d7d90b1e106693fc61810999eddd9d254a66281bfaafa6d"
+    },
+    "chronos_history": {
+      "cache_key": "58b5a0d477067914759ffa0668e0b9569033c88e13525cadddb5f417a20c2e29",
+      "settings": "Chronos-2 zero-shot (amazon/chronos-2@29ec3766), context 8192 h, covariates none, multivariate, median of quantiles; fallback HolidayAwarePreviousWeekBaseline if fewer than 168 ok hours in the last 28 days",
+      "wall_seconds": 24.69909390003886,
+      "memory_before": {
+        "rss_bytes": 873717760,
+        "process_lifetime_peak_bytes": 1663201280
+      },
+      "memory_after": {
+        "rss_bytes": 1174728704,
+        "process_lifetime_peak_bytes": 1663201280
+      },
+      "cold_load_seconds": 0.4220138000091538,
+      "windows": [
+        {
+          "phase": "development",
+          "cutoff": "2024-11-07 00:00:00",
+          "wall_seconds": 2.356034499942325
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-19 00:00:00",
+          "wall_seconds": 2.342656199936755
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-26 00:00:00",
+          "wall_seconds": 2.3166580999968573
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-04-17 00:00:00",
+          "wall_seconds": 1.3768024999881163
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-07-10 00:00:00",
+          "wall_seconds": 2.4393669000128284
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-10-16 00:00:00",
+          "wall_seconds": 2.459323100047186
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-11-06 00:00:00",
+          "wall_seconds": 3.2377954999683425
+        },
+        {
+          "phase": "development",
+          "cutoff": "2026-10-22 00:00:00",
+          "wall_seconds": 2.4429402999812737
+        },
+        {
+          "phase": "recent_check",
+          "cutoff": "2026-10-29 00:00:00",
+          "wall_seconds": 2.580722999991849
+        }
+      ],
+      "skipped_outages": [
+        {
+          "days": 28,
+          "cutoff": "2026-10-22 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-11-07 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-19 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-26 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2026-10-22 00:00:00"
+        }
+      ],
+      "hourly_sha256": "ecdcd127c5d8b5d4000cc26d6f7cc883b9da03945d1be6fb8e63ef3d079760f0"
+    },
+    "timestral_5m_calendar": {
+      "cache_key": "569cbb8f015d289922f99b8ab67aaee4e2c07d8b3c14b1b57c69e1585444ce5b",
+      "settings": "Timestral-5M@bdd20cfc, source a534bdbd, context 32768 h, multivariate, calendar ['is_holiday', 'is_school_holiday', 'is_day_before_holiday', 'is_bridge', 'is_sunday_or_holiday', 'day_type'], median, upstream clampsym defaults; HolidayAwarePreviousWeekBaseline fallback if fewer than 168 ok hours in the retained context's last 28 days",
+      "wall_seconds": 32.852357499999925,
+      "memory_before": {
+        "rss_bytes": 692047872,
+        "process_lifetime_peak_bytes": 1663201280
+      },
+      "memory_after": {
+        "rss_bytes": 1055522816,
+        "process_lifetime_peak_bytes": 1663201280
+      },
+      "cold_load_seconds": 0.16269779996946454,
+      "windows": [
+        {
+          "phase": "development",
+          "cutoff": "2024-11-07 00:00:00",
+          "wall_seconds": 1.5062161999521777
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-19 00:00:00",
+          "wall_seconds": 1.6738101999508217
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-26 00:00:00",
+          "wall_seconds": 1.6288432000437751
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-04-17 00:00:00",
+          "wall_seconds": 1.1296191000146791
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-07-10 00:00:00",
+          "wall_seconds": 2.738899400108494
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-10-16 00:00:00",
+          "wall_seconds": 3.2653136000735685
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-11-06 00:00:00",
+          "wall_seconds": 4.532150299986824
+        },
+        {
+          "phase": "development",
+          "cutoff": "2026-10-22 00:00:00",
+          "wall_seconds": 6.668217500089668
+        },
+        {
+          "phase": "recent_check",
+          "cutoff": "2026-10-29 00:00:00",
+          "wall_seconds": 6.5442565000848845
+        }
+      ],
+      "skipped_outages": [
+        {
+          "days": 28,
+          "cutoff": "2026-10-22 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-11-07 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-19 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-26 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2026-10-22 00:00:00"
+        }
+      ],
+      "hourly_sha256": "4a6f01e6402a32a5b1edb10b2963a0372b6097d764522de96ecd07aa04ef9eac"
+    },
+    "timestral_5m_history": {
+      "cache_key": "76e666aad1fdfa1610817c91446e5618a57e00aee7d221f2aa5fcec151c5451c",
+      "settings": "Timestral-5M@bdd20cfc, source a534bdbd, context 32768 h, multivariate, calendar none, median, upstream clampsym defaults; HolidayAwarePreviousWeekBaseline fallback if fewer than 168 ok hours in the retained context's last 28 days",
+      "wall_seconds": 8.815573300002143,
+      "memory_before": {
+        "rss_bytes": 1044877312,
+        "process_lifetime_peak_bytes": 1663201280
+      },
+      "memory_after": {
+        "rss_bytes": 683945984,
+        "process_lifetime_peak_bytes": 1663201280
+      },
+      "cold_load_seconds": 0.053470700047910213,
+      "windows": [
+        {
+          "phase": "development",
+          "cutoff": "2024-11-07 00:00:00",
+          "wall_seconds": 0.4660228999564424
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-19 00:00:00",
+          "wall_seconds": 0.5420077000744641
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-26 00:00:00",
+          "wall_seconds": 0.527923799934797
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-04-17 00:00:00",
+          "wall_seconds": 0.43186120002064854
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-07-10 00:00:00",
+          "wall_seconds": 0.5918812000891194
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-10-16 00:00:00",
+          "wall_seconds": 0.6892073999624699
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-11-06 00:00:00",
+          "wall_seconds": 0.7727402000455186
+        },
+        {
+          "phase": "development",
+          "cutoff": "2026-10-22 00:00:00",
+          "wall_seconds": 1.0099856000160798
+        },
+        {
+          "phase": "recent_check",
+          "cutoff": "2026-10-29 00:00:00",
+          "wall_seconds": 0.972433099988848
+        }
+      ],
+      "skipped_outages": [
+        {
+          "days": 28,
+          "cutoff": "2026-10-22 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-11-07 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-19 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-26 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2026-10-22 00:00:00"
+        }
+      ],
+      "hourly_sha256": "ce9e711e2b997dec96072f82f4523965cba22823cda27367cfdee35e82f46040"
+    },
+    "timestral_28m_calendar": {
+      "cache_key": "a83141ae545ca42b340b528d2256735dc63cb0152d88052ed91f1fa2654fd214",
+      "settings": "Timestral-28M@49b26409, source a534bdbd, context 32768 h, multivariate, calendar ['is_holiday', 'is_school_holiday', 'is_day_before_holiday', 'is_bridge', 'is_sunday_or_holiday', 'day_type'], median, upstream clampsym defaults; HolidayAwarePreviousWeekBaseline fallback if fewer than 168 ok hours in the retained context's last 28 days",
+      "wall_seconds": 110.78994669998065,
+      "memory_before": {
+        "rss_bytes": 642412544,
+        "process_lifetime_peak_bytes": 1663201280
+      },
+      "memory_after": {
+        "rss_bytes": 1140998144,
+        "process_lifetime_peak_bytes": 1663201280
+      },
+      "cold_load_seconds": 0.3761196000268683,
+      "windows": [
+        {
+          "phase": "development",
+          "cutoff": "2024-11-07 00:00:00",
+          "wall_seconds": 5.742532899952494
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-19 00:00:00",
+          "wall_seconds": 6.497119300067425
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-26 00:00:00",
+          "wall_seconds": 6.470733599970117
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-04-17 00:00:00",
+          "wall_seconds": 4.47705790004693
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-07-10 00:00:00",
+          "wall_seconds": 10.849977899924852
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-10-16 00:00:00",
+          "wall_seconds": 12.636102100019343
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-11-06 00:00:00",
+          "wall_seconds": 18.622436300036497
+        },
+        {
+          "phase": "development",
+          "cutoff": "2026-10-22 00:00:00",
+          "wall_seconds": 20.949750900035724
+        },
+        {
+          "phase": "recent_check",
+          "cutoff": "2026-10-29 00:00:00",
+          "wall_seconds": 21.312305800034665
+        }
+      ],
+      "skipped_outages": [
+        {
+          "days": 28,
+          "cutoff": "2026-10-22 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-11-07 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-19 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-26 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2026-10-22 00:00:00"
+        }
+      ],
+      "hourly_sha256": "6e5dc16c6ab0946b9e6b2a5b4b3b226911c2d22397b219053d0a6ad1aedfb78e"
+    },
+    "timestral_209m_calendar": {
+      "cache_key": "851d932f422aec6d59940f283f01049b627242672be3b8fadabbdf5289ff4c9d",
+      "settings": "Timestral-209M@9874d252, source a534bdbd, context 32768 h, multivariate, calendar ['is_holiday', 'is_school_holiday', 'is_day_before_holiday', 'is_bridge', 'is_sunday_or_holiday', 'day_type'], median, upstream clampsym defaults; HolidayAwarePreviousWeekBaseline fallback if fewer than 168 ok hours in the retained context's last 28 days",
+      "wall_seconds": 554.8617317000171,
+      "memory_before": {
+        "rss_bytes": 670699520,
+        "process_lifetime_peak_bytes": 1663201280
+      },
+      "memory_after": {
+        "rss_bytes": 1988665344,
+        "process_lifetime_peak_bytes": 2891415552
+      },
+      "cold_load_seconds": 2.2235751000698656,
+      "windows": [
+        {
+          "phase": "development",
+          "cutoff": "2024-11-07 00:00:00",
+          "wall_seconds": 33.02898889989592
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-19 00:00:00",
+          "wall_seconds": 35.8277192999376
+        },
+        {
+          "phase": "development",
+          "cutoff": "2024-12-26 00:00:00",
+          "wall_seconds": 32.15076480002608
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-04-17 00:00:00",
+          "wall_seconds": 21.902144699939527
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-07-10 00:00:00",
+          "wall_seconds": 55.10792920005042
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-10-16 00:00:00",
+          "wall_seconds": 63.002253200043924
+        },
+        {
+          "phase": "development",
+          "cutoff": "2025-11-06 00:00:00",
+          "wall_seconds": 99.4025233000284
+        },
+        {
+          "phase": "development",
+          "cutoff": "2026-10-22 00:00:00",
+          "wall_seconds": 103.2475756999338
+        },
+        {
+          "phase": "recent_check",
+          "cutoff": "2026-10-29 00:00:00",
+          "wall_seconds": 106.24628670001402
+        }
+      ],
+      "skipped_outages": [
+        {
+          "days": 28,
+          "cutoff": "2026-10-22 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-11-07 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-19 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2024-12-26 00:00:00"
+        },
+        {
+          "days": 365,
+          "cutoff": "2026-10-22 00:00:00"
+        }
+      ],
+      "hourly_sha256": "35da109ee2cb007998ef94338edb2119be4e031f7fcc23f663959c2da44aca82"
+    }
+  },
+  "environment": {
+    "python": "3.12.10",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+    "logical_cpus": 12,
+    "packages": {
+      "numpy": {
+        "version": "2.2.6",
+        "installed_bytes": 54252696
+      },
+      "pandas": {
+        "version": "2.3.3",
+        "installed_bytes": 66343045
+      },
+      "pyarrow": {
+        "version": "25.0.1",
+        "installed_bytes": 90539218
+      },
+      "holidays": {
+        "version": "0.107",
+        "installed_bytes": 8445471
+      },
+      "lightgbm": {
+        "version": "4.7.0",
+        "installed_bytes": 4924211
+      },
+      "torch": {
+        "version": "2.14.1+cpu",
+        "installed_bytes": 531669155
+      },
+      "chronos-forecasting": {
+        "version": "2.3.2",
+        "installed_bytes": 592004
+      },
+      "timestral": {
+        "version": "1.0.0",
+        "installed_bytes": 220983
+      }
+    }
+  },
+  "shared_preparation_seconds": 0.3481378998840228,
+  "cached_weights_bytes": {
+    "models--amazon--chronos-2": 477930472,
+    "models--mistralai--Timestral-209M": 837271648,
+    "models--mistralai--Timestral-28M": 111296464,
+    "models--mistralai--Timestral-5M": 20843960
+  },
+  "reference": "HolidayAwarePreviousWeekBaseline, same frozen #53 inputs; #54 remains separately owned",
+  "weather": "Excluded: all weather values missing. Archived target-hour forecast issuance unverified.",
+  "recent_trends": "Not implemented in existing features; no marginal gain claimed",
+  "proxy": "No production proxy feature; #53 copy/offset/linear study is separate; outages compare existing model fallbacks",
+  "timing_notes": "Single CPU process; windows include preparation/fit/prediction; LightGBM sub-times exclude fallback. RSS is before/after, not isolated peak. Installed package sizes include files, not download size.",
+  "git_commit": "acf6a93ae6170f7f35ceb7ef6a952de20caa21e9"
+}

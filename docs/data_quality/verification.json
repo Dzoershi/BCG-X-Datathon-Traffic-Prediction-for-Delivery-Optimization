@@ -1,0 +1,31 @@
+{
+  "rows_checked": 124680,
+  "monthly_rows_checked": 350,
+  "source_rows_checked_directly": 4,
+  "production_rows_replayed": 124080,
+  "production_parquet_hashes_unchanged": true,
+  "production_replay_differences": 0,
+  "suspect_zero_rows": 209,
+  "official_suspect_zero_rows": 0,
+  "official_backtest_eligibility": {
+    "debit_horaire": {
+      "legacy_scored": 1684,
+      "target_scored": 1691
+    },
+    "taux_occupation": {
+      "legacy_scored": 1684,
+      "target_scored": 1684
+    }
+  },
+  "frozen_repeat_identical_files": [
+    "monthly.csv",
+    "summary.csv",
+    "eligibility.csv",
+    "sensors.csv",
+    "observations.parquet",
+    "zero_context.parquet",
+    "report.json",
+    "inputs.json"
+  ],
+  "inputs_sha256": "14d727fb24ef986ee82fb2e24022c0b10fab7a1e50148446286c9929ce1e6d31"
+}

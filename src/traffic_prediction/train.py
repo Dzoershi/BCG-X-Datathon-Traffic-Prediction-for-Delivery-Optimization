@@ -3,17 +3,34 @@
 from __future__ import annotations
 
 import json
+from time import perf_counter
 
 import numpy as np
 import pandas as pd
 
 from traffic_prediction.data.build import DEFAULT_DATASET_DIR
 from traffic_prediction.evaluate import KEYS, TARGETS, _check_frame
-from traffic_prediction.features import DEFAULT_LAGS, TabularFeatures
+from traffic_prediction.features import CALENDAR_FLAGS, CYCLICAL_FEATURES, DEFAULT_LAGS, PROFILE_FEATURES, TabularFeatures
+from traffic_prediction.data.weather import VALUE_COLUMNS
 from traffic_prediction.models.baselines import HolidayAwarePreviousWeekBaseline
 from traffic_prediction.models.chronos import MIN_RECENT_OK_HOURS, RECENT_HOURS
 
 SEED = 42
+FEATURE_GROUPS = ("calendar", "lags", "profiles", "weather")
+
+
+def selected_features(columns: list[str], groups: tuple[str, ...]) -> list[str]:
+    """Select whole groups in their original order; arc identity is always retained."""
+    if not groups or len(set(groups)) != len(groups) or set(groups) - set(FEATURE_GROUPS):
+        raise ValueError(f"feature_groups must be a nonempty unique subset of {FEATURE_GROUPS}")
+    calendar = {*CALENDAR_FLAGS, *CYCLICAL_FEATURES}
+    profiles = {*PROFILE_FEATURES, "profile_count"}
+    def group(column):
+        if column in calendar: return "calendar"
+        if column in profiles: return "profiles"
+        if any(column.startswith(name) for name in VALUE_COLUMNS): return "weather"
+        return "lags"
+    return [column for column in columns if column == "arc" or group(column) in groups]
 LIGHTGBM_RUNS = {
     "lightgbm_raw": {},
     "lightgbm_log": {"log_flow": True},
@@ -43,6 +60,7 @@ class LightGBMForecaster:
         max_depth: int = 6, learning_rate: float = 0.05, log_flow: bool = False,
         min_child_samples: int = 30, reg_lambda: float = 1.0, n_jobs: int = 4,
         lags: tuple[int, ...] = DEFAULT_LAGS, weather: str = "lagged",
+        feature_groups: tuple[str, ...] = FEATURE_GROUPS,
     ) -> None:
         for name, value in (("n_estimators", n_estimators), ("max_depth", max_depth),
                             ("min_child_samples", min_child_samples), ("n_jobs", n_jobs)):
@@ -60,6 +78,10 @@ class LightGBMForecaster:
         )
         learning_rate, reg_lambda = float(learning_rate), float(reg_lambda)
         TabularFeatures(lags, weather=weather)  # Validate feature settings before any fit.
+        selected_features([], feature_groups)
+        self.feature_groups = tuple(feature_groups)
+        self.feature_columns_: list[str] = []
+        self.timings_: dict = {}
         self.covariates = covariates
         self.log_flow = log_flow
         self.lags, self.weather = tuple(int(lag) for lag in lags), weather
@@ -82,6 +104,7 @@ class LightGBMForecaster:
             f"LightGBM global, separate targets, flow={'log1p' if self.log_flow else 'raw'}; "
             f"parameters {json.dumps(self.parameters, sort_keys=True)}; "
             f"lags {list(self.lags)} h; weather={self.weather}; training profiles gap=168 h; "
+            f"feature_groups={list(self.feature_groups)}; "
             f"fallback HolidayAwarePreviousWeekBaseline if fewer than {MIN_RECENT_OK_HOURS} "
             "valid hours in the last 28 days"
         )
@@ -94,6 +117,7 @@ class LightGBMForecaster:
     def predict(self, history: pd.DataFrame, target_times: pd.DatetimeIndex) -> pd.DataFrame:
         """Refit on cutoff-limited assembled history and forecast the requested hours."""
         self.models_, self.sources_, self.features_ = {}, None, None
+        self.feature_columns_, self.timings_ = [], {"preparation_seconds": 0.0, "fit_seconds": 0.0, "inference_seconds": 0.0}
         self.feature_importances_, self.training_rows_ = pd.DataFrame(), 0
         _check_frame(history, [*KEYS, *TARGETS, "role", "qualite_mesure", "is_holiday"], "history")
         times = pd.DatetimeIndex(target_times)
@@ -122,18 +146,26 @@ class LightGBMForecaster:
         predictions = pd.DataFrame(np.nan, index=index, columns=list(TARGETS))
         sources = pd.Series(index=index, dtype=object)
         if active:
+            preparation_started = perf_counter()
             builder = TabularFeatures(self.lags, weather=self.weather).fit(history, cutoff=cutoff)
-            inputs = builder.transform(training, covariates)[builder.feature_columns]
+            columns = selected_features(builder.feature_columns, self.feature_groups)
+            inputs = builder.transform(training, covariates)[columns]
             native_index = pd.MultiIndex.from_product([active, times], names=KEYS)
-            future = builder.transform(native_index.to_frame(index=False), covariates)[builder.feature_columns]
+            future = builder.transform(native_index.to_frame(index=False), covariates)[columns]
+            self.feature_columns_ = columns
+            self.timings_["preparation_seconds"] = perf_counter() - preparation_started
             importance = []
             for target in TARGETS:
                 labels = training[target].to_numpy(dtype=float)
                 if target == "debit_horaire" and self.log_flow:
                     labels = np.log1p(labels)
                 model = self._new_model()
+                started = perf_counter()
                 model.fit(inputs, labels, categorical_feature=["arc"])
+                self.timings_["fit_seconds"] += perf_counter() - started
+                started = perf_counter()
                 values = np.asarray(model.predict(future), dtype=float)
+                self.timings_["inference_seconds"] += perf_counter() - started
                 if values.shape != (len(future),) or not np.isfinite(values).all():
                     raise ValueError(f"LightGBM returned invalid predictions for {target}")
                 if target == "debit_horaire" and self.log_flow:
@@ -144,7 +176,7 @@ class LightGBMForecaster:
                 predictions.loc[native_index, target] = values
                 self.models_[target] = model
                 importance.append(pd.DataFrame({
-                    "variable": target, "feature": builder.feature_columns,
+                    "variable": target, "feature": columns,
                     "gain": model.booster_.feature_importance(importance_type="gain"),
                     "split": model.booster_.feature_importance(importance_type="split"),
                 }))

@@ -5,17 +5,23 @@ import importlib
 import pytest
 
 MODULE_NAMES = [
+    "traffic_prediction.analysis",
+    "traffic_prediction.comparison",
+    "traffic_prediction.validation",
+    "traffic_prediction.models.proxy",
     "traffic_prediction",
     "traffic_prediction.data",
     "traffic_prediction.data.traffic",
     "traffic_prediction.data.calendar_events",
     "traffic_prediction.data.weather",
     "traffic_prediction.data.disruptions",
+    "traffic_prediction.data.disruption_review",
     "traffic_prediction.data.dataset",
     "traffic_prediction.data.build",
     "traffic_prediction.data.query",
     "traffic_prediction.data.update",
     "traffic_prediction.data.validate",
+    "traffic_prediction.data.audit",
     "traffic_prediction.models",
     "traffic_prediction.models.base",
     "traffic_prediction.models.baselines",

@@ -1,0 +1,11 @@
+arc,role,variable,expected_hours,source_hours,absent_source_hours,null_source_values,invalid_source_values,suspect_zero_flow,raw_zero_values,valid_target_values,legacy_pair_ok,excluded_by_pair_requirement,latest_valid_hour,coverage_percent
+Champs-Elysées,evalue,debit_horaire,24936,24296,640,9208,0,0,5,15088,15022,66,2025-11-19 11:00:00,60.50689765800449
+Champs-Elysées,evalue,taux_occupation,24936,24296,640,9273,0,0,11,15023,15022,1,2025-11-19 12:00:00,60.24623034969522
+Convention,evalue,debit_horaire,24936,24296,640,9017,0,0,0,15279,15181,98,2026-11-04 23:00:00,61.27285851780558
+Convention,evalue,taux_occupation,24936,24296,640,8764,0,0,3,15532,15181,351,2026-11-04 23:00:00,62.2874558870709
+Saint-Pères,evalue,debit_horaire,24936,24296,640,10631,0,0,0,13665,13665,0,2026-11-04 23:00:00,54.80028873917228
+Saint-Pères,evalue,taux_occupation,24936,24296,640,10631,0,0,0,13665,13665,0,2026-11-04 23:00:00,54.80028873917228
+Champs-Elysées proxy La Boétie-Berri,proxy,debit_horaire,24936,24296,640,23691,0,98,98,507,507,0,2024-01-29 12:00:00,2.0332050048123196
+Champs-Elysées proxy La Boétie-Berri,proxy,taux_occupation,24936,24296,640,1514,0,0,92,22782,507,22275,2026-11-04 23:00:00,91.3618864292589
+Champs-Elysées proxy Washington-Balzac,proxy,debit_horaire,24936,24296,640,10759,0,111,260,13426,12108,1318,2026-11-04 23:00:00,53.8418350978505
+Champs-Elysées proxy Washington-Balzac,proxy,taux_occupation,24936,24296,640,7888,0,0,295,16408,12108,4300,2026-07-29 14:00:00,65.80044914982355

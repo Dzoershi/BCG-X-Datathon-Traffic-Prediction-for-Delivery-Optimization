@@ -139,6 +139,14 @@ Checks the hourly grid, schema, duplicates, partition labels, and data constrain
 
 Use `--data-dir`, `--config`, or paired `--start` / `--end` dates to choose what to validate. Missing measurements are reported separately from missing rows. The CSV check enforces the brief's 360-row format; it does not generate forecasts. PR tests are configured for Windows/Linux and Python 3.10/3.13. [Validation details](docs/methodology.md#vérification-et-tests).
 
+### Audit traffic quality by target (#52)
+
+```powershell
+python -m traffic_prediction.data.audit --inputs docs/data_quality/inputs.json --output-dir outputs/metrics/quality_52
+```
+
+Requires the recorded raw snapshots. Reports monthly coverage, missing/invalid values, zero-flow cases, sensor IDs and per-target eligibility without changing production data. [Results and reproduction instructions](docs/data_quality/README.md).
+
 ## 8. Backtest a forecasting model
 
 Prepare the calendar required by the baseline (see [calendar features](docs/methodology.md#calendrier-horaire-issue-16)):
@@ -159,18 +167,52 @@ from traffic_prediction.models.baselines import HolidayAwarePreviousWeekBaseline
 
 data = query_traffic("SELECT * FROM traffic")
 result = backtest(HolidayAwarePreviousWeekBaseline(), data, author="your-name", description="Holiday-aware baseline")
-print(result.summary)
+print(result.summary[["variable", "subset", "pooled_rmse", "macro_rmse", "n_scored", "n_expected"]])
 ```
 
 Replace `HolidayAwarePreviousWeekBaseline()` with any model implementing `predict(history, target_times)`.
 `PreviousWeekModel` is only the internal reference for `normalized_score`, not a model to score: it has no fallback for sensor outages.
 Chronos-2 (#19) is `Chronos2Forecaster()` in `models/chronos.py`; it needs `torch`, `chronos-forecasting` and the pretrained weights (478 MB, download once): [installation, offline use and results](docs/methodology.md#chronos-2-issue-19).
 The eight configured Thursday cutoffs produce Saturday–Wednesday forecasts after a Friday gap.
-Results contain per-window/arc scores (`scores`), means by arc (`per_arc`), and overall means
-(`summary`), including atypical days, coverage counts, and ratios to the previous-week baseline.
+Results contain per-window/arc scores (`scores`), pooled RMSE and macro means (`per_arc`,
+`summary`), and hourly truth/predictions with source labels (`hourly`). Targets are scored
+independently; `truth_policy="paired"` reproduces the earlier complete-pair mask.
 Each successful call appends a run to `docs/experiments.csv`; use `experiments_path=None` to
 skip logging. Data is read only from existing local Parquet files; no download is triggered.
 [Model contract, metric definitions, and limitations](docs/methodology.md#backtest-issue-15).
+
+### Compare models and simulate sensor outages (#53)
+
+```powershell
+python -m traffic_prediction.validation
+python -m traffic_prediction.validation --verify-only
+```
+
+Requires the #52 audit snapshots and local calendar. Saves hourly predictions, coverage,
+pooled/macro RMSE, day-type and fallback breakdowns under `outputs/metrics/validation_53/`.
+Uses two baselines and a calendar/traffic-only LightGBM diagnostic; evaluates proxy methods
+under historical outages. November 7–11 stays reserved. [Results, rules and reproduction](docs/validation/README.md).
+
+### Measure model complexity and feature value (#55)
+
+```powershell
+python -m traffic_prediction.comparison
+```
+
+Runs controlled LightGBM feature removals, Chronos-2 and pinned Timestral checkpoints
+on the frozen #53 inputs. Requires local pretrained weights; `--allow-download` permits
+fetching them. Saves accuracy, coverage, fallback attribution, runtime and resource
+metadata under `outputs/metrics/complexity_55/`. [Measured results and limitations](docs/complexity/README.md).
+
+### Explore traffic patterns and forecast errors (#56)
+
+```powershell
+python -m traffic_prediction.analysis
+```
+
+Uses the frozen #52 observations and #55 predictions. Exports six figures as PNG/SVG/PDF
+under `outputs/figures/traffic_56/`, with counts and error tables under `outputs/metrics/traffic_56/`.
+[Figures, measured observations and interpretation](docs/traffic_analysis/README.md).
 
 ### Review saved model results
 
@@ -249,9 +291,10 @@ python -m traffic_prediction.predict --team-name your_team
 ```
 
 This command refreshes recent traffic with the issue #8 updater, builds calendar
-features, fits the selected baseline on local history through **2026-11-05 23:00**,
+features, fits the selected model on local history through **2026-11-05 23:00**,
 predicts, and calls the unchanged organizer `test_format_and_export_output` function.
-The default `holiday-aware` model is the safety baseline selected by issue #17.
+The CLI defaults to the E5 `ensemble` selected in #32 (requires Timestral weights and dataset covariates).
+Use `--model holiday-aware` for the safety baseline without those dependencies.
 Use `--model previous-week`, `four-week-mean`, or `day-type-profile` to select
 another implemented baseline. Baselines fit their lag/profile features inside
 `predict`; no separate model artifact is needed.
@@ -269,7 +312,7 @@ Each successful run also writes `outputs/submissions/output_your_team_run.json`
 (issue #48). It records the Git commit and dirty status, selected model and settings,
 ensemble weights and member sources, pinned checkpoint revisions, required and
 installed Timestral package commits (null when unavailable), cutoff, last valid
-observed hour per arc, closure-copy markers, seed, runtime in seconds, and SHA-256
+observed hour per arc, closure-copy markers, reviewed decisions and changed values, seed, runtime in seconds, and SHA-256
 of the published CSV. Traffic fingerprints hash the sorted, cutoff-limited evaluated
 history using the existing dataset content-hash convention; model history and
 calendar fingerprints cover additional inputs. The per-hour `sources` records align
@@ -302,6 +345,22 @@ On **November 5 evening**, run the live command as a dry run, validate the file,
 then run twice with `--skip-update` and compare file hashes. Repeat the live
 command on November 6 for delivery, retaining the November 5 cutoff. That future
 operational dry run has not yet been performed.
+
+## 11. Check submission-period disruptions (#57)
+
+```powershell
+python -m traffic_prediction.data.disruption_review --refresh --assess-history
+# Offline replay: replace SNAPSHOT with the capture directory printed above.
+python -m traffic_prediction.data.disruption_review --snapshot data/raw/disruption_57/SNAPSHOT
+```
+
+[Review, evidence and delivery checklist](docs/disruption_review/README.md).
+Outputs go to `outputs/metrics/disruption_57/`; exact source snapshots stay outside Git.
+The provisional November 11 road closure **does not change the forecast**.
+A prior-year copy needs an approved traffic-order entry in
+`configs/disruptions_review.json` (`--closure-review` selects another file).
+A 07:00–14:00 clock restriction affects end-hour labels **08:00–14:00**.
+The submission sidecar records decisions and every changed value; no forced zeros.
 
 ## Project deliverables
 
