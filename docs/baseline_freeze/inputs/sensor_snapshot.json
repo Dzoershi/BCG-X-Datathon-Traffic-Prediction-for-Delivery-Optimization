@@ -1,0 +1,544 @@
+{
+  "retrieved_at_utc": "2026-11-06T09:53:52.248164+00:00",
+  "entries": [
+    {
+      "arc": "Champs-Elysées",
+      "direction": "configured",
+      "expected_iu_ac": 4264,
+      "responses": {
+        "measurements": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/records?select=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval%2Cmin%28t_1h%29+as+first_hour%2Cmax%28t_1h%29+as+last_hour%2Ccount%28%2A%29+as+rows&where=libelle_nd_amont%3D%27Av_Champs_Elysees-Washington%27+AND+libelle_nd_aval%3D%27Av_Champs_Elysees-Berri%27&group_by=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "4264",
+              "libelle_nd_amont": "Av_Champs_Elysees-Washington",
+              "libelle_nd_aval": "Av_Champs_Elysees-Berri",
+              "first_hour": "2025-10-01T03:00:00+00:00",
+              "last_hour": "2026-11-05T23:00:00+00:00",
+              "rows": 9467
+            }
+          ]
+        },
+        "reference": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/referentiel-comptages-routiers/records?where=libelle_nd_amont%3D%27Av_Champs_Elysees-Washington%27+AND+libelle_nd_aval%3D%27Av_Champs_Elysees-Berri%27&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "4264",
+              "date_debut": "1996-10-10T02:00:00+00:00",
+              "date_fin": "2023-01-01T01:00:00+00:00",
+              "libelle": "AV_Champs_Elysees",
+              "iu_nd_aval": 2293,
+              "libelle_nd_aval": "Av_Champs_Elysees-Berri",
+              "iu_nd_amont": 2294,
+              "libelle_nd_amont": "Av_Champs_Elysees-Washington",
+              "geo_point_2d": {
+                "lon": 2.3017227924560624,
+                "lat": 48.87153587897718
+              },
+              "geo_shape": {
+                "type": "Feature",
+                "geometry": {
+                  "coordinates": [
+                    [
+                      2.3009951475338775,
+                      48.871777042598445
+                    ],
+                    [
+                      2.3024504373782473,
+                      48.871294715355916
+                    ]
+                  ],
+                  "type": "LineString"
+                },
+                "properties": {}
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "arc": "Champs-Elysées",
+      "direction": "reverse",
+      "expected_iu_ac": 4264,
+      "responses": {
+        "measurements": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/records?select=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval%2Cmin%28t_1h%29+as+first_hour%2Cmax%28t_1h%29+as+last_hour%2Ccount%28%2A%29+as+rows&where=libelle_nd_amont%3D%27Av_Champs_Elysees-Berri%27+AND+libelle_nd_aval%3D%27Av_Champs_Elysees-Washington%27&group_by=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "4262",
+              "libelle_nd_amont": "Av_Champs_Elysees-Berri",
+              "libelle_nd_aval": "Av_Champs_Elysees-Washington",
+              "first_hour": "2025-10-01T03:00:00+00:00",
+              "last_hour": "2026-11-05T23:00:00+00:00",
+              "rows": 9467
+            }
+          ]
+        },
+        "reference": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/referentiel-comptages-routiers/records?where=libelle_nd_amont%3D%27Av_Champs_Elysees-Berri%27+AND+libelle_nd_aval%3D%27Av_Champs_Elysees-Washington%27&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "4262",
+              "date_debut": "1996-10-10T02:00:00+00:00",
+              "date_fin": "2023-01-01T01:00:00+00:00",
+              "libelle": "Av_Champs_Elysees",
+              "iu_nd_aval": 2294,
+              "libelle_nd_aval": "Av_Champs_Elysees-Washington",
+              "iu_nd_amont": 2293,
+              "libelle_nd_amont": "Av_Champs_Elysees-Berri",
+              "geo_point_2d": {
+                "lon": 2.301826543471136,
+                "lat": 48.87176413081605
+              },
+              "geo_shape": {
+                "type": "Feature",
+                "geometry": {
+                  "coordinates": [
+                    [
+                      2.302516584652746,
+                      48.87154118830655
+                    ],
+                    [
+                      2.301136502289526,
+                      48.871987073325535
+                    ]
+                  ],
+                  "type": "LineString"
+                },
+                "properties": {}
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "arc": "Convention",
+      "direction": "configured",
+      "expected_iu_ac": 5671,
+      "responses": {
+        "measurements": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/records?select=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval%2Cmin%28t_1h%29+as+first_hour%2Cmax%28t_1h%29+as+last_hour%2Ccount%28%2A%29+as+rows&where=libelle_nd_amont%3D%27Lecourbe-Convention%27+AND+libelle_nd_aval%3D%27Convention-Blomet%27&group_by=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "5671",
+              "libelle_nd_amont": "Lecourbe-Convention",
+              "libelle_nd_aval": "Convention-Blomet",
+              "first_hour": "2025-10-01T03:00:00+00:00",
+              "last_hour": "2026-11-05T23:00:00+00:00",
+              "rows": 9467
+            }
+          ]
+        },
+        "reference": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/referentiel-comptages-routiers/records?where=libelle_nd_amont%3D%27Lecourbe-Convention%27+AND+libelle_nd_aval%3D%27Convention-Blomet%27&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "5671",
+              "date_debut": "1997-01-20T01:00:00+00:00",
+              "date_fin": "2023-01-01T01:00:00+00:00",
+              "libelle": "Convention",
+              "iu_nd_aval": 2973,
+              "libelle_nd_aval": "Convention-Blomet",
+              "iu_nd_amont": 2937,
+              "libelle_nd_amont": "Lecourbe-Convention",
+              "geo_point_2d": {
+                "lon": 2.293205602717535,
+                "lat": 48.838634371808965
+              },
+              "geo_shape": {
+                "type": "Feature",
+                "geometry": {
+                  "coordinates": [
+                    [
+                      2.291878306272707,
+                      48.83923810621147
+                    ],
+                    [
+                      2.2945328991623635,
+                      48.83803063740647
+                    ]
+                  ],
+                  "type": "LineString"
+                },
+                "properties": {}
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "arc": "Convention",
+      "direction": "reverse",
+      "expected_iu_ac": 5671,
+      "responses": {
+        "measurements": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/records?select=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval%2Cmin%28t_1h%29+as+first_hour%2Cmax%28t_1h%29+as+last_hour%2Ccount%28%2A%29+as+rows&where=libelle_nd_amont%3D%27Convention-Blomet%27+AND+libelle_nd_aval%3D%27Lecourbe-Convention%27&group_by=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "5672",
+              "libelle_nd_amont": "Convention-Blomet",
+              "libelle_nd_aval": "Lecourbe-Convention",
+              "first_hour": "2025-10-01T03:00:00+00:00",
+              "last_hour": "2026-11-05T23:00:00+00:00",
+              "rows": 9467
+            }
+          ]
+        },
+        "reference": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/referentiel-comptages-routiers/records?where=libelle_nd_amont%3D%27Convention-Blomet%27+AND+libelle_nd_aval%3D%27Lecourbe-Convention%27&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "5672",
+              "date_debut": "1997-01-20T01:00:00+00:00",
+              "date_fin": "2023-01-01T01:00:00+00:00",
+              "libelle": "Convention",
+              "iu_nd_aval": 2937,
+              "libelle_nd_aval": "Lecourbe-Convention",
+              "iu_nd_amont": 2973,
+              "libelle_nd_amont": "Convention-Blomet",
+              "geo_point_2d": {
+                "lon": 2.2932859242574652,
+                "lat": 48.83866476884104
+              },
+              "geo_shape": {
+                "type": "Feature",
+                "geometry": {
+                  "coordinates": [
+                    [
+                      2.2945792503760125,
+                      48.83806583337022
+                    ],
+                    [
+                      2.2919925981389175,
+                      48.83926370431186
+                    ]
+                  ],
+                  "type": "LineString"
+                },
+                "properties": {}
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "arc": "Saint-Pères",
+      "direction": "configured",
+      "expected_iu_ac": 191,
+      "responses": {
+        "measurements": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/records?select=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval%2Cmin%28t_1h%29+as+first_hour%2Cmax%28t_1h%29+as+last_hour%2Ccount%28%2A%29+as+rows&where=libelle_nd_amont%3D%27Sts_Peres-Voltaire%27+AND+libelle_nd_aval%3D%27Sts_Peres-Universite%27&group_by=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "191",
+              "libelle_nd_amont": "Sts_Peres-Voltaire",
+              "libelle_nd_aval": "Sts_Peres-Universite",
+              "first_hour": "2025-10-01T03:00:00+00:00",
+              "last_hour": "2026-11-05T23:00:00+00:00",
+              "rows": 9467
+            }
+          ]
+        },
+        "reference": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/referentiel-comptages-routiers/records?where=libelle_nd_amont%3D%27Sts_Peres-Voltaire%27+AND+libelle_nd_aval%3D%27Sts_Peres-Universite%27&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "191",
+              "date_debut": "1996-10-03T02:00:00+00:00",
+              "date_fin": "2023-01-01T01:00:00+00:00",
+              "libelle": "Sts_Peres",
+              "iu_nd_aval": 119,
+              "libelle_nd_aval": "Sts_Peres-Universite",
+              "iu_nd_amont": 114,
+              "libelle_nd_amont": "Sts_Peres-Voltaire",
+              "geo_point_2d": {
+                "lon": 2.332454190717672,
+                "lat": 48.85728037029827
+              },
+              "geo_shape": {
+                "type": "Feature",
+                "geometry": {
+                  "coordinates": [
+                    [
+                      2.3332577811223216,
+                      48.85826006602721
+                    ],
+                    [
+                      2.331650600313023,
+                      48.856300674569326
+                    ]
+                  ],
+                  "type": "LineString"
+                },
+                "properties": {}
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "arc": "Saint-Pères",
+      "direction": "reverse",
+      "expected_iu_ac": 191,
+      "responses": {
+        "measurements": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/records?select=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval%2Cmin%28t_1h%29+as+first_hour%2Cmax%28t_1h%29+as+last_hour%2Ccount%28%2A%29+as+rows&where=libelle_nd_amont%3D%27Sts_Peres-Universite%27+AND+libelle_nd_aval%3D%27Sts_Peres-Voltaire%27&group_by=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval&limit=100",
+          "total_count": 0,
+          "results": []
+        },
+        "reference": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/referentiel-comptages-routiers/records?where=libelle_nd_amont%3D%27Sts_Peres-Universite%27+AND+libelle_nd_aval%3D%27Sts_Peres-Voltaire%27&limit=100",
+          "total_count": 0,
+          "results": []
+        }
+      }
+    },
+    {
+      "arc": "Champs-Elysées proxy La Boétie-Berri",
+      "direction": "configured",
+      "expected_iu_ac": 4272,
+      "responses": {
+        "measurements": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/records?select=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval%2Cmin%28t_1h%29+as+first_hour%2Cmax%28t_1h%29+as+last_hour%2Ccount%28%2A%29+as+rows&where=libelle_nd_amont%3D%27Av_Champs_Elysees-La_Boetie%27+AND+libelle_nd_aval%3D%27Av_Champs_Elysees-Berri%27&group_by=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "4272",
+              "libelle_nd_amont": "Av_Champs_Elysees-La_Boetie",
+              "libelle_nd_aval": "Av_Champs_Elysees-Berri",
+              "first_hour": "2025-10-01T03:00:00+00:00",
+              "last_hour": "2026-11-05T23:00:00+00:00",
+              "rows": 9467
+            }
+          ]
+        },
+        "reference": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/referentiel-comptages-routiers/records?where=libelle_nd_amont%3D%27Av_Champs_Elysees-La_Boetie%27+AND+libelle_nd_aval%3D%27Av_Champs_Elysees-Berri%27&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "4272",
+              "date_debut": "1996-10-10T02:00:00+00:00",
+              "date_fin": "2023-01-01T01:00:00+00:00",
+              "libelle": "Av_Champs_Elysees",
+              "iu_nd_aval": 2293,
+              "libelle_nd_aval": "Av_Champs_Elysees-Berri",
+              "iu_nd_amont": 2300,
+              "libelle_nd_amont": "Av_Champs_Elysees-La_Boetie",
+              "geo_point_2d": {
+                "lon": 2.3039212731001606,
+                "lat": 48.871075362292714
+              },
+              "geo_shape": {
+                "type": "Feature",
+                "geometry": {
+                  "coordinates": [
+                    [
+                      2.305325961547575,
+                      48.870609536278884
+                    ],
+                    [
+                      2.302516584652746,
+                      48.87154118830655
+                    ]
+                  ],
+                  "type": "LineString"
+                },
+                "properties": {}
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "arc": "Champs-Elysées proxy La Boétie-Berri",
+      "direction": "reverse",
+      "expected_iu_ac": 4272,
+      "responses": {
+        "measurements": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/records?select=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval%2Cmin%28t_1h%29+as+first_hour%2Cmax%28t_1h%29+as+last_hour%2Ccount%28%2A%29+as+rows&where=libelle_nd_amont%3D%27Av_Champs_Elysees-Berri%27+AND+libelle_nd_aval%3D%27Av_Champs_Elysees-La_Boetie%27&group_by=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "4274",
+              "libelle_nd_amont": "Av_Champs_Elysees-Berri",
+              "libelle_nd_aval": "Av_Champs_Elysees-La_Boetie",
+              "first_hour": "2025-10-01T03:00:00+00:00",
+              "last_hour": "2026-11-05T23:00:00+00:00",
+              "rows": 9467
+            }
+          ]
+        },
+        "reference": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/referentiel-comptages-routiers/records?where=libelle_nd_amont%3D%27Av_Champs_Elysees-Berri%27+AND+libelle_nd_aval%3D%27Av_Champs_Elysees-La_Boetie%27&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "4274",
+              "date_debut": "1996-10-10T02:00:00+00:00",
+              "date_fin": "2023-01-01T01:00:00+00:00",
+              "libelle": "Av_Champs_Elysees",
+              "iu_nd_aval": 2300,
+              "libelle_nd_aval": "Av_Champs_Elysees-La_Boetie",
+              "iu_nd_amont": 2293,
+              "libelle_nd_amont": "Av_Champs_Elysees-Berri",
+              "geo_point_2d": {
+                "lon": 2.3037906419474967,
+                "lat": 48.87085653031464
+              },
+              "geo_shape": {
+                "type": "Feature",
+                "geometry": {
+                  "coordinates": [
+                    [
+                      2.3024504373782473,
+                      48.871294715355916
+                    ],
+                    [
+                      2.305130846516746,
+                      48.870418345273364
+                    ]
+                  ],
+                  "type": "LineString"
+                },
+                "properties": {}
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "arc": "Champs-Elysées proxy Washington-Balzac",
+      "direction": "configured",
+      "expected_iu_ac": 4265,
+      "responses": {
+        "measurements": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/records?select=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval%2Cmin%28t_1h%29+as+first_hour%2Cmax%28t_1h%29+as+last_hour%2Ccount%28%2A%29+as+rows&where=libelle_nd_amont%3D%27Av_Champs_Elysees-Washington%27+AND+libelle_nd_aval%3D%27Av_Champs_Elysees-Balzac%27&group_by=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "4265",
+              "libelle_nd_amont": "Av_Champs_Elysees-Washington",
+              "libelle_nd_aval": "Av_Champs_Elysees-Balzac",
+              "first_hour": "2025-10-01T03:00:00+00:00",
+              "last_hour": "2026-11-05T23:00:00+00:00",
+              "rows": 9467
+            }
+          ]
+        },
+        "reference": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/referentiel-comptages-routiers/records?where=libelle_nd_amont%3D%27Av_Champs_Elysees-Washington%27+AND+libelle_nd_aval%3D%27Av_Champs_Elysees-Balzac%27&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "4265",
+              "date_debut": "1996-10-10T02:00:00+00:00",
+              "date_fin": "2023-01-01T01:00:00+00:00",
+              "libelle": "Av_Champs_Elysees",
+              "iu_nd_aval": 2296,
+              "libelle_nd_aval": "Av_Champs_Elysees-Balzac",
+              "iu_nd_amont": 2294,
+              "libelle_nd_amont": "Av_Champs_Elysees-Washington",
+              "geo_point_2d": {
+                "lon": 2.3002135268762136,
+                "lat": 48.872281169599816
+              },
+              "geo_shape": {
+                "type": "Feature",
+                "geometry": {
+                  "coordinates": [
+                    [
+                      2.3008608816978278,
+                      48.8720729519349
+                    ],
+                    [
+                      2.2995661720545995,
+                      48.87248938726472
+                    ]
+                  ],
+                  "type": "LineString"
+                },
+                "properties": {}
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "arc": "Champs-Elysées proxy Washington-Balzac",
+      "direction": "reverse",
+      "expected_iu_ac": 4265,
+      "responses": {
+        "measurements": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/records?select=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval%2Cmin%28t_1h%29+as+first_hour%2Cmax%28t_1h%29+as+last_hour%2Ccount%28%2A%29+as+rows&where=libelle_nd_amont%3D%27Av_Champs_Elysees-Balzac%27+AND+libelle_nd_aval%3D%27Av_Champs_Elysees-Washington%27&group_by=iu_ac%2Clibelle_nd_amont%2Clibelle_nd_aval&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "4267",
+              "libelle_nd_amont": "Av_Champs_Elysees-Balzac",
+              "libelle_nd_aval": "Av_Champs_Elysees-Washington",
+              "first_hour": "2025-10-01T03:00:00+00:00",
+              "last_hour": "2026-11-05T23:00:00+00:00",
+              "rows": 9467
+            }
+          ]
+        },
+        "reference": {
+          "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/referentiel-comptages-routiers/records?where=libelle_nd_amont%3D%27Av_Champs_Elysees-Balzac%27+AND+libelle_nd_aval%3D%27Av_Champs_Elysees-Washington%27&limit=100",
+          "total_count": 1,
+          "results": [
+            {
+              "iu_ac": "4267",
+              "date_debut": "1996-10-10T02:00:00+00:00",
+              "date_fin": "2023-01-01T01:00:00+00:00",
+              "libelle": "Av_Champs_Elysees",
+              "iu_nd_aval": 2294,
+              "libelle_nd_aval": "Av_Champs_Elysees-Washington",
+              "iu_nd_amont": 2296,
+              "libelle_nd_amont": "Av_Champs_Elysees-Balzac",
+              "geo_point_2d": {
+                "lon": 2.3000489411544196,
+                "lat": 48.872090076862385
+              },
+              "geo_shape": {
+                "type": "Feature",
+                "geometry": {
+                  "coordinates": [
+                    [
+                      2.2993664847253443,
+                      48.87230468059165
+                    ],
+                    [
+                      2.300731397583495,
+                      48.87187547313312
+                    ]
+                  ],
+                  "type": "LineString"
+                },
+                "properties": {}
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

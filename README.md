@@ -386,3 +386,11 @@ docs/methodology.md            Data contract, decisions, and detailed examples
 ```
 
 One issue, one branch, one PR. Keep raw data unchanged and use a personal copy of notebook templates.
+
+### Frozen simple reference (#54)
+
+[Baseline decision, aligned results and reproduction](docs/baseline_freeze/README.md):
+`DayTypeProfileBaseline` is the frozen three-arc reference. In Python 3.11.8 with
+`requirements-baseline54.txt`, run `python -m traffic_prediction.baseline_freeze` offline.
+Compact inputs and expected checksums are versioned; the command checks all scores and
+exports 360 valid hourly rows twice. This does not replace the production ensemble.

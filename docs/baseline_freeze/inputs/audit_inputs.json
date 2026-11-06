@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "start": "2024-01-01",
+  "end": "2026-11-05",
+  "config": "configs/baseline.yaml",
+  "sensor_snapshot": {
+    "path": "/private/tmp/traffic-issue-54/data/raw/baseline54/sensors.json",
+    "sha256": "fcc8d7e925a7660b26f8f5fcf85c13b343652afba589f73e5fd1a2a222a5aa14"
+  },
+  "sources": [
+    {
+      "path": "/private/tmp/traffic-audit-20261102/raw/historical/2024/opendata_txt_2024_zip.zip",
+      "sha256": "f74a620bd8ccb96e63a1c1d12368aa979a6048cc0473bf490528882a75c6ae7e",
+      "url": "https://opendata.paris.fr/api/datasets/1.0/comptages-routiers-permanents-historique/attachments/opendata_txt_2024_zip/"
+    },
+    {
+      "path": "/private/tmp/traffic-audit-20261102/raw/historical/2025/opendata_txt_2025_zip.zip",
+      "sha256": "9549fea12ac05d7f46d6d3c951a094604e47019e9b95a6aacb6a56eb01cdcd09",
+      "url": "https://opendata.paris.fr/api/datasets/1.0/comptages-routiers-permanents-historique/attachments/opendata_txt_2025_zip/"
+    },
+    {
+      "path": "/private/tmp/traffic-issue-54/data/raw/baseline54/traffic_20251231T230000000000Z_20261105T230000000000Z_d99hka2u.jsonl",
+      "sha256": "558899c82a6c9e50994b1ea151e4e9a2d66bfda3a33cae573ef073604fd5dbdd",
+      "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/exports/jsonl?where=%28t_1h+%3E%3D+date%272025-12-31T23%3A00%3A00Z%27+AND+t_1h+%3C+date%272026-11-05T23%3A00%3A00Z%27%29+AND+iu_ac+%3D+%274264%27&limit=-1&timezone=UTC",
+      "retrieved_at_utc": "2026-11-06T09:53:58.022368+00:00"
+    },
+    {
+      "path": "/private/tmp/traffic-issue-54/data/raw/baseline54/traffic_20251231T230000000000Z_20261105T230000000000Z_gr36x3ui.jsonl",
+      "sha256": "adbf61769ca30e528ab62c96b501b626abb781e49f4b2e9cbb1458106e3e0283",
+      "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/exports/jsonl?where=%28t_1h+%3E%3D+date%272025-12-31T23%3A00%3A00Z%27+AND+t_1h+%3C+date%272026-11-05T23%3A00%3A00Z%27%29+AND+iu_ac+%3D+%275671%27&limit=-1&timezone=UTC",
+      "retrieved_at_utc": "2026-11-06T09:54:03.954729+00:00"
+    },
+    {
+      "path": "/private/tmp/traffic-issue-54/data/raw/baseline54/traffic_20251231T230000000000Z_20261105T230000000000Z_q5mb15je.jsonl",
+      "sha256": "bfbde6599a124ca53a42edad86a8c3d7044b430aa1cb3f3b17ec644a3d860fa5",
+      "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/exports/jsonl?where=%28t_1h+%3E%3D+date%272025-12-31T23%3A00%3A00Z%27+AND+t_1h+%3C+date%272026-11-05T23%3A00%3A00Z%27%29+AND+iu_ac+%3D+%27191%27&limit=-1&timezone=UTC",
+      "retrieved_at_utc": "2026-11-06T09:54:08.542418+00:00"
+    },
+    {
+      "path": "/private/tmp/traffic-issue-54/data/raw/baseline54/traffic_20251231T230000000000Z_20261105T230000000000Z_x8zpwy5l.jsonl",
+      "sha256": "60cdd27a585bd7ae5ee971566720747cffb9b142a5033ec9b711f4348a1e6a6f",
+      "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/exports/jsonl?where=%28t_1h+%3E%3D+date%272025-12-31T23%3A00%3A00Z%27+AND+t_1h+%3C+date%272026-11-05T23%3A00%3A00Z%27%29+AND+iu_ac+%3D+%274272%27&limit=-1&timezone=UTC",
+      "retrieved_at_utc": "2026-11-06T09:54:13.566479+00:00"
+    },
+    {
+      "path": "/private/tmp/traffic-issue-54/data/raw/baseline54/traffic_20251231T230000000000Z_20261105T230000000000Z_1bt6d0_c.jsonl",
+      "sha256": "3bf4b8e7a5bfa3c1ec31b933577203418a5eed2806ceedf0a6a5f504bb077e6d",
+      "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/comptages-routiers-permanents/exports/jsonl?where=%28t_1h+%3E%3D+date%272025-12-31T23%3A00%3A00Z%27+AND+t_1h+%3C+date%272026-11-05T23%3A00%3A00Z%27%29+AND+iu_ac+%3D+%274265%27&limit=-1&timezone=UTC",
+      "retrieved_at_utc": "2026-11-06T09:54:17.603049+00:00"
+    }
+  ],
+  "config_sha256": "e723677e6dca6ba7add09f09048e6258e2b8df06524f3309beed069aea0e734e"
+}

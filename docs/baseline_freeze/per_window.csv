@@ -1,0 +1,623 @@
+phase,scenario,model,variable,cutoff,n_expected,n_scored,n_ignored,n_estimated_truth,n_fallback,n_native,n_source_unknown,n_forecast_fallback,n_forecast_native,n_forecast_unknown,sum_squared_error,rmse
+development,observed,day_type,debit_horaire,2024-11-07,360,178,182,0,0,178,0,0,360,0,4508853.458514268,159.15601593211463
+development,observed,day_type,taux_occupation,2024-11-07,360,178,182,0,0,178,0,0,360,0,3234.046397432107,4.262487534946423
+development,observed,day_type,debit_horaire,2024-12-19,360,201,159,0,0,201,0,0,360,0,3464537.713643942,131.2878746801454
+development,observed,day_type,taux_occupation,2024-12-19,360,201,159,0,0,201,0,0,360,0,5855.621179086452,5.39744788553322
+development,observed,day_type,debit_horaire,2024-12-26,360,240,120,0,0,240,0,0,360,0,16591775.188617557,262.93040261491217
+development,observed,day_type,taux_occupation,2024-12-26,360,233,127,0,0,233,0,0,360,0,5424.068817410999,4.824859097505006
+development,observed,day_type,debit_horaire,2025-04-17,360,120,240,0,0,120,0,0,360,0,1075772.6359432288,94.68247972140132
+development,observed,day_type,taux_occupation,2025-04-17,360,120,240,0,0,120,0,0,360,0,1259.6556682193702,3.2399275560565783
+development,observed,day_type,debit_horaire,2025-07-10,360,158,202,0,0,158,0,0,360,0,3508528.7328352146,149.01636841608735
+development,observed,day_type,taux_occupation,2025-07-10,360,158,202,0,0,158,0,0,360,0,9171.110895903632,7.618727299902272
+development,observed,day_type,debit_horaire,2025-10-16,360,246,114,0,0,246,0,0,360,0,1154260.436628686,68.49901894225617
+development,observed,day_type,taux_occupation,2025-10-16,360,246,114,0,0,246,0,0,360,0,1227.4007229352706,2.233704061210931
+development,observed,day_type,debit_horaire,2025-11-06,360,355,5,0,0,355,0,0,360,0,3403841.5718475496,97.91979431085637
+development,observed,day_type,taux_occupation,2025-11-06,360,355,5,0,0,355,0,0,360,0,3431.397467996278,3.1090044002144634
+development,observed,day_type,debit_horaire,2026-10-22,360,193,167,0,0,193,0,0,360,0,1911056.0179027154,99.50801300571565
+development,observed,day_type,taux_occupation,2026-10-22,360,193,167,0,0,193,0,0,360,0,676.001478957055,1.8715229992081455
+development,observed,holiday_aware,debit_horaire,2024-11-07,360,178,182,0,0,178,0,120,240,0,5357805.0,173.49359668266618
+development,observed,holiday_aware,taux_occupation,2024-11-07,360,178,182,0,0,178,0,120,240,0,3622.8113752163003,4.511415841448624
+development,observed,holiday_aware,debit_horaire,2024-12-19,360,201,159,0,0,201,0,120,240,0,2743338.0,116.82657129777468
+development,observed,holiday_aware,taux_occupation,2024-12-19,360,201,159,0,0,201,0,120,240,0,27909.0309613684,11.783501190449103
+development,observed,holiday_aware,debit_horaire,2024-12-26,360,240,120,0,0,240,0,120,240,0,16311758.0,260.7022407524211
+development,observed,holiday_aware,taux_occupation,2024-12-26,360,233,127,0,0,233,0,120,240,0,5422.895296499,4.824337129631289
+development,observed,holiday_aware,debit_horaire,2025-04-17,360,120,240,0,1,119,0,240,120,0,6689549.242214533,236.10642448929912
+development,observed,holiday_aware,taux_occupation,2025-04-17,360,120,240,0,1,119,0,240,120,0,5583.303924686256,6.82110934567969
+development,observed,holiday_aware,debit_horaire,2025-07-10,360,158,202,0,2,156,0,122,238,0,4221498.74424224,163.45747606807657
+development,observed,holiday_aware,taux_occupation,2025-07-10,360,158,202,0,2,156,0,122,238,0,5828.087490667818,6.073436398594374
+development,observed,holiday_aware,debit_horaire,2025-10-16,360,246,114,0,31,215,0,120,240,0,1961878.7693797958,89.30351028206202
+development,observed,holiday_aware,taux_occupation,2025-10-16,360,246,114,0,31,215,0,120,240,0,2202.178679768876,2.991980256071054
+development,observed,holiday_aware,debit_horaire,2025-11-06,360,355,5,0,0,355,0,0,360,0,7190250.0,142.31734030719053
+development,observed,holiday_aware,taux_occupation,2025-11-06,360,355,5,0,0,355,0,0,360,0,5425.4204873727,3.909331734749235
+development,observed,holiday_aware,debit_horaire,2026-10-22,360,193,167,0,0,193,0,120,240,0,2496344.0,113.72961298829044
+development,observed,holiday_aware,taux_occupation,2026-10-22,360,193,167,0,0,193,0,120,240,0,833.25543628,2.0778319663070097
+development,observed,previous_week,debit_horaire,2024-11-07,360,178,182,0,0,178,0,120,240,0,8313760.0,216.11690552553398
+development,observed,previous_week,taux_occupation,2024-11-07,360,178,182,0,0,178,0,120,240,0,4380.3079211262,4.9606926398438675
+development,observed,previous_week,debit_horaire,2024-12-19,360,201,159,0,0,201,0,120,240,0,4755487.0,153.8152765608234
+development,observed,previous_week,taux_occupation,2024-12-19,360,201,159,0,0,201,0,120,240,0,23221.3639249278,10.748449830364363
+development,observed,previous_week,debit_horaire,2024-12-26,360,240,120,0,0,240,0,120,240,0,16973340.0,265.9365525835063
+development,observed,previous_week,taux_occupation,2024-12-26,360,233,127,0,0,233,0,120,240,0,5894.6882218865,5.029820183769788
+development,observed,previous_week,debit_horaire,2025-04-17,360,120,240,0,1,119,0,240,120,0,6968438.242214533,240.97783857674779
+development,observed,previous_week,taux_occupation,2025-04-17,360,120,240,0,1,119,0,240,120,0,4385.958901470256,6.0456312749168
+development,observed,previous_week,debit_horaire,2025-07-10,360,158,202,0,7,151,0,129,231,0,5120154.469629112,180.01677962628844
+development,observed,previous_week,taux_occupation,2025-07-10,360,158,202,0,7,151,0,129,231,0,6419.457837912021,6.374125821380132
+development,observed,previous_week,debit_horaire,2025-10-16,360,246,114,0,31,215,0,120,240,0,1961878.7693797958,89.30351028206202
+development,observed,previous_week,taux_occupation,2025-10-16,360,246,114,0,31,215,0,120,240,0,2202.178679768876,2.991980256071054
+development,observed,previous_week,debit_horaire,2025-11-06,360,355,5,0,0,355,0,0,360,0,9757918.0,165.79231875375433
+development,observed,previous_week,taux_occupation,2025-11-06,360,355,5,0,0,355,0,0,360,0,6869.0043720513,4.398784842463354
+development,observed,previous_week,debit_horaire,2026-10-22,360,193,167,0,0,193,0,120,240,0,2496344.0,113.72961298829044
+development,observed,previous_week,taux_occupation,2026-10-22,360,193,167,0,0,193,0,120,240,0,833.25543628,2.0778319663070097
+development,observed,four_week,debit_horaire,2024-11-07,360,178,182,0,0,178,0,120,240,0,6249786.520833333,187.3797220336308
+development,observed,four_week,taux_occupation,2024-11-07,360,178,182,0,0,178,0,120,240,0,3396.454888549231,4.368204120578687
+development,observed,four_week,debit_horaire,2024-12-19,360,201,159,0,0,201,0,120,240,0,5603276.645833333,166.96406271403671
+development,observed,four_week,taux_occupation,2024-12-19,360,201,159,0,0,201,0,120,240,0,5133.708925937889,5.053794656251052
+development,observed,four_week,debit_horaire,2024-12-26,360,240,120,0,0,240,0,120,240,0,15892732.625,257.33192431339205
+development,observed,four_week,taux_occupation,2024-12-26,360,233,127,0,0,233,0,120,240,0,6869.793557190979,5.42992564591201
+development,observed,four_week,debit_horaire,2025-04-17,360,120,240,0,1,119,0,240,120,0,4056752.193603422,183.86480979248998
+development,observed,four_week,taux_occupation,2025-04-17,360,120,240,0,1,119,0,240,120,0,2059.9811879955632,4.143248713263908
+development,observed,four_week,debit_horaire,2025-07-10,360,158,202,0,0,158,0,120,240,0,4888316.618055556,175.89403847914664
+development,observed,four_week,taux_occupation,2025-07-10,360,158,202,0,0,158,0,120,240,0,7449.283513533363,6.866393814055877
+development,observed,four_week,debit_horaire,2025-10-16,360,246,114,0,31,215,0,120,240,0,1456876.116602018,76.95622545703219
+development,observed,four_week,taux_occupation,2025-10-16,360,246,114,0,31,215,0,120,240,0,2310.0815558209642,3.0644045800394113
+development,observed,four_week,debit_horaire,2025-11-06,360,355,5,0,0,355,0,0,360,0,8512888.520833334,154.85466626588703
+development,observed,four_week,taux_occupation,2025-11-06,360,355,5,0,0,355,0,0,360,0,5791.231692869775,4.038976196056276
+development,observed,four_week,debit_horaire,2026-10-22,360,193,167,0,0,193,0,120,240,0,3364908.701388889,132.0407517050068
+development,observed,four_week,taux_occupation,2026-10-22,360,193,167,0,0,193,0,120,240,0,1537.0527988360952,2.8220567214439765
+recent_check,observed,day_type,debit_horaire,2026-10-29,360,239,121,0,0,239,0,0,360,0,1181553.4853949412,70.31172329430431
+recent_check,observed,day_type,taux_occupation,2026-10-29,360,239,121,0,0,239,0,0,360,0,821.7035397974511,1.8542087597343313
+recent_check,observed,holiday_aware,debit_horaire,2026-10-29,360,239,121,0,0,239,0,120,240,0,1431105.0,77.3814385320453
+recent_check,observed,holiday_aware,taux_occupation,2026-10-29,360,239,121,0,0,239,0,120,240,0,1280.0692390392,2.3142900074661648
+recent_check,observed,previous_week,debit_horaire,2026-10-29,360,239,121,0,0,239,0,120,240,0,1431105.0,77.3814385320453
+recent_check,observed,previous_week,taux_occupation,2026-10-29,360,239,121,0,0,239,0,120,240,0,1280.0692390392,2.3142900074661648
+recent_check,observed,four_week,debit_horaire,2026-10-29,360,239,121,0,0,239,0,120,240,0,1389275.3125,76.24216298294527
+recent_check,observed,four_week,taux_occupation,2026-10-29,360,239,121,0,0,239,0,120,240,0,1196.4478244821423,2.2374221423373633
+development,outage_28d,profile,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,3618965.1537921843,201.64952223570904
+development,outage_28d,profile,taux_occupation,2024-11-07,120,89,31,0,89,0,0,120,0,0,2904.626753122584,5.7128150375329625
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,3618965.1537921843,201.64952223570904
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-11-07,120,89,31,0,89,0,0,108,12,0,2904.626753122584,5.7128150375329625
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,3618965.1537921843,201.64952223570904
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-11-07,120,89,31,0,89,0,0,108,12,0,2904.626753122584,5.7128150375329625
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,3618965.1537921843,201.64952223570904
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-11-07,120,89,31,0,89,0,0,108,12,0,2904.626753122584,5.7128150375329625
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-11-07,120,89,31,0,0,89,0,0,120,0,11779011.0,363.797248755742
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-11-07,120,89,31,0,0,89,0,0,120,0,14539.501865206399,12.781439257638441
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-11-07,120,89,31,0,0,89,0,0,120,0,8137415.986594114,302.3766530319599
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-11-07,120,89,31,0,0,89,0,0,120,0,17781.479588373903,14.134776456928748
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-11-07,120,89,31,0,0,89,0,0,120,0,6922215.42867435,278.8865386600422
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-11-07,120,89,31,0,0,89,0,0,120,0,9044.714393121492,10.08097239442185
+development,outage_28d,profile,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,2241777.4875633167,136.6802072833797
+development,outage_28d,profile,taux_occupation,2024-12-19,120,120,0,0,120,0,0,120,0,0,5874.397264560573,6.9966642436238695
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,2241777.4875633167,136.6802072833797
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,29386.07585466821,15.64876881596659
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,2241777.4875633167,136.6802072833797
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,13490.929178223158,10.603037763703679
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,2241777.4875633167,136.6802072833797
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,13572.999471887699,10.635239956502978
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-19,120,120,0,0,1,119,0,1,119,0,12543338.355625,323.30762383557914
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,11832.266545528208,9.929865115535813
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-19,120,120,0,0,1,119,0,1,119,0,24386261.30190781,450.7980081838928
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,10289.489871465508,9.259900049616045
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-19,120,120,0,0,1,119,0,1,119,0,17358598.209695216,380.3353587043853
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,10500.366619339358,9.354306770742625
+development,outage_28d,profile,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,14181650.088131648,343.7737881239596
+development,outage_28d,profile,taux_occupation,2024-12-26,120,113,7,0,113,0,0,120,0,0,4791.424057969913,6.511680490771413
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,14181650.088131648,343.7737881239596
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,17120.690368132,12.308961541545925
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,14181650.088131648,343.7737881239596
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,8986.9509627382,8.917989655368434
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,14181650.088131648,343.7737881239596
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,9105.806262647324,8.976767586754905
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-26,120,120,0,0,0,120,0,0,120,0,8231278.0,261.9045309522791
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,7329.9329226586,8.053984295513432
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-26,120,120,0,0,0,120,0,0,120,0,14144113.771368008,343.3185325050194
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,6037.651834398508,7.309620182134394
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-26,120,120,0,0,0,120,0,0,120,0,9818021.996673612,286.03644867792656
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,7189.763960847699,7.97660515144225
+development,outage_28d,profile,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1105050.996149309,96.36463472033768
+development,outage_28d,profile,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1149.007605505333,3.1073342428331507
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1105050.996149309,96.36463472033768
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-04-17,120,119,1,0,0,119,0,0,120,0,15888.8118882881,11.555060693595387
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1105050.996149309,96.36463472033768
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-04-17,120,119,1,0,0,119,0,0,120,0,4217.617138814625,5.953331909979067
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1105050.996149309,96.36463472033768
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-04-17,120,119,1,0,0,119,0,0,120,0,4351.471879467418,6.047064625399651
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1105050.996149309,96.36463472033768
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-04-17,120,119,1,0,1,118,0,1,119,0,8084.923645137429,8.242604857269797
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1105050.996149309,96.36463472033768
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-04-17,120,119,1,0,1,118,0,1,119,0,8389.45767776732,8.396406633256031
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1105050.996149309,96.36463472033768
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-04-17,120,119,1,0,1,118,0,1,119,0,4836.2215592724015,6.374991553312843
+development,outage_28d,profile,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1100332.6182100817,170.1649832716598
+development,outage_28d,profile,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,8251.602454876018,14.735923215837314
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1100332.6182100817,170.1649832716598
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-07-10,120,38,82,0,23,15,0,74,46,0,11108.29646653793,17.097473240940673
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1100332.6182100817,170.1649832716598
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-07-10,120,38,82,0,23,15,0,74,46,0,8352.274543468111,14.825542098429949
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1100332.6182100817,170.1649832716598
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-07-10,120,38,82,0,23,15,0,74,46,0,8451.052609432863,14.912951461761848
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1100332.6182100817,170.1649832716598
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,8251.602454876018,14.735923215837314
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1100332.6182100817,170.1649832716598
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,8251.602454876018,14.735923215837314
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1100332.6182100817,170.1649832716598
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,8251.602454876018,14.735923215837314
+development,outage_28d,profile,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,531157.9391006774,74.7739005339414
+development,outage_28d,profile,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,495.9880184315531,2.2849346839255213
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,531157.9391006774,74.7739005339414
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-10-16,120,95,25,0,2,93,0,5,115,0,7204.436152318356,8.7083965242979
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,531157.9391006774,74.7739005339414
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-10-16,120,95,25,0,2,93,0,5,115,0,13795.234706180876,12.050435548442517
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,531157.9391006774,74.7739005339414
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-10-16,120,95,25,0,2,93,0,5,115,0,10336.23317749818,10.430841504882569
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,531157.9391006774,74.7739005339414
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,495.9880184315531,2.2849346839255213
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,531157.9391006774,74.7739005339414
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,495.9880184315531,2.2849346839255213
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,531157.9391006774,74.7739005339414
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,495.9880184315531,2.2849346839255213
+development,outage_28d,profile,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2350685.1668276973,142.35352928620622
+development,outage_28d,profile,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,2919.8389140336794,5.017073362128562
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2350685.1668276973,142.35352928620622
+development,outage_28d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-11-06,120,116,4,0,0,116,0,0,120,0,17587.2496037246,12.313172650530154
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2350685.1668276973,142.35352928620622
+development,outage_28d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-11-06,120,116,4,0,0,116,0,0,120,0,15423.935579303825,11.531043399907496
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2350685.1668276973,142.35352928620622
+development,outage_28d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-11-06,120,116,4,0,0,116,0,0,120,0,11594.545871237633,9.997648806024358
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-11-06,120,116,4,0,58,58,0,62,58,0,25458283.72084003,468.4740794437723
+development,outage_28d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,2919.8389140336794,5.017073362128562
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-11-06,120,116,4,0,58,58,0,62,58,0,26061840.785088476,473.9947692229976
+development,outage_28d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,2919.8389140336794,5.017073362128562
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-11-06,120,116,4,0,58,58,0,62,58,0,13517390.006080445,341.36377105713586
+development,outage_28d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,2919.8389140336794,5.017073362128562
+development,outage_90d,profile,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,4576739.333661281,226.76868711722153
+development,outage_90d,profile,taux_occupation,2024-11-07,120,89,31,0,89,0,0,120,0,0,3179.072057082563,5.9766136527080835
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,4576739.333661281,226.76868711722153
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-11-07,120,89,31,0,89,0,0,108,12,0,3179.072057082563,5.9766136527080835
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,4576739.333661281,226.76868711722153
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-11-07,120,89,31,0,89,0,0,108,12,0,3179.072057082563,5.9766136527080835
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,4576739.333661281,226.76868711722153
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-11-07,120,89,31,0,89,0,0,108,12,0,3179.072057082563,5.9766136527080835
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-11-07,120,89,31,0,0,89,0,0,120,0,11779011.0,363.797248755742
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-11-07,120,89,31,0,0,89,0,0,120,0,14539.501865206399,12.781439257638441
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-11-07,120,89,31,0,0,89,0,0,120,0,8004787.368628969,299.9023692940599
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-11-07,120,89,31,0,0,89,0,0,120,0,17392.085445228877,13.979151991298687
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-11-07,120,89,31,0,0,89,0,0,120,0,6929475.048541865,279.03274038781825
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-11-07,120,89,31,0,0,89,0,0,120,0,8571.767759289778,9.813867601276817
+development,outage_90d,profile,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,2189855.7149775284,135.0881105975383
+development,outage_90d,profile,taux_occupation,2024-12-19,120,120,0,0,120,0,0,120,0,0,6323.155821932118,7.258992022503376
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,2189855.7149775284,135.0881105975383
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,29393.143220045426,15.65065047105216
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,2189855.7149775284,135.0881105975383
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,13562.445861135071,10.631104466428951
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,2189855.7149775284,135.0881105975383
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,13669.805641639627,10.67309922251562
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-19,120,120,0,0,1,119,0,1,119,0,12543506.253460208,323.30978763228785
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,11839.333910905425,9.932830207157066
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-19,120,120,0,0,1,119,0,1,119,0,25006946.492706653,456.4988726958211
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,10156.340451982722,9.19979186901472
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-19,120,120,0,0,1,119,0,1,119,0,18883561.324517496,396.6900692450541
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,10391.785359365924,9.305815994744865
+development,outage_90d,profile,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,14154358.202159816,343.442840976484
+development,outage_90d,profile,taux_occupation,2024-12-26,120,113,7,0,113,0,0,120,0,0,5067.203794645242,6.696455141120378
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,14154358.202159816,343.442840976484
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,17120.690368132,12.308961541545925
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,14154358.202159816,343.442840976484
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,9025.346999880472,8.937020053271143
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,14154358.202159816,343.442840976484
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,9384.063042576405,9.112892278882532
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-26,120,120,0,0,0,120,0,0,120,0,8231278.0,261.9045309522791
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,7329.9329226586,8.053984295513432
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-26,120,120,0,0,0,120,0,0,120,0,14150499.891329527,343.39602855558195
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,5883.859062103162,7.215923310440035
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-26,120,120,0,0,0,120,0,0,120,0,10350547.682991927,293.6912733210381
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,6931.227602614216,7.831877001604877
+development,outage_90d,profile,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1055805.0729695726,94.19294844923071
+development,outage_90d,profile,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1169.4542360918829,3.1348598887000563
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1055805.0729695726,94.19294844923071
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-04-17,120,119,1,0,0,119,0,0,120,0,15888.8118882881,11.555060693595387
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1055805.0729695726,94.19294844923071
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-04-17,120,119,1,0,0,119,0,0,120,0,4124.034738758753,5.886913801578584
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1055805.0729695726,94.19294844923071
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-04-17,120,119,1,0,0,119,0,0,120,0,4189.922102103199,5.933753401468471
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1055805.0729695726,94.19294844923071
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-04-17,120,119,1,0,1,118,0,1,119,0,8085.150376365747,8.242720433056508
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1055805.0729695726,94.19294844923071
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-04-17,120,119,1,0,1,118,0,1,119,0,8459.349507689909,8.431308952520741
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1055805.0729695726,94.19294844923071
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-04-17,120,119,1,0,1,118,0,1,119,0,4871.060229682054,6.397912100132798
+development,outage_90d,profile,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1098610.6915189938,170.03178429797316
+development,outage_90d,profile,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,8293.899280277406,14.77364231920217
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1098610.6915189938,170.03178429797316
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-07-10,120,38,82,0,23,15,0,74,46,0,11158.350835952853,17.135950848215092
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1098610.6915189938,170.03178429797316
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-07-10,120,38,82,0,23,15,0,74,46,0,8414.315123174378,14.880502187315258
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1098610.6915189938,170.03178429797316
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-07-10,120,38,82,0,23,15,0,74,46,0,8513.235162749614,14.967715399582014
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1098610.6915189938,170.03178429797316
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,8293.899280277406,14.77364231920217
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1098610.6915189938,170.03178429797316
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,8293.899280277406,14.77364231920217
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1098610.6915189938,170.03178429797316
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,8293.899280277406,14.77364231920217
+development,outage_90d,profile,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,569936.762830094,77.45537002416253
+development,outage_90d,profile,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,538.1716188050768,2.3801185702553753
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,569936.762830094,77.45537002416253
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-10-16,120,95,25,0,2,93,0,5,115,0,7205.30224527857,8.708919955563147
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,569936.762830094,77.45537002416253
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-10-16,120,95,25,0,2,93,0,5,115,0,14021.20066284712,12.148727749221583
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,569936.762830094,77.45537002416253
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-10-16,120,95,25,0,2,93,0,5,115,0,11068.375080683636,10.793943272762611
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,569936.762830094,77.45537002416253
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,538.1716188050768,2.3801185702553753
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,569936.762830094,77.45537002416253
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,538.1716188050768,2.3801185702553753
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,569936.762830094,77.45537002416253
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,538.1716188050768,2.3801185702553753
+development,outage_90d,profile,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2376337.580997279,143.1281551676702
+development,outage_90d,profile,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,2940.5025932480894,5.034794959739816
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2376337.580997279,143.1281551676702
+development,outage_90d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-11-06,120,116,4,0,0,116,0,0,120,0,17587.2496037246,12.313172650530154
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2376337.580997279,143.1281551676702
+development,outage_90d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-11-06,120,116,4,0,0,116,0,0,120,0,15677.871975069042,11.62557821145233
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2376337.580997279,143.1281551676702
+development,outage_90d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-11-06,120,116,4,0,0,116,0,0,120,0,13244.487618494039,10.685345918631304
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-11-06,120,116,4,0,58,58,0,62,58,0,25470925.09729829,468.5903760150765
+development,outage_90d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,2940.5025932480894,5.034794959739816
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-11-06,120,116,4,0,58,58,0,62,58,0,26150332.133119624,474.798797070198
+development,outage_90d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,2940.5025932480894,5.034794959739816
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-11-06,120,116,4,0,58,58,0,62,58,0,13982271.3513961,347.18413269444494
+development,outage_90d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,2940.5025932480894,5.034794959739816
+development,outage_180d,profile,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,8169067.689133253,302.9641520147089
+development,outage_180d,profile,taux_occupation,2024-11-07,120,89,31,0,89,0,0,120,0,0,3734.2402172156753,6.477480625182474
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,8169067.689133253,302.9641520147089
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-11-07,120,89,31,0,89,0,0,108,12,0,3734.2402172156753,6.477480625182474
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,8169067.689133253,302.9641520147089
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-11-07,120,89,31,0,89,0,0,108,12,0,3734.2402172156753,6.477480625182474
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,8169067.689133253,302.9641520147089
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-11-07,120,89,31,0,89,0,0,108,12,0,3734.2402172156753,6.477480625182474
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-11-07,120,89,31,0,0,89,0,0,120,0,11779011.0,363.797248755742
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-11-07,120,89,31,0,0,89,0,0,120,0,14539.501865206399,12.781439257638441
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-11-07,120,89,31,0,0,89,0,0,120,0,8347767.3344795285,306.25991998571675
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-11-07,120,89,31,0,0,89,0,0,120,0,15951.23317728164,13.387581524329935
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-11-07,120,89,31,0,0,89,0,0,120,0,7547414.136232505,291.20852670394856
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-11-07,120,89,31,0,0,89,0,0,120,0,8549.850552410553,9.80131300101873
+development,outage_180d,profile,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,4057449.2938519684,183.88060650532563
+development,outage_180d,profile,taux_occupation,2024-12-19,120,120,0,0,120,0,0,120,0,0,5568.059649704132,6.811791033264877
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,4057449.2938519684,183.88060650532563
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,29412.61949534825,15.655834773694933
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,4057449.2938519684,183.88060650532563
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,13381.798005159793,10.560065500570136
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,4057449.2938519684,183.88060650532563
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,13103.420421822304,10.449649285112518
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-19,120,120,0,0,1,119,0,1,119,0,12542977.367346939,323.30297152138553
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,11858.810186208251,9.940996842289112
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-19,120,120,0,0,1,119,0,1,119,0,23468621.97114541,442.2350616578757
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,10456.598286322129,9.334790787836887
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-19,120,120,0,0,1,119,0,1,119,0,16154647.624896266,366.9087945808907
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-19,120,120,0,0,1,119,0,1,119,0,10346.7597039395,9.285633932738742
+development,outage_180d,profile,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,21522983.180305477,423.50701667057695
+development,outage_180d,profile,taux_occupation,2024-12-26,120,113,7,0,113,0,0,120,0,0,5220.859870707099,6.797227356854468
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,21522983.180305477,423.50701667057695
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,17120.690368132,12.308961541545925
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,21522983.180305477,423.50701667057695
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,9063.739538568203,8.956008285620776
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,21522983.180305477,423.50701667057695
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,8757.205320704843,8.80326031755434
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-26,120,120,0,0,0,120,0,0,120,0,8231278.0,261.9045309522791
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,7329.9329226586,8.053984295513432
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-26,120,120,0,0,0,120,0,0,120,0,13820633.615384616,339.3699261791943
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,6095.262117810912,7.344410985503901
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2024-12-26,120,120,0,0,0,120,0,0,120,0,9503067.681754738,281.41114171491057
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2024-12-26,120,113,7,0,0,113,0,0,120,0,7058.9206212636445,7.903690535564962
+development,outage_180d,profile,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1114284.8550388094,96.7664108957083
+development,outage_180d,profile,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1301.0617645574546,3.30655290886722
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1114284.8550388094,96.7664108957083
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-04-17,120,119,1,0,0,119,0,0,120,0,15888.8118882881,11.555060693595387
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1114284.8550388094,96.7664108957083
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-04-17,120,119,1,0,0,119,0,0,120,0,4103.064635544175,5.871927686243424
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1114284.8550388094,96.7664108957083
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-04-17,120,119,1,0,0,119,0,0,120,0,3997.0925398218974,5.795602896996982
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1114284.8550388094,96.7664108957083
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-04-17,120,119,1,0,1,118,0,1,119,0,8085.1746200047355,8.242732791106722
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1114284.8550388094,96.7664108957083
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-04-17,120,119,1,0,1,118,0,1,119,0,8580.239600098246,8.491339928558872
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1114284.8550388094,96.7664108957083
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-04-17,120,119,1,0,1,118,0,1,119,0,4953.032523304835,6.451520909411861
+development,outage_180d,profile,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1057566.3206974834,166.8253357554954
+development,outage_180d,profile,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,7899.109037237516,14.417742210679828
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1057566.3206974834,166.8253357554954
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-07-10,120,38,82,0,23,15,0,74,46,0,10840.444398743704,16.89008148584602
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1057566.3206974834,166.8253357554954
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-07-10,120,38,82,0,23,15,0,74,46,0,7988.5004153700775,14.49909290753452
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1057566.3206974834,166.8253357554954
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-07-10,120,38,82,0,23,15,0,74,46,0,8026.51186005526,14.533547272336635
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1057566.3206974834,166.8253357554954
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,7899.109037237516,14.417742210679828
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1057566.3206974834,166.8253357554954
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,7899.109037237516,14.417742210679828
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1057566.3206974834,166.8253357554954
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,7899.109037237516,14.417742210679828
+development,outage_180d,profile,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,597919.6421830953,79.33404672867994
+development,outage_180d,profile,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,553.8343977832702,2.414505283932857
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,597919.6421830953,79.33404672867994
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-10-16,120,95,25,0,2,93,0,5,115,0,7206.863366268113,8.709863353975624
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,597919.6421830953,79.33404672867994
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-10-16,120,95,25,0,2,93,0,5,115,0,13682.110346441565,12.000925554850722
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,597919.6421830953,79.33404672867994
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-10-16,120,95,25,0,2,93,0,5,115,0,11511.08229954747,11.00769219063004
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,597919.6421830953,79.33404672867994
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,553.8343977832702,2.414505283932857
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,597919.6421830953,79.33404672867994
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,553.8343977832702,2.414505283932857
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,597919.6421830953,79.33404672867994
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,553.8343977832702,2.414505283932857
+development,outage_180d,profile,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2424883.723965128,144.58274459347538
+development,outage_180d,profile,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,3009.5471663584503,5.09356183076045
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2424883.723965128,144.58274459347538
+development,outage_180d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-11-06,120,116,4,0,0,116,0,0,120,0,17587.2496037246,12.313172650530154
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2424883.723965128,144.58274459347538
+development,outage_180d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-11-06,120,116,4,0,0,116,0,0,120,0,15548.502803458128,11.577513432131736
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2424883.723965128,144.58274459347538
+development,outage_180d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-11-06,120,116,4,0,0,116,0,0,120,0,13957.275166208612,10.969108333849631
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-11-06,120,116,4,0,58,58,0,62,58,0,25493510.87649115,468.7980860530391
+development,outage_180d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,3009.5471663584503,5.09356183076045
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-11-06,120,116,4,0,58,58,0,62,58,0,26295677.157344326,476.1164479894302
+development,outage_180d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,3009.5471663584503,5.09356183076045
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-11-06,120,116,4,0,58,58,0,62,58,0,14665107.441507757,355.56059963527724
+development,outage_180d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,3009.5471663584503,5.09356183076045
+development,outage_365d,profile,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,4211129.224562784,188.11602946730616
+development,outage_365d,profile,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1997.896169218118,4.097443524785633
+development,outage_365d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,4211129.224562784,188.11602946730616
+development,outage_365d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-04-17,120,119,1,0,0,119,0,0,120,0,15888.8118882881,11.555060693595387
+development,outage_365d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,4211129.224562784,188.11602946730616
+development,outage_365d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-04-17,120,119,1,0,0,119,0,0,120,0,4123.799827931971,5.8867461357404585
+development,outage_365d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,4211129.224562784,188.11602946730616
+development,outage_365d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-04-17,120,119,1,0,0,119,0,0,120,0,3816.3521589296024,5.6630544946603205
+development,outage_365d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,4211129.224562784,188.11602946730616
+development,outage_365d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-04-17,120,119,1,0,1,118,0,1,119,0,8099.2472365497,8.249903099277983
+development,outage_365d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,4211129.224562784,188.11602946730616
+development,outage_365d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-04-17,120,119,1,0,1,118,0,1,119,0,8128.898958744561,8.264990942739606
+development,outage_365d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,4211129.224562784,188.11602946730616
+development,outage_365d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-04-17,120,119,1,0,1,118,0,1,119,0,4829.681356116212,6.370679525327102
+development,outage_365d,profile,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1220069.9035424248,179.1845493473158
+development,outage_365d,profile,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,7557.500720167732,14.102538704047255
+development,outage_365d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1220069.9035424248,179.1845493473158
+development,outage_365d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-07-10,120,38,82,0,23,15,0,74,46,0,10613.640178636917,16.71246003706352
+development,outage_365d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1220069.9035424248,179.1845493473158
+development,outage_365d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-07-10,120,38,82,0,23,15,0,74,46,0,7723.444079786836,14.256525818566143
+development,outage_365d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1220069.9035424248,179.1845493473158
+development,outage_365d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-07-10,120,38,82,0,23,15,0,74,46,0,7789.491805306051,14.317354031224568
+development,outage_365d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1220069.9035424248,179.1845493473158
+development,outage_365d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,7557.500720167732,14.102538704047255
+development,outage_365d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1220069.9035424248,179.1845493473158
+development,outage_365d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,7557.500720167732,14.102538704047255
+development,outage_365d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1220069.9035424248,179.1845493473158
+development,outage_365d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,7557.500720167732,14.102538704047255
+development,outage_365d,profile,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,661516.4893283201,83.44657851951688
+development,outage_365d,profile,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,662.5311789720209,2.640835551531333
+development,outage_365d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,661516.4893283201,83.44657851951688
+development,outage_365d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-10-16,120,95,25,0,2,93,0,5,115,0,7213.047646037446,8.713599561989865
+development,outage_365d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,661516.4893283201,83.44657851951688
+development,outage_365d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-10-16,120,95,25,0,2,93,0,5,115,0,15148.242206615521,12.627556419286696
+development,outage_365d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,661516.4893283201,83.44657851951688
+development,outage_365d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-10-16,120,95,25,0,2,93,0,5,115,0,17473.611052364944,13.562180795124027
+development,outage_365d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,661516.4893283201,83.44657851951688
+development,outage_365d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,662.5311789720209,2.640835551531333
+development,outage_365d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,661516.4893283201,83.44657851951688
+development,outage_365d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,662.5311789720209,2.640835551531333
+development,outage_365d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,661516.4893283201,83.44657851951688
+development,outage_365d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,662.5311789720209,2.640835551531333
+development,outage_365d,profile,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2502977.886685552,146.89246262104618
+development,outage_365d,profile,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,3228.2127677932026,5.275359742426138
+development,outage_365d,copy:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2502977.886685552,146.89246262104618
+development,outage_365d,copy:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-11-06,120,116,4,0,0,116,0,0,120,0,17587.2496037246,12.313172650530154
+development,outage_365d,offset:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2502977.886685552,146.89246262104618
+development,outage_365d,offset:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-11-06,120,116,4,0,0,116,0,0,120,0,16219.787762955508,11.82479414523579
+development,outage_365d,linear:Champs-Elysées proxy La Boétie-Berri,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2502977.886685552,146.89246262104618
+development,outage_365d,linear:Champs-Elysées proxy La Boétie-Berri,taux_occupation,2025-11-06,120,116,4,0,0,116,0,0,120,0,17086.634681804884,12.136662426019171
+development,outage_365d,copy:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-11-06,120,116,4,0,58,58,0,62,58,0,25547055.223854985,469.2901391339957
+development,outage_365d,copy:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,3228.2127677932026,5.275359742426138
+development,outage_365d,offset:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-11-06,120,116,4,0,58,58,0,62,58,0,27732321.89313909,488.94962977600835
+development,outage_365d,offset:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,3228.2127677932026,5.275359742426138
+development,outage_365d,linear:Champs-Elysées proxy Washington-Balzac,debit_horaire,2025-11-06,120,116,4,0,58,58,0,62,58,0,24325636.19377085,457.934231403515
+development,outage_365d,linear:Champs-Elysées proxy Washington-Balzac,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,3228.2127677932026,5.275359742426138
+development,outage_28d,day_type,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,3618965.1537921843,201.64952223570904
+development,outage_28d,day_type,taux_occupation,2024-11-07,120,89,31,0,89,0,0,120,0,0,2904.626753122584,5.7128150375329625
+development,outage_28d,day_type,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,2241777.4875633167,136.6802072833797
+development,outage_28d,day_type,taux_occupation,2024-12-19,120,120,0,0,120,0,0,120,0,0,5874.397264560573,6.9966642436238695
+development,outage_28d,day_type,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,14181650.088131648,343.7737881239596
+development,outage_28d,day_type,taux_occupation,2024-12-26,120,113,7,0,113,0,0,120,0,0,4791.424057969913,6.511680490771413
+development,outage_28d,day_type,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1105050.996149309,96.36463472033768
+development,outage_28d,day_type,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1149.007605505333,3.1073342428331507
+development,outage_28d,day_type,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1100332.6182100817,170.1649832716598
+development,outage_28d,day_type,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,8251.602454876018,14.735923215837314
+development,outage_28d,day_type,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,531157.9391006774,74.7739005339414
+development,outage_28d,day_type,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,495.9880184315531,2.2849346839255213
+development,outage_28d,day_type,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2350685.1668276973,142.35352928620622
+development,outage_28d,day_type,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,2919.8389140336794,5.017073362128562
+development,outage_28d,holiday_aware,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,3618965.1537921843,201.64952223570904
+development,outage_28d,holiday_aware,taux_occupation,2024-11-07,120,89,31,0,89,0,0,120,0,0,2904.626753122584,5.7128150375329625
+development,outage_28d,holiday_aware,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,2241777.4875633167,136.6802072833797
+development,outage_28d,holiday_aware,taux_occupation,2024-12-19,120,120,0,0,120,0,0,120,0,0,5874.397264560573,6.9966642436238695
+development,outage_28d,holiday_aware,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,14181650.088131648,343.7737881239596
+development,outage_28d,holiday_aware,taux_occupation,2024-12-26,120,113,7,0,113,0,0,120,0,0,4791.424057969913,6.511680490771413
+development,outage_28d,holiday_aware,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1105050.996149309,96.36463472033768
+development,outage_28d,holiday_aware,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1149.007605505333,3.1073342428331507
+development,outage_28d,holiday_aware,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1100332.6182100817,170.1649832716598
+development,outage_28d,holiday_aware,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,8251.602454876018,14.735923215837314
+development,outage_28d,holiday_aware,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,531157.9391006774,74.7739005339414
+development,outage_28d,holiday_aware,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,495.9880184315531,2.2849346839255213
+development,outage_28d,holiday_aware,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2350685.1668276973,142.35352928620622
+development,outage_28d,holiday_aware,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,2919.8389140336794,5.017073362128562
+development,outage_28d,previous_week,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,3618965.1537921843,201.64952223570904
+development,outage_28d,previous_week,taux_occupation,2024-11-07,120,89,31,0,89,0,0,120,0,0,2904.626753122584,5.7128150375329625
+development,outage_28d,previous_week,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,2241777.4875633167,136.6802072833797
+development,outage_28d,previous_week,taux_occupation,2024-12-19,120,120,0,0,120,0,0,120,0,0,5874.397264560573,6.9966642436238695
+development,outage_28d,previous_week,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,14181650.088131648,343.7737881239596
+development,outage_28d,previous_week,taux_occupation,2024-12-26,120,113,7,0,113,0,0,120,0,0,4791.424057969913,6.511680490771413
+development,outage_28d,previous_week,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1105050.996149309,96.36463472033768
+development,outage_28d,previous_week,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1149.007605505333,3.1073342428331507
+development,outage_28d,previous_week,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1100332.6182100817,170.1649832716598
+development,outage_28d,previous_week,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,8251.602454876018,14.735923215837314
+development,outage_28d,previous_week,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,531157.9391006774,74.7739005339414
+development,outage_28d,previous_week,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,495.9880184315531,2.2849346839255213
+development,outage_28d,previous_week,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2350685.1668276973,142.35352928620622
+development,outage_28d,previous_week,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,2919.8389140336794,5.017073362128562
+development,outage_28d,four_week,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,3618965.1537921843,201.64952223570904
+development,outage_28d,four_week,taux_occupation,2024-11-07,120,89,31,0,89,0,0,120,0,0,2904.626753122584,5.7128150375329625
+development,outage_28d,four_week,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,2241777.4875633167,136.6802072833797
+development,outage_28d,four_week,taux_occupation,2024-12-19,120,120,0,0,120,0,0,120,0,0,5874.397264560573,6.9966642436238695
+development,outage_28d,four_week,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,14181650.088131648,343.7737881239596
+development,outage_28d,four_week,taux_occupation,2024-12-26,120,113,7,0,113,0,0,120,0,0,4791.424057969913,6.511680490771413
+development,outage_28d,four_week,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1105050.996149309,96.36463472033768
+development,outage_28d,four_week,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1149.007605505333,3.1073342428331507
+development,outage_28d,four_week,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1100332.6182100817,170.1649832716598
+development,outage_28d,four_week,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,8251.602454876018,14.735923215837314
+development,outage_28d,four_week,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,531157.9391006774,74.7739005339414
+development,outage_28d,four_week,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,495.9880184315531,2.2849346839255213
+development,outage_28d,four_week,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2350685.1668276973,142.35352928620622
+development,outage_28d,four_week,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,2919.8389140336794,5.017073362128562
+development,outage_90d,day_type,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,4576739.333661281,226.76868711722153
+development,outage_90d,day_type,taux_occupation,2024-11-07,120,89,31,0,89,0,0,120,0,0,3179.072057082563,5.9766136527080835
+development,outage_90d,day_type,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,2189855.7149775284,135.0881105975383
+development,outage_90d,day_type,taux_occupation,2024-12-19,120,120,0,0,120,0,0,120,0,0,6323.155821932118,7.258992022503376
+development,outage_90d,day_type,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,14154358.202159816,343.442840976484
+development,outage_90d,day_type,taux_occupation,2024-12-26,120,113,7,0,113,0,0,120,0,0,5067.203794645242,6.696455141120378
+development,outage_90d,day_type,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1055805.0729695726,94.19294844923071
+development,outage_90d,day_type,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1169.4542360918829,3.1348598887000563
+development,outage_90d,day_type,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1098610.6915189938,170.03178429797316
+development,outage_90d,day_type,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,8293.899280277406,14.77364231920217
+development,outage_90d,day_type,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,569936.762830094,77.45537002416253
+development,outage_90d,day_type,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,538.1716188050768,2.3801185702553753
+development,outage_90d,day_type,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2376337.580997279,143.1281551676702
+development,outage_90d,day_type,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,2940.5025932480894,5.034794959739816
+development,outage_90d,holiday_aware,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,4576739.333661281,226.76868711722153
+development,outage_90d,holiday_aware,taux_occupation,2024-11-07,120,89,31,0,89,0,0,120,0,0,3179.072057082563,5.9766136527080835
+development,outage_90d,holiday_aware,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,2189855.7149775284,135.0881105975383
+development,outage_90d,holiday_aware,taux_occupation,2024-12-19,120,120,0,0,120,0,0,120,0,0,6323.155821932118,7.258992022503376
+development,outage_90d,holiday_aware,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,14154358.202159816,343.442840976484
+development,outage_90d,holiday_aware,taux_occupation,2024-12-26,120,113,7,0,113,0,0,120,0,0,5067.203794645242,6.696455141120378
+development,outage_90d,holiday_aware,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1055805.0729695726,94.19294844923071
+development,outage_90d,holiday_aware,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1169.4542360918829,3.1348598887000563
+development,outage_90d,holiday_aware,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1098610.6915189938,170.03178429797316
+development,outage_90d,holiday_aware,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,8293.899280277406,14.77364231920217
+development,outage_90d,holiday_aware,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,569936.762830094,77.45537002416253
+development,outage_90d,holiday_aware,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,538.1716188050768,2.3801185702553753
+development,outage_90d,holiday_aware,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2376337.580997279,143.1281551676702
+development,outage_90d,holiday_aware,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,2940.5025932480894,5.034794959739816
+development,outage_90d,previous_week,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,4576739.333661281,226.76868711722153
+development,outage_90d,previous_week,taux_occupation,2024-11-07,120,89,31,0,89,0,0,120,0,0,3179.072057082563,5.9766136527080835
+development,outage_90d,previous_week,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,2189855.7149775284,135.0881105975383
+development,outage_90d,previous_week,taux_occupation,2024-12-19,120,120,0,0,120,0,0,120,0,0,6323.155821932118,7.258992022503376
+development,outage_90d,previous_week,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,14154358.202159816,343.442840976484
+development,outage_90d,previous_week,taux_occupation,2024-12-26,120,113,7,0,113,0,0,120,0,0,5067.203794645242,6.696455141120378
+development,outage_90d,previous_week,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1055805.0729695726,94.19294844923071
+development,outage_90d,previous_week,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1169.4542360918829,3.1348598887000563
+development,outage_90d,previous_week,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1098610.6915189938,170.03178429797316
+development,outage_90d,previous_week,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,8293.899280277406,14.77364231920217
+development,outage_90d,previous_week,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,569936.762830094,77.45537002416253
+development,outage_90d,previous_week,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,538.1716188050768,2.3801185702553753
+development,outage_90d,previous_week,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2376337.580997279,143.1281551676702
+development,outage_90d,previous_week,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,2940.5025932480894,5.034794959739816
+development,outage_90d,four_week,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,4576739.333661281,226.76868711722153
+development,outage_90d,four_week,taux_occupation,2024-11-07,120,89,31,0,89,0,0,120,0,0,3179.072057082563,5.9766136527080835
+development,outage_90d,four_week,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,2189855.7149775284,135.0881105975383
+development,outage_90d,four_week,taux_occupation,2024-12-19,120,120,0,0,120,0,0,120,0,0,6323.155821932118,7.258992022503376
+development,outage_90d,four_week,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,14154358.202159816,343.442840976484
+development,outage_90d,four_week,taux_occupation,2024-12-26,120,113,7,0,113,0,0,120,0,0,5067.203794645242,6.696455141120378
+development,outage_90d,four_week,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1055805.0729695726,94.19294844923071
+development,outage_90d,four_week,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1169.4542360918829,3.1348598887000563
+development,outage_90d,four_week,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1098610.6915189938,170.03178429797316
+development,outage_90d,four_week,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,8293.899280277406,14.77364231920217
+development,outage_90d,four_week,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,569936.762830094,77.45537002416253
+development,outage_90d,four_week,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,538.1716188050768,2.3801185702553753
+development,outage_90d,four_week,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2376337.580997279,143.1281551676702
+development,outage_90d,four_week,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,2940.5025932480894,5.034794959739816
+development,outage_180d,day_type,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,8169067.689133253,302.9641520147089
+development,outage_180d,day_type,taux_occupation,2024-11-07,120,89,31,0,89,0,0,120,0,0,3734.2402172156753,6.477480625182474
+development,outage_180d,day_type,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,4057449.2938519684,183.88060650532563
+development,outage_180d,day_type,taux_occupation,2024-12-19,120,120,0,0,120,0,0,120,0,0,5568.059649704132,6.811791033264877
+development,outage_180d,day_type,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,21522983.180305477,423.50701667057695
+development,outage_180d,day_type,taux_occupation,2024-12-26,120,113,7,0,113,0,0,120,0,0,5220.859870707099,6.797227356854468
+development,outage_180d,day_type,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1114284.8550388094,96.7664108957083
+development,outage_180d,day_type,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1301.0617645574546,3.30655290886722
+development,outage_180d,day_type,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1057566.3206974834,166.8253357554954
+development,outage_180d,day_type,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,7899.109037237516,14.417742210679828
+development,outage_180d,day_type,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,597919.6421830953,79.33404672867994
+development,outage_180d,day_type,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,553.8343977832702,2.414505283932857
+development,outage_180d,day_type,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2424883.723965128,144.58274459347538
+development,outage_180d,day_type,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,3009.5471663584503,5.09356183076045
+development,outage_180d,holiday_aware,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,8169067.689133253,302.9641520147089
+development,outage_180d,holiday_aware,taux_occupation,2024-11-07,120,89,31,0,89,0,0,120,0,0,3734.2402172156753,6.477480625182474
+development,outage_180d,holiday_aware,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,4057449.2938519684,183.88060650532563
+development,outage_180d,holiday_aware,taux_occupation,2024-12-19,120,120,0,0,120,0,0,120,0,0,5568.059649704132,6.811791033264877
+development,outage_180d,holiday_aware,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,21522983.180305477,423.50701667057695
+development,outage_180d,holiday_aware,taux_occupation,2024-12-26,120,113,7,0,113,0,0,120,0,0,5220.859870707099,6.797227356854468
+development,outage_180d,holiday_aware,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1114284.8550388094,96.7664108957083
+development,outage_180d,holiday_aware,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1301.0617645574546,3.30655290886722
+development,outage_180d,holiday_aware,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1057566.3206974834,166.8253357554954
+development,outage_180d,holiday_aware,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,7899.109037237516,14.417742210679828
+development,outage_180d,holiday_aware,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,597919.6421830953,79.33404672867994
+development,outage_180d,holiday_aware,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,553.8343977832702,2.414505283932857
+development,outage_180d,holiday_aware,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2424883.723965128,144.58274459347538
+development,outage_180d,holiday_aware,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,3009.5471663584503,5.09356183076045
+development,outage_180d,previous_week,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,8169067.689133253,302.9641520147089
+development,outage_180d,previous_week,taux_occupation,2024-11-07,120,89,31,0,89,0,0,120,0,0,3734.2402172156753,6.477480625182474
+development,outage_180d,previous_week,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,4057449.2938519684,183.88060650532563
+development,outage_180d,previous_week,taux_occupation,2024-12-19,120,120,0,0,120,0,0,120,0,0,5568.059649704132,6.811791033264877
+development,outage_180d,previous_week,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,21522983.180305477,423.50701667057695
+development,outage_180d,previous_week,taux_occupation,2024-12-26,120,113,7,0,113,0,0,120,0,0,5220.859870707099,6.797227356854468
+development,outage_180d,previous_week,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1114284.8550388094,96.7664108957083
+development,outage_180d,previous_week,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1301.0617645574546,3.30655290886722
+development,outage_180d,previous_week,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1057566.3206974834,166.8253357554954
+development,outage_180d,previous_week,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,7899.109037237516,14.417742210679828
+development,outage_180d,previous_week,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,597919.6421830953,79.33404672867994
+development,outage_180d,previous_week,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,553.8343977832702,2.414505283932857
+development,outage_180d,previous_week,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2424883.723965128,144.58274459347538
+development,outage_180d,previous_week,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,3009.5471663584503,5.09356183076045
+development,outage_180d,four_week,debit_horaire,2024-11-07,120,89,31,0,89,0,0,120,0,0,8169067.689133253,302.9641520147089
+development,outage_180d,four_week,taux_occupation,2024-11-07,120,89,31,0,89,0,0,120,0,0,3734.2402172156753,6.477480625182474
+development,outage_180d,four_week,debit_horaire,2024-12-19,120,120,0,0,120,0,0,120,0,0,4057449.2938519684,183.88060650532563
+development,outage_180d,four_week,taux_occupation,2024-12-19,120,120,0,0,120,0,0,120,0,0,5568.059649704132,6.811791033264877
+development,outage_180d,four_week,debit_horaire,2024-12-26,120,120,0,0,120,0,0,120,0,0,21522983.180305477,423.50701667057695
+development,outage_180d,four_week,taux_occupation,2024-12-26,120,113,7,0,113,0,0,120,0,0,5220.859870707099,6.797227356854468
+development,outage_180d,four_week,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,1114284.8550388094,96.7664108957083
+development,outage_180d,four_week,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1301.0617645574546,3.30655290886722
+development,outage_180d,four_week,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1057566.3206974834,166.8253357554954
+development,outage_180d,four_week,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,7899.109037237516,14.417742210679828
+development,outage_180d,four_week,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,597919.6421830953,79.33404672867994
+development,outage_180d,four_week,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,553.8343977832702,2.414505283932857
+development,outage_180d,four_week,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2424883.723965128,144.58274459347538
+development,outage_180d,four_week,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,3009.5471663584503,5.09356183076045
+development,outage_365d,day_type,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,4211129.224562784,188.11602946730616
+development,outage_365d,day_type,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1997.896169218118,4.097443524785633
+development,outage_365d,day_type,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1220069.9035424248,179.1845493473158
+development,outage_365d,day_type,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,7557.500720167732,14.102538704047255
+development,outage_365d,day_type,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,661516.4893283201,83.44657851951688
+development,outage_365d,day_type,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,662.5311789720209,2.640835551531333
+development,outage_365d,day_type,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2502977.886685552,146.89246262104618
+development,outage_365d,day_type,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,3228.2127677932026,5.275359742426138
+development,outage_365d,holiday_aware,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,4211129.224562784,188.11602946730616
+development,outage_365d,holiday_aware,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1997.896169218118,4.097443524785633
+development,outage_365d,holiday_aware,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1220069.9035424248,179.1845493473158
+development,outage_365d,holiday_aware,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,7557.500720167732,14.102538704047255
+development,outage_365d,holiday_aware,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,661516.4893283201,83.44657851951688
+development,outage_365d,holiday_aware,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,662.5311789720209,2.640835551531333
+development,outage_365d,holiday_aware,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2502977.886685552,146.89246262104618
+development,outage_365d,holiday_aware,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,3228.2127677932026,5.275359742426138
+development,outage_365d,previous_week,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,4211129.224562784,188.11602946730616
+development,outage_365d,previous_week,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1997.896169218118,4.097443524785633
+development,outage_365d,previous_week,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1220069.9035424248,179.1845493473158
+development,outage_365d,previous_week,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,7557.500720167732,14.102538704047255
+development,outage_365d,previous_week,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,661516.4893283201,83.44657851951688
+development,outage_365d,previous_week,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,662.5311789720209,2.640835551531333
+development,outage_365d,previous_week,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2502977.886685552,146.89246262104618
+development,outage_365d,previous_week,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,3228.2127677932026,5.275359742426138
+development,outage_365d,four_week,debit_horaire,2025-04-17,120,119,1,0,119,0,0,120,0,0,4211129.224562784,188.11602946730616
+development,outage_365d,four_week,taux_occupation,2025-04-17,120,119,1,0,119,0,0,120,0,0,1997.896169218118,4.097443524785633
+development,outage_365d,four_week,debit_horaire,2025-07-10,120,38,82,0,38,0,0,120,0,0,1220069.9035424248,179.1845493473158
+development,outage_365d,four_week,taux_occupation,2025-07-10,120,38,82,0,38,0,0,120,0,0,7557.500720167732,14.102538704047255
+development,outage_365d,four_week,debit_horaire,2025-10-16,120,95,25,0,95,0,0,120,0,0,661516.4893283201,83.44657851951688
+development,outage_365d,four_week,taux_occupation,2025-10-16,120,95,25,0,95,0,0,120,0,0,662.5311789720209,2.640835551531333
+development,outage_365d,four_week,debit_horaire,2025-11-06,120,116,4,0,116,0,0,120,0,0,2502977.886685552,146.89246262104618
+development,outage_365d,four_week,taux_occupation,2025-11-06,120,116,4,0,116,0,0,120,0,0,3228.2127677932026,5.275359742426138

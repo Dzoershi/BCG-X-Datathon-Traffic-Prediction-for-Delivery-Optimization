@@ -1,0 +1,17 @@
+{
+  "full_test_command": "python -m pytest -q",
+  "passed": 785,
+  "skipped": 1,
+  "subtests_passed": 27,
+  "complete_offline_runs": 2,
+  "all_nine_artifact_hashes_identical": true,
+  "independent_verification": {
+    "hourly_rows": 91920,
+    "aggregate_rows_independently_checked": 2106,
+    "comparison_alignment_verified": true,
+    "hourly_sha256": "af1ea422b159e898a87be7a910fdfd494339e809f5401e561c24032de47d80df"
+  },
+  "submission_rows": 360,
+  "submission_sha256": "4e4413d3d50b713e4e27c090e2279f3c81b3f3492ba71bf9dc6d968ac13f82ee",
+  "input_code_environment_checks_passed": true
+}
