@@ -1,0 +1,13 @@
+{
+  "artifact_sha256": {
+    "hourly_predictions.parquet": "af1ea422b159e898a87be7a910fdfd494339e809f5401e561c24032de47d80df",
+    "output_baseline54.csv": "4e4413d3d50b713e4e27c090e2279f3c81b3f3492ba71bf9dc6d968ac13f82ee",
+    "per_arc.csv": "a040b4817ecb6ec6662fcc26154122d8943df3de7bc64fa9e29d244b78c1de66",
+    "per_day_kind.csv": "0b3dab998c8983f4833b10cb139a9574fd5f5c1a2968b35632e0ccda6c55a637",
+    "per_forecast_source.csv": "735f54aa6de32dcfaea088c03cafef6c54574562d0b7222538c7fa9ac680eaf5",
+    "per_window.csv": "955200e8fa9494f14873076ec9bf4ba533eec49f9b59a30954a154e12f99a16f",
+    "scores.csv": "47220064c00f216cd8640d45f650a1063b9c23bff8bb5cf1b277110b9911f5cf",
+    "submission_sources.csv": "5b6e2c7ac14cd04740a3f2755061f082edabde3bd252343278ea270d0c9a8221",
+    "summary.csv": "3c36450339bf644e81c30401e3e480ee450dff9e9b42afd63fd76896d6494e55"
+  }
+}

@@ -71,9 +71,15 @@ def load_data(end: str | None = None) -> tuple[pd.DataFrame, pd.DataFrame | None
     return data, covariates, source
 
 
-def build_models(calendar: pd.DataFrame, covariates: pd.DataFrame | None) -> dict:
-    """Name -> factory. Settings are explicit so that a name always means the same model."""
-    from traffic_prediction.models.baselines import DayTypeProfileBaseline, HolidayAwarePreviousWeekBaseline
+def build_models(calendar: pd.DataFrame, covariates: pd.DataFrame):
+    """Name -> factory. Settings are explicit."""
+
+    from traffic_prediction.models.baselines import (
+        DayTypeProfileBaseline,
+        HolidayAwarePreviousWeekBaseline,
+        PreviousWeekBaseline,
+        FourWeekMeanBaseline,
+    )
 
     def lightgbm():
         from traffic_prediction.train import LightGBMForecaster
@@ -101,6 +107,8 @@ def build_models(calendar: pd.DataFrame, covariates: pd.DataFrame | None) -> dic
         "ensemble_e5": ensemble,
         "baseline_holiday_aware": lambda: HolidayAwarePreviousWeekBaseline(calendar),
         "baseline_day_type": lambda: DayTypeProfileBaseline(calendar),
+        "baseline_previous_week": lambda: PreviousWeekBaseline(calendar),
+        "baseline_four_week": lambda: FourWeekMeanBaseline(calendar),
         "lightgbm_raw": lightgbm,
         "chronos2": chronos,
         "timestral_5m": timestral("5M"),

@@ -1,0 +1,6 @@
+arc,expected_id,upstream,downstream,measurement_ids,reference_ids,reverse_measurement_ids,reverse_checked,snapshot_ids_match,checked_at_utc
+Champs-Elysées,4264,Av_Champs_Elysees-Washington,Av_Champs_Elysees-Berri,4264,4264,4262,True,True,2026-11-06T09:53:52.248164+00:00
+Convention,5671,Lecourbe-Convention,Convention-Blomet,5671,5671,5672,True,True,2026-11-06T09:53:52.248164+00:00
+Saint-Pères,191,Sts_Peres-Voltaire,Sts_Peres-Universite,191,191,,True,True,2026-11-06T09:53:52.248164+00:00
+Champs-Elysées proxy La Boétie-Berri,4272,Av_Champs_Elysees-La_Boetie,Av_Champs_Elysees-Berri,4272,4272,4274,True,True,2026-11-06T09:53:52.248164+00:00
+Champs-Elysées proxy Washington-Balzac,4265,Av_Champs_Elysees-Washington,Av_Champs_Elysees-Balzac,4265,4265,4267,True,True,2026-11-06T09:53:52.248164+00:00

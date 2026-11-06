@@ -1541,3 +1541,17 @@ préserve les prédictions non corrigées et journalise chaque décision et ajus
 Documenter une décision quand elle est prise : ce qui change, sa raison, le comportement réellement implémenté, la validation effectuée et les limites restantes. Un résultat chiffré doit être accompagné de sa période et de sa provenance. Une proposition non testée reste une proposition.
 
 Le code et les tests décrivent le comportement technique ; les constats exploratoires justifient ou interrogent les choix métier ; le brief reste la référence pour arbitrer le périmètre. Aucun statut d'issue ou succès de tests de données ne signifie, à lui seul, que les livrables de prévision et de présentation sont terminés.
+
+## Frozen baseline reference (issue #54)
+
+The completed [baseline freeze](baseline_freeze/README.md) selects `DayTypeProfileBaseline`
+on the aligned three-arc #53 truth policy: development pooled RMSE 145.13 vehicles/hour
+and 4.24 occupancy points. Four existing baselines, holiday/day-kind diagnostics, per-arc
+coverage, simulated Champs outages and proxy alternatives are retained. Earlier two-arc
+scores above remain historical experiments and cannot be compared directly to this pool.
+This reference does not change production E5 or its internal holiday-aware fallback.
+
+The versioned compact inputs end at 2026-11-05 23:00; November 7–11 remains unobserved test
+truth. In the recorded Python 3.11.8 environment (`requirements-baseline54.txt`), run
+`python -m traffic_prediction.baseline_freeze` to reproduce the scores, all source labels
+and a twice-exported 360-row submission, checked against frozen artifact hashes.
